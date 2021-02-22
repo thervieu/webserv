@@ -7,27 +7,78 @@ bool		isSkippable(std::string line)
 	return (false);
 }
 
-std::vector<std::string>	breakDown(std::vector<std::string> previousVector, std::string line)
+std::string		readFile(std::string _fileName)
 {
-	size_t	i = 0;
-	size_t	j;
-	std::vector<std::string> newVector = previousVector;
+	char buffer[BUFFER_SIZE + 1];
+	std::string rtn;
+	int rtn_value;
+	int fd;
+
+	fd = open(_fileName.c_str(), O_RDONLY);
+	if (fd < -1)
+	{
+		std::cout << "Error: couldn't open " << _fileName << std::endl;
+		exit(0);
+	}
+	while ((rtn_value = read(fd, buffer, BUFFER_SIZE)) > 0)
+	{
+		rtn += buffer;
+	}
+	if (rtn_value < 0)
+	{
+		std::cout << "Error: problem when reading " << _fileName << std::endl;
+		exit(0);
+	}
+	close(fd);
+	return (rtn);
+}
+
+std::vector<std::string>	splitSpaces(std::string line)
+{
+	std::vector<std::string>	rtn_vector;
+	int i = 0;
+	int j;
+
 	while (line[i])
 	{
 		j = 0;
 		while (std::isspace(line[i]))
 			i++;
-		while (line[i + j] && !std::isspace(line[i + j]) && line[i + j] != '#')
+		while (line[i + j] && !std::isspace(line[i + j]))
 			j++;
-		if (!line[i + j] || line[i + j] == '#')
-		{
-			newVector.push_back(std::string(line, i, j));
+		if (j != 0)
+			rtn_vector.push_back(std::string(line, i, j));
+		if (!line[i + j])
 			break;
-		}
-		newVector.push_back(std::string(line, i, j));
 		i = i + j + 1;
 	}
-	return (newVector);
+	return (rtn_vector);
+}
+
+std::vector<std::string>	createVectorLines(std::string file)
+{
+	std::vector<std::string> rtn;
+	size_t	i = 0;
+	size_t	j;
+	while (file[i])
+	{
+		j = 0;
+		if (file[i] == '\n')
+			i++;
+		while (std::isspace(file[i]))
+			i++;
+		while (file[i + j] && file[i + j] != '\n' && file[i + j] != '#')
+			j++;
+		if (j != 0)
+			rtn.push_back(std::string(file, i, j));
+		if (!file[i + j])
+			break;
+		else if (file[i + j] == '#')
+			while (file[i + j] && file[i + j] != '\n')
+				j++;
+		i = i + j + 1;
+	}
+	return (rtn);
 }
 
 int			main(int ac, char **av)
@@ -37,28 +88,8 @@ int			main(int ac, char **av)
 		std::cout << "Format: ./webserv [path_to_configuration_file]" << std::endl;
 		return (1);
 	}
-	std::ifstream config_file(av[1]);
+	std::string config_file = av[1];
+	Config _config = Config(config_file);
 
-	if (!config_file)
-	{
-		std::cout << "Could not open " << av[1] << std::endl;
-		return (1);
-	}
-
-	std::string line;
-	std::vector<std::string> _configFile;
-	while (getline(config_file, line))
-	{
-		if (isSkippable(line))
-			continue;
-		_configFile = breakDown(_configFile, line);
-	}
-	size_t size = _configFile.size();
-	size_t i = 0;
-	while (i < size)
-	{
-		std::cout << _configFile[i] << " - ";
-		i++;
-	}
 	return (0);
 }
