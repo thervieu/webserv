@@ -7,10 +7,10 @@ class location
 {
 	public:
 
-		std::vector<std::string>	_file_extensions;
-		std::vector<std::string>	_cgi_path;
-		std::vector<std::string>	_indexes;
+		std::vector<std::string>	_cgi_extensions;
 		std::vector<std::string>	_methods;
+		std::string					_index;
+		std::string					_cgi_path;
 		std::string					_root;
 		std::string					_upload_path;
 		size_t						_client_max_body_size;
@@ -36,11 +36,11 @@ class Config
 
 		std::vector<server>	_servers;
 		size_t				parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
-		size_t				parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
+		location			parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
 		void				parseConfig(std::string file);
 		void				parseDirective(std::vector<std::string> splittedLine, bool name);
 		void				parseServerDirectives(server _server, std::vector<std::string> splittedLine);
-		void				parseLocationDirectives(location _location, std::vector<std::string> splittedLine);
+		void				parseLocationDirectives(location &_loc, std::vector<std::string> splittedLine);
 
 	public:
 
@@ -58,6 +58,18 @@ static const char * server_directives[] =
 	"root",
 	"server_name",
 	"error_page",
+	NULL
+};
+
+static const char * valid_methods[] =
+{
+	"GET",
+	"HEAD",
+	"POST",
+	"PUT",
+	"DELETE",
+	"TRACE",
+	"CONNECT",
 	NULL
 };
 
