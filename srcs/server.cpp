@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <iostream>
+#include <string>
 #define PORT 8080
 
 int main(int argc, char const *argv[])
@@ -16,9 +18,8 @@ int main(int argc, char const *argv[])
 	int					opt = 1;
 	int					addrlen = sizeof(address);
 	char				buffer[1024] = {0};
-	char				*message;
+	std::string			message("Hello from server!");
 
-	message = "Hello from server";
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
@@ -48,8 +49,8 @@ int main(int argc, char const *argv[])
 		exit(EXIT_FAILURE);
 	}
 	valread = read(new_socket, buffer, 1024);
-	printf("%s\n",buffer );
-	send(new_socket , message , strlen(message), 0);
-	printf("Hello message sent\n");
+	std::cout << buffer << std::endl;
+	send(new_socket , &message.at(0) , message.size(), 0);
+	std::cout << "Hello message sent" << std::endl;
 	return 0;
 }

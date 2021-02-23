@@ -3,7 +3,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <string.h>
+#include <string>
+#include <iostream>
 # define PORT 8080
 
 int main(int argc, char const *argv[])
@@ -11,7 +12,7 @@ int main(int argc, char const *argv[])
 	int					sock = 0;
 	int					valread;
 	struct sockaddr_in	serv_addr;
-	char				*message = "Hello from client";
+	std::string			message("Hello from client");
 	char				buffer[1024] = {0};
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -32,9 +33,9 @@ int main(int argc, char const *argv[])
 		printf("\nConnection Failed \n");
 		return (-1);
 	}
-	send(sock, message, strlen(message), 0);
-	printf("Hello message sent\n");
+	send(sock, (char *)&message.at(0), message.size(), 0);
+	std::cout << "Hello message sent" << std::endl;
 	valread = read(sock , buffer, 1024);
-	printf("%s\n",buffer );
+	std::cout << buffer << std::endl;
 	return 0;
 }
