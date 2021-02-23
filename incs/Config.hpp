@@ -3,47 +3,51 @@
 
 # include "webserv.hpp"
 
-struct location
+class location
 {
-	std::string	_root;
-	std::vector<std::string> _methods;
-	bool		_autoindex;
-	std::vector<std::string> _indexes;
-	bool		_upload;
-	std::string	_upload_path;
-	std::vector<std::string> _file_extensions;
-	std::vector<std::string> _cgi_path;
-	size_t		_client_max_body_size;
+	public:
+
+		std::vector<std::string>	_file_extensions;
+		std::vector<std::string>	_cgi_path;
+		std::vector<std::string>	_indexes;
+		std::vector<std::string>	_methods;
+		std::string					_root;
+		std::string					_upload_path;
+		size_t						_client_max_body_size;
+		bool						_autoindex;
+		bool						_upload;
 };
 
-struct	server
+class server
 {
-	size_t		_port;
-	std::string	_root;
-	std::string	_host;
-	std::vector<std::string>	_names;
-	std::vector<std::string>	_error_pages;
-	std::vector<location>		_locations;
+	public:
+
+		size_t						_port;
+		std::string					_root;
+		std::string					_host;
+		std::vector<std::string>	_names;
+		std::vector<std::string>	_error_pages;
+		std::vector<location>		_locations;
 };
 
 class Config
 {
 	private:
 
-		std::vector<server> _servers;
-		void	parseConfig(std::string file);
-		void	parseDirective(std::vector<std::string> splittedLine, bool name);
-		size_t	parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
-		void	parseServerDirectives(server _server, std::vector<std::string> splittedLine);
-		size_t	parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
-		void	parseLocationDirectives(location _location, std::vector<std::string> splittedLine);
+		std::vector<server>	_servers;
+		size_t				parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
+		size_t				parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
+		void				parseConfig(std::string file);
+		void				parseDirective(std::vector<std::string> splittedLine, bool name);
+		void				parseServerDirectives(server _server, std::vector<std::string> splittedLine);
+		void				parseLocationDirectives(location _location, std::vector<std::string> splittedLine);
 
 	public:
 
 		Config(void);
 		Config(std::string file);
-		Config &operator=(const Config &other);
 		~Config(void);
+		Config				&operator=(const Config &other);
 		std::vector<server>	getServers(void);
 
 };

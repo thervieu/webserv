@@ -15,7 +15,7 @@
 
 std::vector<std::string>	createVectorLines(std::string file);
 std::vector<std::string>	splitSpaces(std::string line);
-std::string		readFile(std::string _fileName);
+std::string					readFile(std::string _fileName);
 
 #define BUFFER_SIZE 10000
 
