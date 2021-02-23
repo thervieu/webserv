@@ -103,7 +103,7 @@ void	Config::parseDirective(std::vector<std::string> splittedLine, bool name)
 {
 	if (splittedLine.size() < 2)
 	{
-		std::cout << "SyntaxError: Directives should have at least one argument" << std::endl;
+		std::cout << "SyntaxError: Directives should have at least one argument: " << splittedLine[0] << std::endl;
 		exit(1);
 	}
 	if (splittedLine[splittedLine.size() - 1][splittedLine[splittedLine.size() - 1].length() - 1] != ';')
@@ -131,17 +131,34 @@ size_t	Config::parseServer(std::vector<std::string> lines, size_t start, size_t 
 	std::vector<std::string>	splittedLine;
 
 	server _server; /* = defaultServer();*/
-	while (start < end)
+	while (start < end - 1)
 	{
 		splittedLine = splitSpaces(lines[start]);
 		if (splittedLine[0] == "location")
-			start = parseLocation(lines, start + 1, getNbLastLine(lines, start));
+		{
+			_server._locations.push_back(parseLocation(lines, start + 1, getNbLastLine(lines, start)));
+			start = getNbLastLine(lines, start);
+		}
 		else
 			parseServerDirectives(_server, splittedLine);
 		start++;
 	}
 	_servers.push_back(_server);
 	return (end + 1);
+}
+
+
+/*
+*	returns the unsigned int format of the string given as argument
+*/
+
+size_t	stringToUnsignedInt(std::string str)
+{
+	std::istringstream stream(str);
+	size_t uInt;
+
+	stream >> uInt;
+	return (uInt);
 }
 
 /*
@@ -159,7 +176,7 @@ void	Config::parseServerDirectives(server _server, std::vector<std::string> spli
 			std::cout << "SyntaxError: " << splittedLine[0] << " [port] [host]" << std::endl;
 			exit(1);
 		}
-		//_server.port = atoi(splittedLine[1])
+		_server._port = stringToUnsignedInt(splittedLine[1]);
 		_server._host = splittedLine[2];
 	}
 	else if (splittedLine[0] == server_directives[1])
@@ -198,7 +215,7 @@ void	Config::parseServerDirectives(server _server, std::vector<std::string> spli
 *	and set them accordingly exits if a parse_error is occured
 */
 
-size_t	Config::parseLocation(std::vector<std::string> lines, size_t start, size_t end)
+location	Config::parseLocation(std::vector<std::string> lines, size_t start, size_t end)
 {
 	std::vector<std::string>	splittedLine;
 
@@ -209,7 +226,37 @@ size_t	Config::parseLocation(std::vector<std::string> lines, size_t start, size_
 		parseLocationDirectives(_location, splittedLine);
 		start++;
 	}
-	return (end + 1);
+	return (_location);
+}
+
+/*
+*	self explanatory: returns true is index is on, false if off and exits if wrong argument is given
+*/
+
+bool	onOffBool(std::string str)
+{
+	if (str == "on")
+		return (true);
+	else if (str == "off")
+		return (false);
+	std::cout << "Invalid boolean parameter: '" << str << "': should be 'on' or 'off'" << std::endl;
+	exit(1);
+}
+
+/*
+*	checks if the method is valid to HTTP 1.1 
+*/
+
+bool	isMethod(std::string str)
+{
+	size_t i = 0;
+	while (valid_methods[i])
+	{
+		if (str == valid_methods[i])
+			return (true);
+		i++;
+	}
+	return (false);
 }
 
 /*
@@ -217,10 +264,62 @@ size_t	Config::parseLocation(std::vector<std::string> lines, size_t start, size_
 *	exits if a parse_error is occured
 */
 
-// WIP
-void	Config::parseLocationDirectives(location _location, std::vector<std::string> splittedLine)
+void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> splittedLine)
 {
+	char last_char;
+
 	parseDirective(splittedLine, false);
-	(void)_location;
-	(void)splittedLine;
+
+	if (splittedLine[0] == location_directives[0])
+		_loc._root = splittedLine[1];
+	else if (splittedLine[0] == location_directives[1])
+	{
+		for (size_t i = 1; i < splittedLine.size(); ++i)
+		{
+			if (isMethod(splittedLine[i]) == false)
+			{
+				std::cout << "Invalid method: " << splittedLine[i] << std::endl;
+				exit(1);
+			}
+			else
+				_loc._methods.push_back(splittedLine[i]);
+		}
+	}
+	else if (splittedLine[0] == location_directives[2])
+		_loc._autoindex = onOffBool(splittedLine[1]);
+	else if (splittedLine[0] == location_directives[3])
+		_loc._index = splittedLine[1];
+	else if (splittedLine[0] == location_directives[4])
+		_loc._upload = onOffBool(splittedLine[1]);
+	else if (splittedLine[0] == location_directives[5])
+		_loc._upload_path = splittedLine[1];
+	else if (splittedLine[0] == location_directives[6])
+	{
+		for (size_t i = 1; i < splittedLine.size(); ++i)
+		_loc._cgi_extensions.push_back(splittedLine[i]);
+	}
+	else if (splittedLine[0] == location_directives[7])
+		_loc._cgi_path = splittedLine[1];
+	else if (splittedLine[0] == location_directives[8])
+	{
+		if (splittedLine.size() != 2)
+		{
+			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
+			exit(1);
+		}
+		_loc._client_max_body_size = stringToUnsignedInt(splittedLine[1]);
+		last_char = splittedLine[1][splittedLine[1].size() - 1];
+		if (last_char == 'K' || last_char == 'k')
+			_loc._client_max_body_size *= 1024;
+		else if (last_char == 'M' || last_char == 'm')
+			_loc._client_max_body_size *= 1024 * 1024;
+		else if (last_char == 'G' || last_char == 'G')
+			_loc._client_max_body_size *= 1024 * 1024 * 1024;
+		else if (!std::isdigit(last_char))
+		{
+			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
+			exit(1);
+		}
+	}
+	return ;
 }
