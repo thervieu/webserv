@@ -1,45 +1,52 @@
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 
+# include <map>
+
 # include "webserv.hpp"
 
 class location
 {
 	public:
 
+
 		std::vector<std::string>	_cgi_extensions;
 		std::vector<std::string>	_methods;
+		std::string					_name;
 		std::string					_index;
 		std::string					_cgi_path;
 		std::string					_root;
 		std::string					_upload_path;
+		size_t						_upload_cleanup;
 		size_t						_client_max_body_size;
 		bool						_autoindex;
 		bool						_upload;
 };
 
-class server
+class server_info
 {
 	public:
 
-		size_t						_port;
-		std::string					_root;
-		std::string					_host;
-		std::vector<std::string>	_names;
-		std::vector<std::string>	_error_pages;
-		std::vector<location>		_locations;
+		size_t							_port;
+		std::string						_root;
+		std::string						_index;
+		std::string						_host;
+		std::vector<std::string>		_names;
+		std::vector<std::string>		_error_pages;
+		std::vector<location>			_locations;
+		size_t						_client_max_body_size;
 };
 
 class Config
 {
 	private:
 
-		std::vector<server>	_servers;
+		std::vector<server_info>	_servers;
 		size_t				parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
 		location			parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
 		void				parseConfig(std::string file);
 		void				parseDirective(std::vector<std::string> splittedLine, bool name);
-		void				parseServerDirectives(server _server, std::vector<std::string> splittedLine);
+		void				parseServerDirectives(server_info _server, std::vector<std::string> splittedLine);
 		void				parseLocationDirectives(location &_loc, std::vector<std::string> splittedLine);
 
 	public:
@@ -48,7 +55,7 @@ class Config
 		Config(std::string file);
 		~Config(void);
 		Config				&operator=(const Config &other);
-		std::vector<server>	getServers(void);
+		std::vector<server_info>	getServers(void);
 
 };
 
@@ -58,6 +65,8 @@ static const char * server_directives[] =
 	"root",
 	"server_name",
 	"error_page",
+	"index",
+	"client_max_body_size",
 	NULL
 };
 
@@ -80,7 +89,8 @@ static const char * location_directives[] =
 	"autoindex",
 	"index",
 	"upload_enable",
-	"upload_path",
+	"upload_store",
+	"upload_cleanup",
 	"cgi_extension",
 	"cgi_path",
 	"client_max_body_size",

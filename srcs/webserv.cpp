@@ -1,4 +1,5 @@
 #include "../incs/webserv.hpp"
+#include "../incs/Server.hpp"
 
 bool		isSkippable(std::string line)
 {
@@ -90,6 +91,12 @@ int			main(int ac, char **av)
 	}
 	std::string config_file = av[1];
 	Config _config = Config(config_file);
+	Server _server;
+
+	for (size_t i = 0; i < _config.getServers().size(); i++)
+	{
+
+	}
 
 	return (0);
 }

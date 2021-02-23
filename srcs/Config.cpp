@@ -16,7 +16,8 @@ Config &Config::operator=(const Config &other)
 
 Config::~Config() {}
 
-std::vector<server>	Config::getServers(void)
+
+std::vector<server_info>	Config::getServers(void)
 {
 	return (_servers);
 }
@@ -113,7 +114,6 @@ void	Config::parseDirective(std::vector<std::string> splittedLine, bool name)
 	}
 	if (isDirectiveName(splittedLine[0], (name == true) ? server_directives : location_directives) == false)
 	{
-		std::cout << name << std::endl;
 		std::cout << "SyntaxError: " << splittedLine[0] << " is not a valid directive" << std::endl;
 		exit(1);
 	}
@@ -130,18 +130,20 @@ size_t	Config::parseServer(std::vector<std::string> lines, size_t start, size_t 
 {
 	std::vector<std::string>	splittedLine;
 
-	server _server; /* = defaultServer();*/
+	server_info _server; /* = defaultServer();*/
 	while (start < end - 1)
 	{
 		splittedLine = splitSpaces(lines[start]);
 		if (splittedLine[0] == "location")
 		{
-			_server._locations.push_back(parseLocation(lines, start + 1, getNbLastLine(lines, start)));
+			_server._locations.push_back(parseLocation(lines, start, getNbLastLine(lines, start)));
 			start = getNbLastLine(lines, start);
 		}
 		else
+		{
 			parseServerDirectives(_server, splittedLine);
-		start++;
+			start++;
+		}
 	}
 	_servers.push_back(_server);
 	return (end + 1);
@@ -166,9 +168,14 @@ size_t	stringToUnsignedInt(std::string str)
 *	exits if a parse_error is occured
 */
 
-void	Config::parseServerDirectives(server _server, std::vector<std::string> splittedLine)
+void	Config::parseServerDirectives(server_info _server, std::vector<std::string> splittedLine)
 {
+	char last_char;
+
 	parseDirective(splittedLine, true);
+	
+	splittedLine[splittedLine.size() - 1] = std::string(splittedLine[splittedLine.size() - 1], 0, splittedLine[splittedLine.size() - 1].length() - 1);
+	
 	if (splittedLine[0] == server_directives[0])
 	{
 		if (splittedLine.size() != 3)
@@ -186,6 +193,7 @@ void	Config::parseServerDirectives(server _server, std::vector<std::string> spli
 			std::cout << "SyntaxError: " << splittedLine[0] << " [root_path]" << std::endl;
 			exit(1);
 		}
+		_server._root = splittedLine[1];
 	}
 	else if (splittedLine[0] == server_directives[2])
 	{
@@ -199,13 +207,40 @@ void	Config::parseServerDirectives(server _server, std::vector<std::string> spli
 	}
 	else if (splittedLine[0] == server_directives[2])
 	{
-		if (splittedLine.size() != 2)
+		if (splittedLine.size() < 3)
 		{
-			std::cout << "SyntaxError: " << splittedLine[0] << " [server_name]" << std::endl;
+			std::cout << "SyntaxError: " << splittedLine[0] << " [error_number] ... [file_path]" << std::endl;
 			exit(1);
 		}
-		for (size_t i = 1; i < splittedLine.size(); i++)
-			_server._names.push_back(splittedLine[i]);
+		for (size_t i = 1; i < splittedLine.size() - 1; i++)
+		{
+			_server._error_pages.push_back(splittedLine[i]);
+			_server._error_pages.push_back(splittedLine[splittedLine.size() - 1]);
+
+		}
+	}
+	else if (splittedLine[0] == location_directives[3])
+		_server._index = splittedLine[1];
+	else if (splittedLine[0] == location_directives[4])
+	{
+		if (splittedLine.size() != 2)
+		{
+			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
+			exit(1);
+		}
+		_server._client_max_body_size = stringToUnsignedInt(splittedLine[1]);
+		last_char = splittedLine[1][splittedLine[1].size() - 1];
+		if (last_char == 'K' || last_char == 'k')
+			_server._client_max_body_size *= 1024;
+		else if (last_char == 'M' || last_char == 'm')
+			_server._client_max_body_size *= 1024 * 1024;
+		else if (last_char == 'G' || last_char == 'G')
+			_server._client_max_body_size *= 1024 * 1024 * 1024;
+		else if (!std::isdigit(last_char))
+		{
+			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
+			exit(1);
+		}
 	}
 	return ;
 }
@@ -220,6 +255,11 @@ location	Config::parseLocation(std::vector<std::string> lines, size_t start, siz
 	std::vector<std::string>	splittedLine;
 
 	location _location; /* = defaultLocation();*/
+	splittedLine = splitSpaces(lines[start]);
+	if (splittedLine.size() != 3)
+		exit(1);
+	_location._name = splittedLine[1];
+	start++;	
 	while (start < end - 1)
 	{
 		splittedLine = splitSpaces(lines[start]);
@@ -269,6 +309,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 	char last_char;
 
 	parseDirective(splittedLine, false);
+	splittedLine[splittedLine.size() - 1] = std::string(splittedLine[splittedLine.size() - 1], 0, splittedLine[splittedLine.size() - 1].length() - 1);
 
 	if (splittedLine[0] == location_directives[0])
 		_loc._root = splittedLine[1];
@@ -294,13 +335,15 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 	else if (splittedLine[0] == location_directives[5])
 		_loc._upload_path = splittedLine[1];
 	else if (splittedLine[0] == location_directives[6])
+		_loc._upload_cleanup = stringToUnsignedInt(splittedLine[1]);
+	else if (splittedLine[0] == location_directives[7])
 	{
 		for (size_t i = 1; i < splittedLine.size(); ++i)
-		_loc._cgi_extensions.push_back(splittedLine[i]);
+			_loc._cgi_extensions.push_back(splittedLine[i]);
 	}
-	else if (splittedLine[0] == location_directives[7])
-		_loc._cgi_path = splittedLine[1];
 	else if (splittedLine[0] == location_directives[8])
+		_loc._cgi_path = splittedLine[1];
+	else if (splittedLine[0] == location_directives[9])
 	{
 		if (splittedLine.size() != 2)
 		{
