@@ -90,8 +90,8 @@ int			main(int ac, char **av)
 		return (1);
 	}
 	std::string config_file = av[1];
-	Config _config = Config(config_file);
-	Server _server;
+	Config		_config(config_file);
+	Server		_server;
 
 	for (size_t i = 0; i < _config.getServers().size(); i++)
 	{

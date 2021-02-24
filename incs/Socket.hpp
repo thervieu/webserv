@@ -8,9 +8,9 @@ class Socket
 {
 	private:
 		
-		int     _id;
-		struct sockaddr_in _addr;
-		server_info _server;
+		int					_id;
+		struct sockaddr_in	_addr;
+		server_info			_server;
 
 	public:
 

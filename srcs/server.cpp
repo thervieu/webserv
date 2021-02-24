@@ -52,5 +52,6 @@ int main(int argc, char const *argv[])
 	std::cout << buffer << std::endl;
 	send(new_socket , &message.at(0) , message.size(), 0);
 	std::cout << "Hello message sent" << std::endl;
-	return 0;
+	close(new_socket);
+	return (0);
 }

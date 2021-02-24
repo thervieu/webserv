@@ -1,8 +1,9 @@
 #include "../incs/Config.hpp"
 
-Config::Config() {}
+Config::Config() : _servers(NULL)
+{}
 
-Config::Config(std::string file)
+Config::Config(std::string file) : _servers(NULL)
 {
 	parseConfig(file);
 }
@@ -356,7 +357,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 			_loc._client_max_body_size *= 1024;
 		else if (last_char == 'M' || last_char == 'm')
 			_loc._client_max_body_size *= 1024 * 1024;
-		else if (last_char == 'G' || last_char == 'G')
+		else if (last_char == 'G' || last_char == 'g')
 			_loc._client_max_body_size *= 1024 * 1024 * 1024;
 		else if (!std::isdigit(last_char))
 		{

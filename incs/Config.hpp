@@ -27,14 +27,14 @@ class server_info
 {
 	public:
 
-		size_t							_port;
 		std::string						_root;
 		std::string						_index;
 		std::string						_host;
 		std::vector<std::string>		_names;
 		std::vector<std::string>		_error_pages;
 		std::vector<location>			_locations;
-		size_t						_client_max_body_size;
+		size_t							_client_max_body_size;
+		size_t							_port;
 };
 
 class Config
