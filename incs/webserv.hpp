@@ -7,6 +7,7 @@
 # include <fcntl.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
+# include <sys/stat.h>
 
 # include <iostream>
 # include <sstream>

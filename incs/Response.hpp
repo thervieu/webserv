@@ -29,11 +29,16 @@ class Response
 		~Response();
 
 		Response	&operator=(Response const &rhs);
-		std::string	getDate(void);
+		std::string	getDate(int type);
 		std::string	getDay(long day);
 		std::string	getNumberDay(long day);
 		std::string	getCode(void);
 		std::string	getMessage(int code);
+		std::string	getLocation(std::string url);
+		std::string	getServer(void);
+		std::string	getRetryAfter(void);
+		std::string	getLastModified(const char *file);
+		std::string	getContentLength(const char *file);
 };
 
 

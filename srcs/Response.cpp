@@ -165,16 +165,20 @@ std::string		Response::getDay(long day)
 	}
 }
 
-std::string		Response::getDate()
+std::string		Response::getDate(int type)
 {
 	struct timeval	tv;
 	struct timezone	tz;
 	long			day;
 	std::string		date;
 
-	date = "Date: ";
+	date = "";
+	if (type == 0)
+		date = "Date: ";
 	gettimeofday(&tv, &tz);
 
+	if (type == 1)
+		tv.tv_sec += SEC_PER_DAY;
 	day = tv.tv_sec / SEC_PER_DAY;
 	long hms = tv.tv_sec % SEC_PER_DAY;
 
@@ -225,6 +229,8 @@ std::string		Response::getMessage(int code)
 			return ("Method Not Allowed");
 		case 406:
 			return ("Not Acceptable");
+		case 429:
+			return ("Too Many Requests");
 		case 500:
 			return ("Internal Server Error");
 		case 504:
@@ -240,6 +246,59 @@ std::string		Response::getCode()
 	//insert algo here...;
 	this->_code = 200;
 	ret += std::to_string(this->_code) + " ";
-	ret += this->getMessage(this->_code);
+	ret += this->getMessage(this->_code) + "\n";
+	return (ret);
+}
+
+std::string		Response::getLocation(std::string url)
+{
+	std::string	ret;
+
+	ret = "Location: " + url + "\n";
+	return (ret);
+}
+
+std::string		Response::getServer()
+{
+	std::string ret;
+
+	ret = "Server: Webserv/1.0";
+	return (ret);
+}
+
+std::string		Response::getRetryAfter()
+{
+	std::string	ret;
+
+	ret = "Retry-After: ";
+	if (this->_code == 429)
+		ret += "1\n";
+	else if (this->_code == 301)
+		ret += "3\n";
+	else if (this->_code == 503)
+		ret += this->getDate(1);
+}
+
+std::string		Response::getLastModified(const char *file)
+{
+	std::string	ret;
+	struct stat	time;
+	char		buff[50];
+
+	stat(file, &time);
+	ret = "Last-Modified: ";
+	strftime(buff, 50, "%a, %d %b %Y %T GMT\n", localtime(time.st_mtim));
+	ret += buff;
+	return (ret);
+}
+
+std::string		Response::getContentLength(const char *file)
+{
+	std::string	ret;
+	struct stat	stt;
+
+	stat(file, &stt);
+	ret = "Content-Length: ";
+	ret += stt.st_size;
 	return (ret);
 }
