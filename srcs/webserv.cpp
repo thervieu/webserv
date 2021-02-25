@@ -90,12 +90,12 @@ int			main(int ac, char **av)
 		return (1);
 	}
 	std::string config_file = av[1];
-	Config		_config(config_file);
-	Server		_server;
+	Config		config(config_file);
+	Server		server;
 
-	for (size_t i = 0; i < _config.getServers().size(); i++)
+	for (size_t i = 0; i < config.getServers().size(); i++)
 	{
-
+		server.addSocket(new Socket(config.getServers()[i]));
 	}
 
 	return (0);

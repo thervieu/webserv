@@ -14,6 +14,9 @@ class Server
 		Server(void);
 		Server(const Server &server);
 		~Server(void);
+
+		void	addSocket(Socket *socket);
+
 };
 
 #endif

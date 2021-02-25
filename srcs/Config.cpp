@@ -1,9 +1,9 @@
 #include "../incs/Config.hpp"
 
-Config::Config() : _servers(NULL)
+Config::Config()
 {}
 
-Config::Config(std::string file) : _servers(NULL)
+Config::Config(std::string file)
 {
 	parseConfig(file);
 }

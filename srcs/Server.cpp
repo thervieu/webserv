@@ -1,8 +1,7 @@
 #include "../incs/Server.hpp"
 
 Server::Server(void)
-{
-}
+{}
 
 Server::Server(const Server &other)
 {
@@ -10,3 +9,8 @@ Server::Server(const Server &other)
 }
 
 Server::~Server(void) {}
+
+void	Server::addSocket(Socket *socket)
+{
+	_sockets.push_back(socket);
+}
