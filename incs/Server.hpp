@@ -17,6 +17,9 @@ class Server
 
 		void	addSocket(Socket *socket);
 
+		int		getMaxFd(void);
+
+		void	select_loop(void);
 };
 
 #endif

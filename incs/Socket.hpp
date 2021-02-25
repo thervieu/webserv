@@ -8,7 +8,7 @@ class Socket
 {
 	private:
 		
-		int					_id;
+		int					_fd;
 		int					_opt;
 		struct sockaddr_in	_address;
 		server_info			_server;
@@ -19,6 +19,8 @@ class Socket
 		Socket(const Socket &other);
 		Socket(server_info _server);
 		~Socket(void);
+
+		int		getFd(void);
 
 };
 
