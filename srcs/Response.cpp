@@ -200,3 +200,46 @@ std::string		Response::getDate()
 	date += std::to_string(sec) + " GMT\n";
 	return (date);
 }
+
+std::string		Response::getMessage(int code)
+{
+	switch (code)
+	{
+		case 200:
+			return ("OK");
+		case 201:
+			return ("Created");
+		case 202:
+			return ("Accepted");
+		case 301:
+			return ("Moved Permanently");
+		case 302:
+			return ("Found");
+		case 401:
+			return ("Unauthorized");
+		case 403:
+			return ("Forbidden");
+		case 404:
+			return ("Not Found");
+		case 405:
+			return ("Method Not Allowed");
+		case 406:
+			return ("Not Acceptable");
+		case 500:
+			return ("Internal Server Error");
+		case 504:
+			return ("Gateway Time-Out");
+	}
+}
+
+std::string		Response::getCode()
+{
+	std::string	ret;
+
+	ret = "HTTP/1.1 ";
+	//insert algo here...;
+	this->_code = 200;
+	ret += std::to_string(this->_code) + " ";
+	ret += this->getMessage(this->_code);
+	return (ret);
+}
