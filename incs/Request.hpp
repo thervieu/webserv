@@ -11,6 +11,7 @@ class Request
 
 		std::string		_accept_charsets;
 		std::string		_accept_language;
+		std::string		_host;
 		std::string		_referer;
 		std::string		_user_agent;
 

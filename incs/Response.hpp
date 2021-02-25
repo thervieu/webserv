@@ -19,6 +19,7 @@ class Response
 
 		Request			_request;
 		std::string		_response;
+		int				_code;
 
 	public:
 
@@ -31,6 +32,8 @@ class Response
 		std::string	getDate(void);
 		std::string	getDay(long day);
 		std::string	getNumberDay(long day);
+		std::string	getCode(void);
+		std::string	getMessage(int code);
 };
 
 
