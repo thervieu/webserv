@@ -1,4 +1,4 @@
-#include "../incs/webserv.hpp"
+#include "../incs/Webserv.hpp"
 #include "../incs/Server.hpp"
 
 bool		isSkippable(std::string line)

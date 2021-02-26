@@ -2,7 +2,7 @@
 #ifndef REPONSE_HPP
 # define RESPONSE_HPP
 
-# include "webserv.hpp"
+# include "Webserv.hpp"
 # include "Request.hpp"
 # include <ctime>
 # include <sys/time.h>
@@ -39,6 +39,9 @@ class Response
 		std::string	getRetryAfter(void);
 		std::string	getLastModified(const char *file);
 		std::string	getContentLength(const char *file);
+		std::string	getContentType(std::string file);
+		std::string	getExtension(std::string extension);
+		std::string	getContentLanguage(void);
 };
 
 
