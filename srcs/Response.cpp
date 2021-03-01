@@ -515,5 +515,6 @@ std::string		Response::sendResponse()
 				response += this->getWWWAuthentificate() + "\n";
 		}
 	}
+	/*std::cout << response << std::endl;*/
 	return (response);
 }
