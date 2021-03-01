@@ -42,6 +42,7 @@ class Response
 		std::string	getContentType(std::string file);
 		std::string	getExtension(std::string extension);
 		std::string	getContentLanguage(void);
+		std::string	getWWWAuthentificate(void);
 };
 
 

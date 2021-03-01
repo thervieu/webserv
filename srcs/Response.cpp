@@ -287,7 +287,7 @@ std::string		Response::getLastModified(const char *file)
 
 	stat(file, &time);
 	ret = "Last-Modified: ";
-	strftime(buff, 50, "%a, %d %b %Y %T GMT\n", localtime(time.st_mtim));
+	//strftime(buff, 50, "%a, %d %b %Y %T GMT\n", localtime(&(time.st_mtim)));
 	ret += buff;
 	return (ret);
 }
@@ -305,145 +305,142 @@ std::string		Response::getContentLength(const char *file)
 
 std::string		Response::getExtension(std::string extension)
 {
-	switch (extension)
-	{
-		case ".aac":
-			return ("audio/aac");
-		case ".abw":
-			return ("application/x-abiword");
-		case ".arc":
-			return ("application/octet-stream");
-		case ".avi":
-			return ("video/x-msvideo");
-		case ".azw":
-			return ("application/vnd.amazon.ebook");
-		case ".bin":
-			return ("application/octet-stream");
-		case ".bmp":
-			return ("image/bmp");
-		case ".bz":
-			return ("application/x-bzip");
-		case ".bz2":
-			return ("application/x-bzip2");
-		case ".csh":
-			return ("application/x-csh");
-		case ".css":
-			return ("text/css");
-		case ".csv":
-			return ("text/csv");
-		case ".doc":
-			return ("application/msword");
-		case ".docx":
-			return ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-		case ".eot":
-			return ("application/vnd.ms-fontobject");
-		case ".epub":
-			return ("application/epub+zip");
-		case ".gif":
-			return ("image/gif");
-		case ".htm":
-			return ("text/html");
-		case ".html":
-			return ("text/html");
-		case ".ico":
-			return ("image/x-icon");
-		case ".ics":
-			return ("text/calendar");
-		case ".jar":
-			return ("application/java-archive");
-		case ".jpeg":
-			return ("image/jpeg");
-		case ".jpg":
-			return ("image/jpeg");
-		case ".js":
-			return ("application/javascript");
-		case ".json":
-			return ("application/json");
-		case ".mid":
-			return ("audio/midi");
-		case ".midi":
-			return ("audio/midi");
-		case ".mpeg":
-			return ("video/mpeg");
-		case ".mpkg":
-			return ("application/vnd.apple.installer+xml");
-		case ".odp":
-			return ("application/vnd.oasis.opendocument.presentation");
-		case ".ods":
-			return ("application/vnd.oasis.opendocument.spreadsheet");
-		case ".odt":
-			return ("application/vnd.oasis.opendocument.text");
-		case ".oga":
-			return ("audio/ogg");
-		case ".ogv":
-			return ("video/ogg");
-		case ".ogx":
-			return ("application/ogg");
-		case ".otf":
-			return ("font/otf");
-		case ".png":
-			return ("image/png");
-		case ".pdf":
-			return ("application/pdf");
-		case ".ppt":
-			return ("application/vnd.ms-powerpoint");
-		case ".pptx":
-			return ("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-		case ".rar":
-			return ("application/x-rar-compressed");
-		case ".rtf":
-			return ("application/rtf");
-		case ".sh":
-			return ("application/x-sh");
-		case ".svg":
-			return ("image/svg+xml");
-		case ".swf":
-			return ("application/x-shockwave-flash");
-		case ".tar":
-			return ("application/x-tar");
-		case ".tif":
-			return ("image/tiff");
-		case ".tiff":
-			return ("image/tiff");
-		case ".ts":
-			return ("application/typescript");
-		case ".ttf":
-			return ("font/ttf");
-		case ".vsd":
-			return ("application/vnd.visio");
-		case ".wav":
-			return ("audio/x-wav");
-		case ".weba":
-			return ("audio/webm");
-		case ".webm":
-			return ("video/webm");
-		case ".webp":
-			return ("image/webp");
-		case ".woff":
-			return ("font/woff");
-		case ".woff2":
-			return ("font/woff2");
-		case ".xhtml":
-			return ("application/xhtml+xml");
-		case ".xls":
-			return ("application/vnd.ms-excel");
-		case ".xlsx":
-			return ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-		case ".xml":
-			return ("application/xml");
-		case ".xul":
-			return ("application/vnd.mozilla.xul+xml");
-		case ".zip":
-			return ("application/zip");
-		case ".3gp":
-			return ("video/3gpp");
-		case ".3g2":
-			return ("video/3gpp2");
-		case ".7z":
-			return ("application/x-7z-compressed");
-		default:
-			return ("Unknown Type");
-	}
+	if (extension.compare(".aac") == 0)
+		return ("audio/aac");
+	if (extension.compare(".abw") == 0)
+		return ("application/x-abiword");
+	if (extension.compare(".arc") == 0)
+		return ("application/octet-stream");
+	if (extension.compare(".avi") == 0)
+		return ("video/x-msvideo");
+	if (extension.compare(".azw") == 0)
+		return ("application/vnd.amazon.ebook");
+	if (extension.compare(".bin") == 0)
+		return ("application/octet-stream");
+	if (extension.compare(".bmp") == 0)
+		return ("image/bmp");
+	if (extension.compare(".bz") == 0)
+		return ("application/x-bzip");
+	if (extension.compare(".bz2") == 0)
+		return ("application/x-bzip2");
+	if (extension.compare(".csh") == 0)
+		return ("application/x-csh");
+	if (extension.compare(".css") == 0)
+		return ("text/css");
+	if (extension.compare(".csv") == 0)
+		return ("text/csv");
+	if (extension.compare(".doc") == 0)
+		return ("application/msword");
+	if (extension.compare(".docx") == 0)
+		return ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+	if (extension.compare(".eot") == 0)
+		return ("application/vnd.ms-fontobject");
+	if (extension.compare(".epub") == 0)
+		return ("application/epub+zip");
+	if (extension.compare(".gif") == 0)
+		return ("image/gif");
+	if (extension.compare(".htm") == 0)
+		return ("text/html");
+	if (extension.compare(".html") == 0)
+		return ("text/html");
+	if (extension.compare(".ico") == 0)
+		return ("image/x-icon");
+	if (extension.compare(".ics") == 0)
+		return ("text/calendar");
+	if (extension.compare(".jar") == 0)
+		return ("application/java-archive");
+	if (extension.compare(".jpeg") == 0)
+		return ("image/jpeg");
+	if (extension.compare(".jpg") == 0)
+		return ("image/jpeg");
+	if (extension.compare(".js") == 0)
+		return ("application/javascript");
+	if (extension.compare(".json") == 0)
+		return ("application/json");
+	if (extension.compare(".mid") == 0)
+		return ("audio/midi");
+	if (extension.compare(".midi") == 0)
+		return ("audio/midi");
+	if (extension.compare(".mpeg") == 0)
+		return ("video/mpeg");
+	if (extension.compare(".mpkg") == 0)
+		return ("application/vnd.apple.installer+xml");
+	if (extension.compare(".odp") == 0)
+		return ("application/vnd.oasis.opendocument.presentation");
+	if (extension.compare(".ods") == 0)
+		return ("application/vnd.oasis.opendocument.spreadsheet");
+	if (extension.compare(".odt") == 0)
+		return ("application/vnd.oasis.opendocument.text");
+	if (extension.compare(".oga") == 0)
+		return ("audio/ogg");
+	if (extension.compare(".ogv") == 0)
+		return ("video/ogg");
+	if (extension.compare(".ogx") == 0)
+		return ("application/ogg");
+	if (extension.compare(".otf") == 0)
+		return ("font/otf");
+	if (extension.compare(".png") == 0)
+		return ("image/png");
+	if (extension.compare(".pdf") == 0)
+		return ("application/pdf");
+	if (extension.compare(".ppt") == 0)
+		return ("application/vnd.ms-powerpoint");
+	if (extension.compare(".pptx") == 0)
+		return ("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+	if (extension.compare(".rar") == 0)
+		return ("application/x-rar-compressed");
+	if (extension.compare(".rtf") == 0)
+		return ("application/rtf");
+	if (extension.compare(".sh") == 0)
+		return ("application/x-sh");
+	if (extension.compare(".svg") == 0)
+		return ("image/svg+xml");
+	if (extension.compare(".swf") == 0)
+		return ("application/x-shockwave-flash");
+	if (extension.compare(".tar") == 0)
+		return ("application/x-tar");
+	if (extension.compare(".tif") == 0)
+		return ("image/tiff");
+	if (extension.compare(".tiff") == 0)
+		return ("image/tiff");
+	if (extension.compare(".ts") == 0)
+		return ("application/typescript");
+	if (extension.compare(".ttf") == 0)
+		return ("font/ttf");
+	if (extension.compare(".vsd") == 0)
+		return ("application/vnd.visio");
+	if (extension.compare(".wav") == 0)
+		return ("audio/x-wav");
+	if (extension.compare(".weba") == 0)
+		return ("audio/webm");
+	if (extension.compare(".webm") == 0)
+		return ("video/webm");
+	if (extension.compare(".webp") == 0)
+		return ("image/webp");
+	if (extension.compare(".woff") == 0)
+		return ("font/woff");
+	if (extension.compare(".woff2") == 0)
+		return ("font/woff2");
+	if (extension.compare(".xhtml") == 0)
+		return ("application/xhtml+xml");
+	if (extension.compare(".xls") == 0)
+		return ("application/vnd.ms-excel");
+	if (extension.compare(".xlsx") == 0)
+		return ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	if (extension.compare(".xml") == 0)
+		return ("application/xml");
+	if (extension.compare(".xul") == 0)
+		return ("application/vnd.mozilla.xul+xml");
+	if (extension.compare(".zip") == 0)
+		return ("application/zip");
+	if (extension.compare(".3gp") == 0)
+		return ("video/3gpp");
+	if (extension.compare(".3g2") == 0)
+		return ("video/3gpp2");
+	if (extension.compare(".7z") == 0)
+		return ("application/x-7z-compressed");
+	else
+		return ("text/plain");
 }
 
 std::string		Response::getContentType(std::string file)
@@ -466,5 +463,13 @@ std::string		Response::getContentLanguage()
 	std::string	ret;
 
 	ret = "Content-Language: en-US, fr-FR\n";
+	return (ret);
+}
+
+std::string		Response::getWWWAuthentificate()
+{
+	std::string ret;
+
+	ret = "WWW-Authentificate: basic realm=\"localhost\"";
 	return (ret);
 }
