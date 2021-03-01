@@ -12,14 +12,14 @@
 
 NAME =	webserv
 
-SRCS =	webserv.cpp		\
+SRCS =	Webserv.cpp		\
 		Config.cpp		\
 		Socket.cpp		\
 		Server.cpp
 
 SRCS_DIR = ./srcs/
 
-INCS = ./incs/webserv.hpp
+INCS = ./incs/Webserv.hpp
 
 FLAGS =	-Wall -Wextra -Werror -std=c++98
 
