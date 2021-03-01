@@ -18,7 +18,8 @@ class Response
 	private:
 
 		Request			_request;
-		std::string		_response;
+		std::string		_encoding_type;
+		std::string		_content;
 		int				_code;
 
 	public:
@@ -34,16 +35,18 @@ class Response
 		std::string	getNumberDay(long day);
 		std::string	getCode(void);
 		std::string	getMessage(int code);
-		std::string	getLocation(std::string url);
+		std::string	getLocation(void);
 		std::string	getServer(void);
 		std::string	getRetryAfter(void);
-		std::string	getLastModified(const char *file);
-		std::string	getContentLength(const char *file);
-		std::string	getContentType(std::string file);
+		std::string	getLastModified(void);
+		std::string	getContentLength(void);
+		std::string	getContentType(void);
 		std::string	getExtension(std::string extension);
 		std::string	getContentLanguage(void);
 		std::string	getWWWAuthentificate(void);
-};
+		std::string getTransferEncoding(void);
 
+		std::string	sendResponse(void);
+};
 
 #endif

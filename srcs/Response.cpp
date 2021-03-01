@@ -1,15 +1,15 @@
 
 # include "../incs/Response.hpp"
 
-Response::Response() : _request(Request())
+Response::Response() : _request(Request()), _code(0), _encoding_type("plain")
 {
 }
 
-Response::Response(Request const &request) : _request(request)
+Response::Response(Request const &request) : _request(request), _code(0), _encoding_type("plain")
 {
 }
 
-Response::Response(Response const &ref) : _request(ref._request)
+Response::Response(Response const &ref) : _request(ref._request), _code(ref._code), _encoding_type(ref._encoding_type)
 {
 }
 
@@ -201,7 +201,7 @@ std::string		Response::getDate(int type)
 	date += std::to_string(min) + ":";
 	if (sec < 10)
 		date.push_back('0');
-	date += std::to_string(sec) + " GMT\n";
+	date += std::to_string(sec) + " GMT";
 	return (date);
 }
 
@@ -243,18 +243,16 @@ std::string		Response::getCode()
 	std::string	ret;
 
 	ret = "HTTP/1.1 ";
-	//insert algo here...;
-	this->_code = 200;
 	ret += std::to_string(this->_code) + " ";
-	ret += this->getMessage(this->_code) + "\n";
+	ret += this->getMessage(this->_code);
 	return (ret);
 }
 
-std::string		Response::getLocation(std::string url)
+std::string		Response::getLocation()
 {
 	std::string	ret;
 
-	ret = "Location: " + url + "\n";
+	ret = "Location: " + this->_content;
 	return (ret);
 }
 
@@ -272,32 +270,32 @@ std::string		Response::getRetryAfter()
 
 	ret = "Retry-After: ";
 	if (this->_code == 429)
-		ret += "1\n";
-	else if (this->_code == 301)
-		ret += "3\n";
-	else if (this->_code == 503)
+		ret += "1";
+	else if (this->_code == 301 || this->_code == 302)
+		ret += "3";
+	else if (this->_code == 504)
 		ret += this->getDate(1);
 }
 
-std::string		Response::getLastModified(const char *file)
+std::string		Response::getLastModified()
 {
 	std::string	ret;
 	struct stat	time;
 	char		buff[50];
 
-	stat(file, &time);
+	stat(this->_content.c_str(), &time);
 	ret = "Last-Modified: ";
 	//strftime(buff, 50, "%a, %d %b %Y %T GMT\n", localtime(&(time.st_mtim)));
-	ret += buff;
+	//ret += buff;
 	return (ret);
 }
 
-std::string		Response::getContentLength(const char *file)
+std::string		Response::getContentLength()
 {
 	std::string	ret;
 	struct stat	stt;
 
-	stat(file, &stt);
+	stat(this->_content.c_str(), &stt);
 	ret = "Content-Length: ";
 	ret += stt.st_size;
 	return (ret);
@@ -443,18 +441,18 @@ std::string		Response::getExtension(std::string extension)
 		return ("text/plain");
 }
 
-std::string		Response::getContentType(std::string file)
+std::string		Response::getContentType()
 {
 	std::string				ret;
 	std::string::iterator	it;
 
-	it = file.end();
+	it = this->_content.end();
 	--it;
 	while (*it != '.')
 		--it;
-	std::string	extension(it, file.end());
+	std::string	extension(it, this->_content.end());
 	ret = "Content-Type: ";
-	ret += this->getExtension(extension) + "\n";
+	ret += this->getExtension(extension);
 	return (ret);
 }
 
@@ -462,7 +460,7 @@ std::string		Response::getContentLanguage()
 {
 	std::string	ret;
 
-	ret = "Content-Language: en-US, fr-FR\n";
+	ret = "Content-Language: en-US, fr-FR";
 	return (ret);
 }
 
@@ -472,4 +470,50 @@ std::string		Response::getWWWAuthentificate()
 
 	ret = "WWW-Authentificate: basic realm=\"localhost\"";
 	return (ret);
+}
+
+std::string		Response::getTransferEncoding()
+{
+	std::string ret;
+
+	if (this->_encoding_type.compare("plain"))
+		return ("");
+	ret = "Transfer-Encoding: " + this->_encoding_type;
+	return (ret);
+}
+
+std::string		Response::sendResponse()
+{
+	std::string	response;
+
+	//insert algo here...
+	this->_content = "/server-documents/index.html";
+	this->_code = 200;
+	this->_encoding_type = "plain"; // substitute of algo for now
+
+	if (this->_encoding_type.compare("plain") == 0)
+	{
+		response = this->getCode() + "\n\n";
+		response += this->getDate(0) + "\n";
+		response += this->getServer() + "\n";
+		if (this->_code < 400)
+		{
+			response += this->getTransferEncoding() + "\n";
+			response += this->getContentType() + "\n";
+			response += this->getContentLength() + "\n";
+			response += this->getContentLanguage() + "\n";
+			response += this->getLastModified() + "\n";
+			if (this->_code == 301 || this->_code == 302)
+			{
+				response += this->getLocation();
+				response += this->getRetryAfter();
+			}
+		}
+		else
+		{
+			if (this->_code == 401)
+				response += this->getWWWAuthentificate() + "\n";
+		}
+	}
+	return (response);
 }
