@@ -1,11 +1,9 @@
 
-#ifndef REPONSE_HPP
+#ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
 # include "Webserv.hpp"
 # include "Request.hpp"
-# include <ctime>
-# include <sys/time.h>
 
 # define SEC_PER_MIN 60
 # define SEC_PER_HOUR 3600
@@ -30,6 +28,8 @@ class Response
 		~Response();
 
 		Response	&operator=(Response const &rhs);
+		std::string	itos(int nb);
+		std::string	itos(long nb);
 		std::string	getDate(int type);
 		std::string	getDay(long day);
 		std::string	getNumberDay(long day);
@@ -47,6 +47,7 @@ class Response
 		std::string getTransferEncoding(void);
 
 		std::string	sendResponse(void);
+		std::string getContent(void);
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "../incs/Webserv.hpp"
 #include "../incs/Server.hpp"
+#include "../incs/Response.hpp"
 
 bool		isSkippable(std::string line)
 {
@@ -97,6 +98,8 @@ int			main(int ac, char **av)
 	{
 		server.addSocket(new Socket(config.getServers()[i]));
 	}
-
+	
+	Response	typical_response;
+	typical_response.sendResponse();
 	return (0);
 }

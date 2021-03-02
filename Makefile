@@ -15,7 +15,9 @@ NAME =	webserv
 SRCS =	Webserv.cpp		\
 		Config.cpp		\
 		Socket.cpp		\
-		Server.cpp
+		Server.cpp		\
+		Response.cpp	\
+		Request.cpp
 
 SRCS_DIR = ./srcs/
 
