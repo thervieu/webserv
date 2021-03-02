@@ -17,6 +17,11 @@ Response::~Response()
 {
 }
 
+void			Response::setRequest(Request request)
+{
+	this->_request = request;
+}
+
 std::string		Response::itos(int nb)
 {
 	std::string			ret;

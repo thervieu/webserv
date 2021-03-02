@@ -3,6 +3,9 @@
 
 # include "Webserv.hpp"
 # include "Config.hpp"
+# include "Response.hpp"
+
+# define SIZE_MALLOC 5000000
 
 class Socket
 {
@@ -10,8 +13,12 @@ class Socket
 		
 		int					_fd;
 		int					_opt;
+		int					_socket;
 		struct sockaddr_in	_address;
+		int					_addrlen;
 		server_info			_server;
+		char				*_buff;
+
 
 	public:
 
@@ -20,8 +27,10 @@ class Socket
 		Socket(server_info _server);
 		~Socket(void);
 
-		int		getFd(void);
+		int				getFd(void);
+		std::string		getBuffer(void);
 
+		void			MainLoop(void);
 };
 
 #endif

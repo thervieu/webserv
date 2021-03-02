@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
 	int					sock = 0;
 	int					valread;
 	struct sockaddr_in	serv_addr;
-	std::string			message("Hello from client");
+	std::string			message("GET");
 	char				buffer[1024] = {0};
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{

@@ -98,8 +98,5 @@ int			main(int ac, char **av)
 	{
 		server.addSocket(new Socket(config.getServers()[i]));
 	}
-	
-	Response	typical_response;
-	typical_response.sendResponse();
 	return (0);
 }

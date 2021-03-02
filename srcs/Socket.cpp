@@ -1,19 +1,20 @@
 #include "../incs/Socket.hpp"
 
-Socket::Socket(void)
+Socket::Socket(void) : _fd(0), _socket(0), _server(server_info()), _buff(NULL)
 {
 }
 
-Socket::Socket(const Socket &other): _fd(other._fd), _address(other._address), _server(other._server)
+Socket::Socket(const Socket &other): _fd(other._fd), _socket(0), _address(other._address), _addrlen(other._addrlen), _server(other._server), _buff(other._buff)
 {
 }
 
 Socket::Socket(server_info server)
 {
-	_server = server;
-	_address.sin_family = AF_INET;
-	_address.sin_addr.s_addr = INADDR_ANY;
-	_address.sin_port = htons(server._port);
+	this->_server = server;
+	this->_address.sin_family = AF_INET;
+	this->_address.sin_addr.s_addr = INADDR_ANY;
+	this->_address.sin_port = htons(server._port);
+	this->_addrlen = sizeof(this->_address);
 	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
 	{
 		std::cout << "Error: Unable to create socket" << std::endl;
@@ -39,12 +40,41 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Unable to listen socket" << std::endl;
 		exit(1);
 	}
+	std::cout << this->_server._client_max_body_size << std::endl;
+	if (this->_buff != static_cast<char*>(malloc(this->_server._client_max_body_size * sizeof(char))))
+	{
+		std::cout << "Error: Memory required too high" << std::endl;
+		exit(1);
+	}
+	if ((this->_socket = accept(this->_fd, (struct sockaddr *)&this->_address, (socklen_t*)&this->_addrlen)) < 0)
+	{
+		std::cout << "Error: accept failed" << std::endl;
+		exit(1);
+	}
+	this->MainLoop();
 }
 
-Socket::~Socket(void) {}
-
+Socket::~Socket(void)
+{}
 
 int		Socket::getFd(void)
 {
 	return (_fd);
+}
+
+void	Socket::MainLoop()
+{
+	Response	response;
+	std::string	message;
+	while (1)
+	{
+		if (read(this->_socket, this->_buff, this->_server._client_max_body_size < 0))
+		{
+			std::cout << "Error: read failed" << std::endl;
+			exit(1);
+		}
+		response.setRequest(Request());
+		message = response.sendResponse();
+		send(this->_socket, &message[0], message.size(), 0);
+	}
 }

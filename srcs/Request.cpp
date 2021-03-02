@@ -12,3 +12,14 @@ Request::Request(Request const &ref) : _accept_charsets(ref._accept_charsets), _
 Request::~Request()
 {
 }
+
+Request		&Request::operator=(Request const &rhs)
+{
+	(void)rhs;
+	this->_accept_charsets = "basic";
+	this->_accept_language = "fr";
+	this->_host = "localhost";
+	this->_referer = "/";
+	this->_user_agent = "/";
+	return (*this);
+}

@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
 	struct sockaddr_in	address;
 	int					opt = 1;
 	int					addrlen = sizeof(address);
-	char				buffer[1024] = {0};
+	char				*buff;
 	std::string			message("Hello from server!");
 
 	address.sin_family = AF_INET;
@@ -48,8 +48,9 @@ int main(int argc, char const *argv[])
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
-	valread = read(new_socket, buffer, 1024);
-	std::cout << buffer << std::endl;
+	buff = static_cast<char *>(malloc(10000000));
+	valread = read(new_socket, buff, 1024);
+	std::cout << buff << std::endl;
 	send(new_socket , &message.at(0) , message.size(), 0);
 	std::cout << "Hello message sent" << std::endl;
 	close(new_socket);
