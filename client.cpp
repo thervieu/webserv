@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
 	int					valread;
 	struct sockaddr_in	serv_addr;
 	std::string			message("GET");
-	char				buffer[1024] = {0};
+	char				buffer[10240] = {0};
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n Socket creation error \n");
@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
 	}
 	send(sock, (char *)&message.at(0), message.size(), 0);
 	std::cout << "Hello message sent" << std::endl;
-	valread = read(sock , buffer, 1024);
+	valread = read(sock , buffer, 10240);
 	std::cout << buffer << std::endl;
-	return 0;
+	return (0);
 }

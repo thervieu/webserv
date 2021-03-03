@@ -559,6 +559,5 @@ std::string		Response::sendResponse()
 				response += this->getRetryAfter() + "\n";
 		}
 	}
-	std::cout << response << std::endl;
 	return (response);
 }
