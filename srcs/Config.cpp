@@ -66,7 +66,10 @@ void	Config::parseConfig(std::string file)
 	{
 		splittedLine = splitSpaces(lines[i]);
 		if (splittedLine[0] == "server")
-			i = parseServer(lines, i + 1, getNbLastLine(lines, i));
+		{
+			parseServer(lines, i + 1, getNbLastLine(lines, i));
+			i = getNbLastLine(lines, i) + 1;
+		}
 		else
 		{
 			std::cout << "SyntaxError: Unexpected token: " << splittedLine[0] << std::endl;
@@ -127,7 +130,7 @@ void	Config::parseDirective(std::vector<std::string> splittedLine, bool name)
 *	exits if a parse_error is occured
 */
 
-size_t	Config::parseServer(std::vector<std::string> lines, size_t start, size_t end)
+void	Config::parseServer(std::vector<std::string> lines, size_t start, size_t end)
 {
 	std::vector<std::string>	splittedLine;
 
@@ -147,7 +150,7 @@ size_t	Config::parseServer(std::vector<std::string> lines, size_t start, size_t 
 		}
 	}
 	_servers.push_back(_server);
-	return (end + 1);
+	return ;
 }
 
 
@@ -155,13 +158,27 @@ size_t	Config::parseServer(std::vector<std::string> lines, size_t start, size_t 
 *	returns the unsigned int format of the string given as argument
 */
 
-size_t	stringToUnsignedInt(std::string str)
+size_t	ft_atoi(std::string str)
 {
-	std::istringstream stream(str);
-	size_t uInt;
+	size_t		i;
+	size_t		nb;
+	size_t		sign;
 
-	stream >> uInt;
-	return (uInt);
+	i = 0;
+	sign = 0;
+	nb = 0;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			sign++;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+		nb = (nb * 10) + (str[i++] - '0');
+	if (sign == 1)
+		return (-nb);
+	else
+		return (nb);
 }
 
 /*
@@ -169,14 +186,14 @@ size_t	stringToUnsignedInt(std::string str)
 *	exits if a parse_error is occured
 */
 
-void	Config::parseServerDirectives(server_info _server, std::vector<std::string> splittedLine)
+void	Config::parseServerDirectives(server_info &_server, std::vector<std::string> splittedLine)
 {
 	char last_char;
 
 	parseDirective(splittedLine, true);
 	
 	splittedLine[splittedLine.size() - 1] = std::string(splittedLine[splittedLine.size() - 1], 0, splittedLine[splittedLine.size() - 1].length() - 1);
-	
+
 	if (splittedLine[0] == server_directives[0])
 	{
 		if (splittedLine.size() != 3)
@@ -184,7 +201,7 @@ void	Config::parseServerDirectives(server_info _server, std::vector<std::string>
 			std::cout << "SyntaxError: " << splittedLine[0] << " [port] [host]" << std::endl;
 			exit(1);
 		}
-		_server._port = stringToUnsignedInt(splittedLine[1]);
+		_server._port = ft_atoi(splittedLine[1]);
 		_server._host = splittedLine[2];
 	}
 	else if (splittedLine[0] == server_directives[1])
@@ -206,7 +223,7 @@ void	Config::parseServerDirectives(server_info _server, std::vector<std::string>
 		for (size_t i = 1; i < splittedLine.size(); i++)
 			_server._names.push_back(splittedLine[i]);
 	}
-	else if (splittedLine[0] == server_directives[2])
+	else if (splittedLine[0] == server_directives[3])
 	{
 		if (splittedLine.size() < 3)
 		{
@@ -220,16 +237,16 @@ void	Config::parseServerDirectives(server_info _server, std::vector<std::string>
 
 		}
 	}
-	else if (splittedLine[0] == location_directives[3])
+	else if (splittedLine[0] == server_directives[4])
 		_server._index = splittedLine[1];
-	else if (splittedLine[0] == location_directives[4])
+	else if (splittedLine[0] == server_directives[5])
 	{
 		if (splittedLine.size() != 2)
 		{
-			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
+			std::cout << "SyntaxError: " << splittedLine[1] << " should be in format <dec, K, M or G>" << std::endl;
 			exit(1);
 		}
-		_server._client_max_body_size = stringToUnsignedInt(splittedLine[1]);
+		_server._client_max_body_size = ft_atoi(splittedLine[1]);
 		last_char = splittedLine[1][splittedLine[1].size() - 1];
 		if (last_char == 'K' || last_char == 'k')
 			_server._client_max_body_size *= 1024;
@@ -239,7 +256,7 @@ void	Config::parseServerDirectives(server_info _server, std::vector<std::string>
 			_server._client_max_body_size *= 1024 * 1024 * 1024;
 		else if (!std::isdigit(last_char))
 		{
-			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
+			std::cout << "SyntaxError: " << splittedLine[1] << " should be in format <dec, K, M or G>" << std::endl;
 			exit(1);
 		}
 	}
@@ -336,7 +353,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 	else if (splittedLine[0] == location_directives[5])
 		_loc._upload_path = splittedLine[1];
 	else if (splittedLine[0] == location_directives[6])
-		_loc._upload_cleanup = stringToUnsignedInt(splittedLine[1]);
+		_loc._upload_cleanup = ft_atoi(splittedLine[1]);
 	else if (splittedLine[0] == location_directives[7])
 	{
 		for (size_t i = 1; i < splittedLine.size(); ++i)
@@ -346,12 +363,13 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		_loc._cgi_path = splittedLine[1];
 	else if (splittedLine[0] == location_directives[9])
 	{
+		_loc._client_max_body_size = 0;
 		if (splittedLine.size() != 2)
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
 			exit(1);
 		}
-		_loc._client_max_body_size = stringToUnsignedInt(splittedLine[1]);
+		_loc._client_max_body_size = ft_atoi(splittedLine[1]);
 		last_char = splittedLine[1][splittedLine[1].size() - 1];
 		if (last_char == 'K' || last_char == 'k')
 			_loc._client_max_body_size *= 1024;
@@ -364,6 +382,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
 			exit(1);
 		}
+		std::cout << "location size = " << _loc._client_max_body_size << std::endl;
 	}
 	return ;
 }

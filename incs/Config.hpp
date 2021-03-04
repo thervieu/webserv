@@ -42,11 +42,11 @@ class Config
 	private:
 
 		std::vector<server_info>	_servers;
-		size_t				parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
+		void				parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
 		location			parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
 		void				parseConfig(std::string file);
 		void				parseDirective(std::vector<std::string> splittedLine, bool name);
-		void				parseServerDirectives(server_info _server, std::vector<std::string> splittedLine);
+		void				parseServerDirectives(server_info &_server, std::vector<std::string> splittedLine);
 		void				parseLocationDirectives(location &_loc, std::vector<std::string> splittedLine);
 
 	public:
