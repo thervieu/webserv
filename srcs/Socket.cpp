@@ -14,7 +14,7 @@ Socket::Socket(server_info server)
 	this->_server = server;
 	this->_address.sin_family = AF_INET;
 	this->_address.sin_addr.s_addr = INADDR_ANY;
-	this->_address.sin_port = htons(/*server._port*/8080);
+	this->_address.sin_port = htons(server._port);
 	this->_addrlen = sizeof(this->_address);
 	if ((this->_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
 	{
@@ -41,9 +41,7 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Unable to listen socket" << std::endl;
 		exit(1);
 	}
-	std::cout << "client max body size: " << this->_server._client_max_body_size << std::endl;
-	std::cout << "port:" << this->_server._port << std::endl;
-	if (!(this->_buff = static_cast<char*>(malloc(/*this->_server._client_max_body_size*/SIZE_MALLOC * sizeof(char)))))
+	if (!(this->_buff = static_cast<char*>(malloc(this->_server._client_max_body_size * sizeof(char)))))
 	{
 		std::cout << "Error: Memory required too high" << std::endl;
 		exit(1);
@@ -72,14 +70,15 @@ void	Socket::MainLoop()
 			exit(1);
 		}
 		// Select ??
-		if (read(this->_socket, this->_buff, /*this->_server._client_max_body_size*/ SIZE_MALLOC < 0))
+		if (read(this->_socket, this->_buff, this->_server._client_max_body_size) < 0)
 		{
 			std::cout << "Error: read failed" << std::endl;
 			exit(1);
 		}
+		std::cout << this->_buff << std::endl;
 		response.setRequest(Request());
 		message = response.sendResponse();
 		send(this->_socket, &message[0], message.size(), 0);
-		std::cout << "Message sent !" << std::endl;
+		std::cout << "Response sent !" << std::endl;
 	}
 }

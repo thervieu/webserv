@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
 	int					sock = 0;
 	int					valread;
 	struct sockaddr_in	serv_addr;
-	std::string			message("GET");
+	std::string			message("GET /index.html HTTP/1.1\nUser-Agent: Ubuntu/18.04.5 LTS 64-bits\nHost: http://localhost:8080\nAccept-Language: en-US\nAccept-Charset: utf-8");
 	char				buffer[10240] = {0};
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{

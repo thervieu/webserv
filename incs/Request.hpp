@@ -19,6 +19,7 @@ class Request
 
 		Request();
 		Request(Request const &ref);
+		Request(std::string request);
 		~Request();
 
 		Request	&operator=(Request const &rhs);
