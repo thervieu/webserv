@@ -26,13 +26,23 @@ class Request
 		Request(std::string request);
 		~Request();
 
-		Request	&operator=(Request const &rhs);
-		void	setAcceptCharsets(std::string header);
-		void	setAcceptLanguage(std::string header);
-		void	setHost(std::string header);
-		void	setReferer(std::string header);
-		void	setUserAgent(std::string header);
-		void	parsing(std::string main_string);
+		Request			&operator=(Request const &rhs);
+		int				setHeader(std::string str);
+		void			setAcceptCharsets(std::string header);
+		void			setAcceptLanguage(std::string header);
+		void			setHost(std::string header);
+		void			setReferer(std::string header);
+		void			setUserAgent(std::string header);
+		std::string		getAcceptCharsets(void) const;
+		std::string		getAcceptLanguage(void) const;
+		std::string		getHost(void) const;
+		std::string		getReferer(void) const;
+		std::string		getUserAgent(void) const;
+		std::string		getMethod(void) const;
+		std::string		getURI(void) const;
+		std::string		getHTTPVersion(void) const;
+		int				getUnknown(void) const;
+		void			parsing(std::string str);
 };
 
 #endif

@@ -536,17 +536,25 @@ std::string		Response::getContent()
 std::string		Response::sendResponse()
 {
 	std::string	response;
+	struct stat	filestat;
 
 	//insert algo here...
 
 	// substitute of algo for now
-	this->_content = "./server-documents/error_pages/404.html";
+	this->_content = "./server-documents" + this->_request.getURI();
 	this->_code = 200;
 	this->_encoding_type = "plain";
+	if (this->_request.getUnknown())
+		this->_code = 501;
+	else if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
+		this->_code = 505;
+	else if (stat(this->_content.c_str(), &filestat) != 0)
+		this->_code = 404;
 	// substitute of algo for now
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
+		std::cout << this->_request.getURI() << " <-----------------\n";
 		response = this->getCode() + "\n\n";
 		response += this->getDate(0) + "\n";
 		response += this->getServer() + "\n";
