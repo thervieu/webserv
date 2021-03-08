@@ -260,8 +260,12 @@ std::string		Response::getMessage(int code)
 			return ("Too Many Requests");
 		case 500:
 			return ("Internal Server Error");
+		case 501:
+			return ("Not Implemented");
 		case 504:
 			return ("Gateway Time-Out");
+		case 505:
+			return ("HTTP Version Not Supported");
 		default:
 			return ("Error Not Found");
 	}
@@ -512,6 +516,15 @@ std::string		Response::getTransferEncoding()
 	return (ret);
 }
 
+std::string		Response::getAllow()
+{
+	std::string	ret;
+
+	ret = "Allow: ";
+	ret += "GET";
+	return (ret);
+}
+
 std::string		Response::getContent()
 {
 	std::string file;
@@ -555,6 +568,8 @@ std::string		Response::sendResponse()
 		{
 			if (this->_code == 401)
 				response += this->getWWWAuthentificate() + "\n";
+			if (this->_code == 405)
+				response += this->getAllow() + "\n";
 			if (this->_code == 429 || this->_code == 504)
 				response += this->getRetryAfter() + "\n";
 		}
