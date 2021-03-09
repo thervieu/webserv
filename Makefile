@@ -6,7 +6,7 @@
 #    By: user42 <user42@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/19 14:45:55 by user42            #+#    #+#              #
-#    Updated: 2021/01/22 14:48:34 by user42           ###   ########.fr        #
+#    Updated: 2021/03/09 08:31:48 by user42           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ NAME =	webserv
 SRCS =	Webserv.cpp		\
 		Config.cpp		\
 		Socket.cpp		\
+		Client.cpp		\
 		Server.cpp		\
 		Response.cpp	\
 		Request.cpp

@@ -11,7 +11,7 @@ Request::Request(Request const &ref) : _accept_charsets(ref._accept_charsets), _
 
 Request::Request(std::string request)
 {
-
+	(void) request;
 }
 
 Request::~Request()

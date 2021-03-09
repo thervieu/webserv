@@ -1,13 +1,14 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "Socket.hpp"
+# include "Client.hpp"
 
 class Server
 {
 	private:
 		
 		std::vector<Socket *> _sockets;
+		std::vector<Client *> _clients;
 
 	public:
 
@@ -16,8 +17,12 @@ class Server
 		~Server(void);
 
 		void	addSocket(Socket *socket);
+		void	addClient(Client *client);
 
-		int		getMaxFd(void);
+		int		acceptSocketDescriptor(int sd, int max_sd, fd_set *read_set, fd_set *write_set);
+		int		receiveConnection(int sd, std::string &request);
+
+		int		getMaxSd(void);
 
 		void	select_loop(void);
 };

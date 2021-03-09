@@ -52,7 +52,7 @@ Socket::Socket(server_info server)
 Socket::~Socket(void)
 {}
 
-int		Socket::getFd(void)
+int		Socket::getSocketDescriptor(void)
 {
 	return (_fd);
 }

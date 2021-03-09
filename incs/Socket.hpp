@@ -27,7 +27,7 @@ class Socket
 		Socket(server_info _server);
 		~Socket(void);
 
-		int				getFd(void);
+		int				getSocketDescriptor(void);
 		std::string		getBuffer(void);
 
 		void			MainLoop(void);
