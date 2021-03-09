@@ -10,26 +10,34 @@ Socket::Socket(const Socket &other): _fd(other._fd), _socket(0), _address(other.
 
 Socket::Socket(server_info server)
 {
-	this->_opt = 1;
 	this->_server = server;
-	this->_address.sin_family = AF_INET;
-	this->_address.sin_addr.s_addr = INADDR_ANY;
-	this->_address.sin_port = htons(server._port);
-	if ((this->_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+	
+	if ((this->_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Error: Unable to create socket" << std::endl;
 		exit(1);
 	}
-	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &this->_opt, sizeof(this->_opt)))
+	std::cout << "fd: " << this->_fd << std::endl;
+	
+	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &this->_opt, sizeof(this->_opt)) < 0)
 	{
 		std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
 		exit(1);
 	}
-	// if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
-	// {
-	// 	std::cout << "Error: Unable to set socket to non blocking" << std::endl;
-	// 	exit(1);
-	// }
+	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEPORT, &this->_opt, sizeof(this->_opt)) < 0)
+	{
+		std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
+		exit(1);
+	}
+	
+	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cout << "Error: Unable to set socket to non blocking" << std::endl;
+		exit(1);
+	}
+	this->_address.sin_family = AF_INET;
+	this->_address.sin_addr.s_addr = INADDR_ANY;
+	this->_address.sin_port = htons((int)server._port);
 	if (bind(this->_fd, (struct sockaddr *)&this->_address, sizeof(this->_address)) < 0)
 	{
 		std::cout << "Error: bind failed" << std::endl;
@@ -45,7 +53,7 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Memory required too high" << std::endl;
 		exit(1);
 	}
-	this->MainLoop();
+	//this->MainLoop();
 }
 
 Socket::~Socket(void)
