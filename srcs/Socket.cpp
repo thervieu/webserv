@@ -15,7 +15,6 @@ Socket::Socket(server_info server)
 	this->_address.sin_family = AF_INET;
 	this->_address.sin_addr.s_addr = INADDR_ANY;
 	this->_address.sin_port = htons(server._port);
-	this->_addrlen = sizeof(this->_address);
 	if ((this->_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
 	{
 		std::cout << "Error: Unable to create socket" << std::endl;
@@ -31,7 +30,7 @@ Socket::Socket(server_info server)
 	// 	std::cout << "Error: Unable to set socket to non blocking" << std::endl;
 	// 	exit(1);
 	// }
-	if (bind(this->_fd, (struct sockaddr *)&this->_address, this->_addrlen) < 0)
+	if (bind(this->_fd, (struct sockaddr *)&this->_address, sizeof(this->_address)) < 0)
 	{
 		std::cout << "Error: bind failed" << std::endl;
 		exit(1);

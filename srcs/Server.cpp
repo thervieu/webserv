@@ -99,6 +99,7 @@ void	Server::select_loop(void)
 		read_set = master_read_set;
 		write_set = master_write_set;
 
+		std::cout << "HERE3" << std::endl;
 		select(max_sd + 1, &read_set, &write_set, NULL, NULL);
 		for (int i = 0; i < getMaxSd(); i++)
 		{
@@ -115,6 +116,7 @@ void	Server::select_loop(void)
 
 			if (FD_ISSET(client_sd, &read_set))
 			{
+				std::cout << "HERE4\n";
 				int rtn = receiveConnection(client_sd, client.getRequest());
 				if (rtn < 0)
 				{
