@@ -554,7 +554,6 @@ std::string		Response::sendResponse()
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
-		std::cout << this->_request.getURI() << " <-----------------\n";
 		response = this->getCode() + "\n\n";
 		response += this->getDate(0) + "\n";
 		response += this->getServer() + "\n";
