@@ -124,9 +124,7 @@ int			Request::setHeader(std::string str)
 	else if (line.compare("User-Agent:") == 0)
 		this->setUserAgent(std::string(it, ite));
 	else
-	{
 		return (-1);
-	}
 	return (0);
 }
 

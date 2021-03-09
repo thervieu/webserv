@@ -557,29 +557,27 @@ std::string		Response::sendResponse()
 		response = this->getCode() + "\n\n";
 		response += this->getDate(0) + "\n";
 		response += this->getServer() + "\n";
-		if (this->_code < 400)
+		if (this->_code == 401)
+			response += this->getWWWAuthentificate() + "\n";
+		if (this->_code == 405)
+			response += this->getAllow() + "\n";
+		if (this->_code == 429 || this->_code == 504)
+			response += this->getRetryAfter() + "\n";
+		if (this->_code > 500 && this->_code < 600)
+			this->_content = "./server-documents/error_pages/50x.html";
+		if (this->_code == 404)
+			this->_content = "./server-documents/error_pages/404.html";
+		response += this->getTransferEncoding();
+		response += this->getContentType() + "\n";
+		response += this->getContentLength() + "\n";
+		response += this->getContentLanguage() + "\n";
+		response += this->getLastModified() + "\n";
+		if (this->_code == 301 || this->_code == 302)
 		{
-			response += this->getTransferEncoding();
-			response += this->getContentType() + "\n";
-			response += this->getContentLength() + "\n";
-			response += this->getContentLanguage() + "\n";
-			response += this->getLastModified() + "\n";
-			if (this->_code == 301 || this->_code == 302)
-			{
-				response += this->getLocation();
-				response += this->getRetryAfter();
-			}
-			response += "\n" + this->getContent();
+			response += this->getLocation();
+			response += this->getRetryAfter();
 		}
-		else
-		{
-			if (this->_code == 401)
-				response += this->getWWWAuthentificate() + "\n";
-			if (this->_code == 405)
-				response += this->getAllow() + "\n";
-			if (this->_code == 429 || this->_code == 504)
-				response += this->getRetryAfter() + "\n";
-		}
+		response += "\n" + this->getContent();
 	}
 	return (response);
 }
