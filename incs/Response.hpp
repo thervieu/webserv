@@ -46,6 +46,7 @@ class Response
 		std::string	getContentLanguage(void);
 		std::string	getWWWAuthentificate(void);
 		std::string getTransferEncoding(void);
+		std::string getAllow(void);
 
 		std::string	sendResponse(void);
 		std::string getContent(void);

@@ -76,7 +76,7 @@ void	Socket::MainLoop()
 			exit(1);
 		}
 		std::cout << this->_buff << std::endl;
-		response.setRequest(Request());
+		response.setRequest(Request(this->_buff));
 		message = response.sendResponse();
 		send(this->_socket, &message[0], message.size(), 0);
 		std::cout << "Response sent !" << std::endl;
