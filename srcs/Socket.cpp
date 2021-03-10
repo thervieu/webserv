@@ -24,17 +24,17 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
 		exit(1);
 	}
-	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEPORT, &this->_opt, sizeof(this->_opt)) < 0)
-	{
-		std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
-		exit(1);
-	}
+	// if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEPORT, &this->_opt, sizeof(this->_opt)) < 0)
+	// {
+	// 	std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
+	// 	exit(1);
+	// }
 	
-	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
-	{
-		std::cout << "Error: Unable to set socket to non blocking" << std::endl;
-		exit(1);
-	}
+	// if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
+	// {
+	// 	std::cout << "Error: Unable to set socket to non blocking" << std::endl;
+	// 	exit(1);
+	// }
 	this->_address.sin_family = AF_INET;
 	this->_address.sin_addr.s_addr = INADDR_ANY;
 	this->_address.sin_port = htons((int)server._port);
@@ -53,7 +53,7 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Memory required too high" << std::endl;
 		exit(1);
 	}
-	//this->MainLoop();
+	this->MainLoop();
 }
 
 Socket::~Socket(void)

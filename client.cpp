@@ -12,7 +12,8 @@ int main(int argc, char const *argv[])
 	int					sock = 0;
 	int					valread;
 	struct sockaddr_in	serv_addr;
-	std::string			message("GET /indexlol.html HTTP/1.1\nUser-Agent: Ubuntu/18.04.5 LTS 64-bits\nHost: http://localhost:8080\nAccept-Language: en-US\nAccept-Charset: utf-8");
+	std::string			message("GET /index.html HTTP/1.1\nUser-Agent: Ubuntu/18.04.5 LTS 64-bits\nHost: http://localhost:8080\nAccept-Language: en-US\nAccept-Charset: utf-8");
+	std::string			message2("GET /indexlol.html HTTP/1.1\n   \n\n\n      \n    User-Agent: bonjour\n\n\n");
 	char				buffer[10240] = {0};
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -34,7 +35,12 @@ int main(int argc, char const *argv[])
 		return (-1);
 	}
 	send(sock, (char *)&message.at(0), message.size(), 0);
-	std::cout << "Hello message sent" << std::endl;
+	std::cout << "GET message sent" << std::endl << std::endl;
+	valread = read(sock , buffer, 10240);
+	std::cout << buffer << std::endl;
+
+	send(sock, (char *)&message2.at(0), message2.size(), 0);
+	std::cout << "404 message sent" << std::endl << std::endl;
 	valread = read(sock , buffer, 10240);
 	std::cout << buffer << std::endl;
 	return (0);

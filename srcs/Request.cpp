@@ -18,41 +18,41 @@ Request::Request(std::string request) : _unknown(0)
 
 	//method
 	i = 0;
-	while (request[i] == ' ' && request[i] != '\0')
+	while (request[i] == ' ')
 		++i;
 	if (request[i] == '\0')
 		return ;
 	it = request.begin() + i;
-	while (request[i] != ' ' && request[i] != '\n' && request[i] != '\0')
+	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
 		++i;
 	ite = request.begin() + i;
 	this->_method.assign(it, ite);
 
 	//url
-	while (request[i] == ' ' && request[i] != '\0')
+	while (request[i] == ' ')
 		++i;
 	if (request[i] == '\0')
 		return ;
 	it = request.begin() + i;
-	while (request[i] != ' ' && request[i] != '\n' && request[i] != '\0')
+	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
 		++i;
 	ite = request.begin() + i;
 	this->_url.assign(it, ite);
 
 	//http version
-	while (request[i] == ' ' && request[i] != '\0')
+	while (request[i] == ' ')
 		++i;
 	if (request[i] == '\0')
 		return ;
 	it = request.begin() + i;
-	while (request[i] != ' ' && request[i] != '\n' && request[i] != '\0')
+	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
 		++i;
 	ite = request.begin() + i;
 	this->_http_version.assign(it, ite);
 
 	if (*ite == '\0')
 		return ;
-	while (*ite != '\n' && *ite != '\0')
+	while (*ite != '\r' && *ite != '\n' && *ite != '\0')
 		++ite;
 
 	//headers
@@ -87,7 +87,7 @@ void		Request::parsing(std::string str)
 	it = str.begin();
 	while (*it != '\0')
 	{
-		while (*it == ' ' || *it == '\n')
+		while (*it == ' ' || *it == '\n' || *it == '\r')
 			++it;
 		if (*it == '\0')
 			return ;
