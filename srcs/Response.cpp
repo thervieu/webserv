@@ -550,6 +550,24 @@ int				Response::findLocation()
 	return (i);
 }
 
+std::string		Response::find_error_page(void)
+{
+	unsigned int		i;
+	std::ostringstream	convert;
+	std::string			code;
+
+
+	std::cout << "JZBDDBZEIDNU ADNAIDABDISABND\n\n\n";
+	i = 0;
+	convert << this->_code;
+	code = convert.str();
+	while (i < this->_request.getConfig()._error_pages.size() && this->_request.getConfig()._error_pages[i].compare(code) != 0)
+		i += 2;
+	if (i < this->_request.getConfig()._error_pages.size())
+		return (this->_request.getConfig()._error_pages[i + 1]);
+	return ("/error_pages/4045.html");
+}
+
 std::string		Response::sendResponse()
 {
 	std::string			response;
@@ -600,10 +618,8 @@ std::string		Response::sendResponse()
 			response += this->getAllow() + "\n";
 		if (this->_code == 429 || this->_code == 504)
 			response += this->getRetryAfter() + "\n";
-		if (this->_code > 500 && this->_code < 600)
-			this->_content = "./server-documents/error_pages/50x.html";
-		if (this->_code == 404)
-			this->_content = "./server-documents/error_pages/404.html";
+		if ((this->_code > 500 && this->_code < 600) || this->_code == 404)
+			this->_content = "./server-documents" + find_error_page();
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\n";
 		response += this->getContentLength() + "\n";
