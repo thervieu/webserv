@@ -9,6 +9,7 @@ class Request
 
 	private:
 
+		server_info		_config;
 		std::string		_method;
 		std::string		_url;
 		std::string		_http_version;
@@ -23,7 +24,7 @@ class Request
 
 		Request();
 		Request(Request const &ref);
-		Request(std::string request);
+		Request(std::string request, server_info config);
 		~Request();
 
 		Request			&operator=(Request const &rhs);
@@ -41,6 +42,7 @@ class Request
 		std::string		getMethod(void) const;
 		std::string		getURI(void) const;
 		std::string		getHTTPVersion(void) const;
+		server_info		getConfig(void) const;
 		int				getUnknown(void) const;
 		void			parsing(std::string str);
 };

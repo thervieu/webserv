@@ -533,10 +533,30 @@ std::string		Response::getContent()
 	return (file);
 }
 
+int				Response::findLocation()
+{
+	unsigned int	i;
+
+	i = 0;
+	while (i < this->_request.getConfig()._locations.size() &&
+		this->_request.getConfig()._locations[i]._name.compare(this->_request.getURI()) != 0)
+	{
+		i++;
+	}
+	if (i == this->_request.getConfig()._locations.size())
+		return (-1);
+	else if (this->_request.getConfig()._locations[i]._index.compare("") == 0)
+		return (-1);
+	return (i);
+}
+
 std::string		Response::sendResponse()
 {
-	std::string	response;
-	struct stat	filestat;
+	std::string			response;
+	struct stat			filestat;
+	std::string			str;
+	int					i;
+	std::ostringstream	convert;
 
 	//insert algo here...
 
@@ -544,12 +564,25 @@ std::string		Response::sendResponse()
 	this->_content = "./server-documents" + this->_request.getURI();
 	this->_code = 200;
 	this->_encoding_type = "plain";
+	i = 0;
+	convert << this->_request.getConfig()._port;
+	str = "localhost:8080";// + convert.str();
+	std::cout << "_index = " << this->_request.getConfig()._index << "\n_port = " << this->_request.getConfig()._port << "\n_locations[0]._name = " << this->_request.getConfig()._locations[0]._name << std::endl;
 	// if (this->_request.getUnknown())
 	// 	this->_code = 501;
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
-	else if (stat(this->_content.c_str(), &filestat) != 0)
+	else if (this->_request.getHost().compare(str) != 0)
 		this->_code = 404;
+	if (stat(this->_content.c_str(), &filestat) == -1)
+		this->_code = 404;
+	else if (S_ISDIR(filestat.st_mode))
+	{
+		if ((i = this->findLocation()) == -1)
+			this->_content.append("index.html");//this->_request.getConfig()._index);
+		else
+			this->_content.append(this->_request.getConfig()._locations[i]._index);
+	}
 	// substitute of algo for now
 
 	if (this->_encoding_type.compare("plain") == 0)

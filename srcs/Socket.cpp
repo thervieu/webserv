@@ -11,7 +11,7 @@ Socket::Socket(const Socket &other): _fd(other._fd), _socket(0), _address(other.
 Socket::Socket(server_info server)
 {
 	this->_server = server;
-	
+
 	if ((this->_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Error: Unable to create socket" << std::endl;
@@ -83,7 +83,7 @@ void	Socket::MainLoop()
 			exit(1);
 		}
 		std::cout << this->_buff << std::endl;
-		response.setRequest(Request(this->_buff));
+		response.setRequest(Request(this->_buff, this->_server));
 		message = response.sendResponse();
 		send(this->_socket, &message[0], message.size(), 0);
 		std::cout << "\nResponse sent !\n" << std::endl;

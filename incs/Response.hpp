@@ -29,6 +29,7 @@ class Response
 
 		Response	&operator=(Response const &rhs);
 		void		setRequest(Request request);
+		int			findLocation(void);
 		std::string	itos(int nb);
 		std::string	itos(long nb);
 		std::string	getDate(int type);

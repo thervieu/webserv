@@ -9,7 +9,7 @@ Request::Request(Request const &ref) : _method("GET"), _url("/"), _accept_charse
 {
 }
 
-Request::Request(std::string request) : _unknown(0)
+Request::Request(std::string request, server_info config) : _config(config), _unknown(0)
 {
 	std::string				line;
 	std::string::iterator	it;
@@ -110,8 +110,10 @@ int			Request::setHeader(std::string str)
 	while (*it != ' ' && *it != '\0' && *it != '\n')
 		++it;
 	line.assign(str.begin(), it);
+	while (*it == ' ')
+	 ++it;
 	ite = it;
-	while (*ite != '\n' && *ite != '\0')
+	while (*ite != '\n' && *ite != '\0' && *ite != '\r')
 		++ite;
 	if (line.compare("Accept-Charset:") == 0)
 		this->setAcceptCharsets(std::string(it, ite));
@@ -128,72 +130,77 @@ int			Request::setHeader(std::string str)
 	return (0);
 }
 
-void		Request::setAcceptCharsets(std::string str)
+server_info		Request::getConfig(void) const
+{
+	return (this->_config);
+}
+
+void			Request::setAcceptCharsets(std::string str)
 {
 	this->_accept_charsets.assign(str);
 }
 
-std::string	Request::getAcceptCharsets(void) const
+std::string		Request::getAcceptCharsets(void) const
 {
 	return (this->_accept_charsets);
 }
 
-void		Request::setAcceptLanguage(std::string str)
+void			Request::setAcceptLanguage(std::string str)
 {
 	this->_accept_language.assign(str);
 }
 
-std::string	Request::getAcceptLanguage(void) const
+std::string		Request::getAcceptLanguage(void) const
 {
 	return (this->_accept_language);
 }
 
-void		Request::setHost(std::string str)
+void			Request::setHost(std::string str)
 {
 	this->_host.assign(str);
 }
 
-std::string	Request::getHost(void) const
+std::string		Request::getHost(void) const
 {
 	return (this->_host);
 }
 
-void		Request::setReferer(std::string str)
+void			Request::setReferer(std::string str)
 {
 	this->_referer.assign(str);
 }
 
-std::string	Request::getReferer(void) const
+std::string		Request::getReferer(void) const
 {
 	return (this->_referer);
 }
 
-void		Request::setUserAgent(std::string str)
+void			Request::setUserAgent(std::string str)
 {
 	this->_user_agent.assign(str);
 }
 
-std::string	Request::getUserAgent(void) const
+std::string		Request::getUserAgent(void) const
 {
 	return (this->_user_agent);
 }
 
-std::string	Request::getURI(void) const
+std::string		Request::getURI(void) const
 {
 	return (this->_url);
 }
 
-std::string	Request::getHTTPVersion(void) const
+std::string		Request::getHTTPVersion(void) const
 {
 	return (this->_http_version);
 }
 
-std::string	Request::getMethod(void) const
+std::string		Request::getMethod(void) const
 {
 	return (this->_method);
 }
 
-int			Request::getUnknown(void) const
+int				Request::getUnknown(void) const
 {
 	return (this->_unknown);
 }
