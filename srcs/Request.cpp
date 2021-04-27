@@ -15,6 +15,7 @@ Request::Request(std::string request, server_info config) : _config(config), _un
 	std::string::iterator	it;
 	std::string::iterator	ite;
 	int						i;
+	std::cout << "request creation port: " << _config._port << std::endl;
 
 	//method
 	i = 0;
@@ -75,6 +76,7 @@ Request		&Request::operator=(Request const &rhs)
 	this->_host = rhs.getHost();
 	this->_referer = rhs.getReferer();
 	this->_user_agent = rhs.getUserAgent();
+	this->_config = rhs.getConfig();
 	return (*this);
 }
 
