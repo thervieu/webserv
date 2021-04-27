@@ -34,6 +34,7 @@ class Request
 		void			setHost(std::string header);
 		void			setReferer(std::string header);
 		void			setUserAgent(std::string header);
+		void			setURI(std::string str);
 		std::string		getAcceptCharsets(void) const;
 		std::string		getAcceptLanguage(void) const;
 		std::string		getHost(void) const;

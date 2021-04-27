@@ -187,6 +187,11 @@ std::string		Request::getUserAgent(void) const
 	return (this->_user_agent);
 }
 
+void			Request::setURI(std::string str)
+{
+	this->_url.assign(str);
+}
+
 std::string		Request::getURI(void) const
 {
 	return (this->_url);

@@ -213,7 +213,7 @@ std::string		Response::getDate(int type)
 	hms -= tz.tz_minuteswest * SEC_PER_MIN;
 	hms = (hms + SEC_PER_DAY) % SEC_PER_DAY;
 
-	int hour = hms / SEC_PER_HOUR + 1;
+	int hour = hms / SEC_PER_HOUR + 2;
 	int min = (hms % SEC_PER_HOUR) / SEC_PER_MIN;
 	int sec = (hms % SEC_PER_HOUR) % SEC_PER_MIN;
 	
@@ -566,8 +566,7 @@ std::string		Response::sendResponse()
 	this->_encoding_type = "plain";
 	i = 0;
 	convert << this->_request.getConfig()._port;
-	str = "localhost:8080";// + convert.str();
-	std::cout << "_index = " << this->_request.getConfig()._index << "\n_port = " << this->_request.getConfig()._port << "\n_locations[0]._name = " << this->_request.getConfig()._locations[0]._name << std::endl;
+	str = "localhost:" + convert.str();
 	// if (this->_request.getUnknown())
 	// 	this->_code = 501;
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
@@ -578,8 +577,13 @@ std::string		Response::sendResponse()
 		this->_code = 404;
 	else if (S_ISDIR(filestat.st_mode))
 	{
+		if (this->_request.getURI()[this->_request.getURI().size() - 1] != '/')
+		{
+			this->_request.setURI(this->_request.getURI() + "/");
+			this->_content.append("/");
+		}
 		if ((i = this->findLocation()) == -1)
-			this->_content.append("index.html");//this->_request.getConfig()._index);
+			this->_content.append(this->_request.getConfig()._index);
 		else
 			this->_content.append(this->_request.getConfig()._locations[i]._index);
 	}
