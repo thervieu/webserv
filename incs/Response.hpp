@@ -48,6 +48,7 @@ class Response
 		std::string	getWWWAuthentificate(void);
 		std::string getTransferEncoding(void);
 		std::string getAllow(void);
+		std::string find_error_page(void);
 
 		std::string	sendResponse(void);
 		std::string getContent(void);

@@ -15,7 +15,6 @@ Request::Request(std::string request, server_info config) : _config(config), _un
 	std::string::iterator	it;
 	std::string::iterator	ite;
 	int						i;
-	std::cout << "request creation port: " << _config._port << std::endl;
 
 	//method
 	i = 0;

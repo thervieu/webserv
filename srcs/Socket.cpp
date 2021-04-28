@@ -17,8 +17,6 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Unable to create socket" << std::endl;
 		exit(1);
 	}
-	std::cout << "fd: " << this->_fd << std::endl;
-	
 	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &this->_opt, sizeof(this->_opt)) < 0)
 	{
 		std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
@@ -29,7 +27,7 @@ Socket::Socket(server_info server)
 	// 	std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
 	// 	exit(1);
 	// }
-	
+
 	// if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
 	// {
 	// 	std::cout << "Error: Unable to set socket to non blocking" << std::endl;

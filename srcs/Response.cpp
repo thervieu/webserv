@@ -556,8 +556,6 @@ std::string		Response::find_error_page(void)
 	std::ostringstream	convert;
 	std::string			code;
 
-
-	std::cout << "JZBDDBZEIDNU ADNAIDABDISABND\n\n\n";
 	i = 0;
 	convert << this->_code;
 	code = convert.str();
@@ -565,7 +563,7 @@ std::string		Response::find_error_page(void)
 		i += 2;
 	if (i < this->_request.getConfig()._error_pages.size())
 		return (this->_request.getConfig()._error_pages[i + 1]);
-	return ("/error_pages/4045.html");
+	return ("./server-documents/" + this->_request.getConfig()._index);
 }
 
 std::string		Response::sendResponse()
@@ -579,7 +577,8 @@ std::string		Response::sendResponse()
 	//insert algo here...
 
 	// substitute of algo for now
-	this->_content = "./server-documents" + this->_request.getURI();
+	this->_content = "." + this->_request.getConfig()._root;
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURI();
 	this->_code = 200;
 	this->_encoding_type = "plain";
 	i = 0;
@@ -619,7 +618,10 @@ std::string		Response::sendResponse()
 		if (this->_code == 429 || this->_code == 504)
 			response += this->getRetryAfter() + "\n";
 		if ((this->_code > 500 && this->_code < 600) || this->_code == 404)
-			this->_content = "./server-documents" + find_error_page();
+		{
+			this->_content = "." + this->_request.getConfig()._root;
+			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
+		}
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\n";
 		response += this->getContentLength() + "\n";
