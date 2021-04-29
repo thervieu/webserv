@@ -583,7 +583,7 @@ std::string		Response::sendResponse()
 	this->_encoding_type = "plain";
 	i = 0;
 	convert << this->_request.getConfig()._port;
-	str = "localhost:" + convert.str();
+	str = this->_request.getConfig()._host + ":" + convert.str();
 	// if (this->_request.getUnknown())
 	// 	this->_code = 501;
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
@@ -632,7 +632,7 @@ std::string		Response::sendResponse()
 			response += this->getLocation();
 			response += this->getRetryAfter();
 		}
-		response += "\n" + this->getContent();
+		response += "\r\n" + this->getContent();
 	}
 	std::cout << response << std::endl;
 	return (response);
