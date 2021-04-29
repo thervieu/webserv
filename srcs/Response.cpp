@@ -608,25 +608,25 @@ std::string		Response::sendResponse()
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
-		response = this->getCode() + "\n";
-		response += this->getDate(0) + "\n";
-		response += this->getServer() + "\n";
+		response = this->getCode() + "\r\n";
+		response += this->getDate(0) + "\r\n";
+		response += this->getServer() + "\r\n";
 		if (this->_code == 401)
-			response += this->getWWWAuthentificate() + "\n";
+			response += this->getWWWAuthentificate() + "\r\n";
 		if (this->_code == 405)
-			response += this->getAllow() + "\n";
+			response += this->getAllow() + "\r\n";
 		if (this->_code == 429 || this->_code == 504)
-			response += this->getRetryAfter() + "\n";
+			response += this->getRetryAfter() + "\r\n";
 		if ((this->_code > 500 && this->_code < 600) || this->_code == 404)
 		{
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
 		}
 		response += this->getTransferEncoding();
-		response += this->getContentType() + "\n";
-		response += this->getContentLength() + "\n";
-		response += this->getContentLanguage() + "\n";
-		response += this->getLastModified() + "\n";
+		response += this->getContentType() + "\r\n";
+		response += this->getContentLength() + "\r\n";
+		response += this->getContentLanguage() + "\r\n";
+		response += this->getLastModified() + "\r\n";
 		if (this->_code == 301 || this->_code == 302)
 		{
 			response += this->getLocation();
