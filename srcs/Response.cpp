@@ -525,11 +525,27 @@ std::string		Response::getAllow()
 	return (ret);
 }
 
-std::string		Response::getContent()
+std::vector<char>	Response::getContent()
 {
-	std::string file;
+	std::vector<char> file;
+	char buffer[1];
+	int rtn_value;
+	int fd;
 
-	file = readFile(this->_content);
+	fd = open(this->_content.c_str(), O_RDONLY);
+	if (fd < -1)
+	{
+		std::cout << "Error: couldn't open " << this->_content << std::endl;
+		exit(0);
+	}
+	while ((rtn_value = read(fd, buffer, 1)) > 0)
+		file.push_back(buffer[0]);
+	if (rtn_value < 0)
+	{
+		std::cout << "Error: problem when reading " << this->_content << std::endl;
+		exit(0);
+	}
+	close(fd);
 	return (file);
 }
 
@@ -566,13 +582,15 @@ std::string		Response::find_error_page(void)
 	return ("./server-documents/" + this->_request.getConfig()._index);
 }
 
-std::string		Response::sendResponse()
+std::vector<char>		Response::sendResponse()
 {
-	std::string			response;
-	struct stat			filestat;
 	std::string			str;
-	int					i;
+	std::string			response;
+	std::vector<char>	f_response;
+	std::vector<char>	file_content;
 	std::ostringstream	convert;
+	int					i;
+	struct stat			filestat;
 
 	//insert algo here...
 
@@ -632,8 +650,10 @@ std::string		Response::sendResponse()
 			response += this->getLocation();
 			response += this->getRetryAfter();
 		}
-		response += "\r\n" + this->getContent();
+		f_response.assign(response.begin(), response.end());
+		f_response.push_back('\n');
+		file_content = this->getContent();
+		std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 	}
-	std::cout << response << std::endl;
-	return (response);
+	return (f_response);
 }

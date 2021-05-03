@@ -64,8 +64,8 @@ int		Socket::getSocketDescriptor(void)
 
 void	Socket::MainLoop()
 {
-	Response	response;
-	std::string	message;
+	Response			response;
+	std::vector<char>	message;
 
 	while (1)
 	{
