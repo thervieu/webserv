@@ -94,7 +94,7 @@ void	Server::select_loop(void)
 	FD_ZERO(&master_read_set);
 	for (size_t i = 0; i < _sockets.size(); i++)
 	{
-		std::cout << "FDSET MASTER + " << _sockets[i]->getSocketDescriptor() << std::endl;
+		// std::cout << "FDSET MASTER + " << _sockets[i]->getSocketDescriptor() << std::endl;
 		FD_SET(_sockets[i]->getSocketDescriptor(), &master_read_set);
 	}
 	int max_sd = this->getMaxSd();
@@ -133,7 +133,7 @@ void	Server::select_loop(void)
 				// std::cout << "setRequest ok" << std::endl;
 				message = response.sendResponse();
 				// std::cout << "sendResponse ok" << std::endl;
-				send(client_sd, &message[0], message.size(), 0);
+				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
 				// std::cout << "\nResponse sent !\n" << std::endl;
 				std::cout << "message.size() = " << message.size() << std::endl;
 				
