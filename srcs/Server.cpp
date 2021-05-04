@@ -110,7 +110,7 @@ void	Server::select_loop(void)
 			int sd = this->_sockets[i]->getSocketDescriptor();
 			if (FD_ISSET(sd, &read_set))
 			{
-				std::cout << "i = " << i << std::endl;
+				// std::cout << "i = " << i << std::endl;
 				max_sd = acceptSocketDescriptor(i, sd, max_sd, &master_read_set, &master_write_set);
 			}
 		}
@@ -133,9 +133,10 @@ void	Server::select_loop(void)
 				// std::cout << "setRequest ok" << std::endl;
 				message = response.sendResponse();
 				// std::cout << "sendResponse ok" << std::endl;
+				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
 				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
 				// std::cout << "\nResponse sent !\n" << std::endl;
-				std::cout << "message.size() = " << message.size() << std::endl;
+				// std::cout << "message.size() = " << message.size() << std::endl;
 				
 				bool_treat = true;
 			}
@@ -156,7 +157,7 @@ void	Server::select_loop(void)
 				}
 				else if (rtn == 0)
 				{
-					std::cout << "rtn == 0" << std::endl;
+					// std::cout << "rtn == 0" << std::endl;
 					client.setReceived(true);
 				}
 			}
