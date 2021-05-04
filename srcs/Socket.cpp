@@ -17,22 +17,18 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Unable to create socket" << std::endl;
 		exit(1);
 	}
-	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &this->_opt, sizeof(this->_opt)) < 0)
+	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &this->_opt, sizeof(this->_opt)) < 0)
 	{
-		std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
+		std::cout << "Error: Unable to set socket options: reuseaddr" << std::endl;
 		exit(1);
 	}
-	// if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEPORT, &this->_opt, sizeof(this->_opt)) < 0)
-	// {
-	// 	std::cout << "Error: Unable to set socket options: setsockopt" << std::endl;
-	// 	exit(1);
-	// }
 
 	// if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
 	// {
 	// 	std::cout << "Error: Unable to set socket to non blocking" << std::endl;
 	// 	exit(1);
 	// }
+
 	this->_address.sin_family = AF_INET;
 	this->_address.sin_addr.s_addr = INADDR_ANY;
 	this->_address.sin_port = htons((int)server._port);
@@ -69,12 +65,13 @@ void	Socket::MainLoop()
 
 	while (1)
 	{
+		std::cout << "\nSelect loop !\n" << std::endl;
+		// Select ??
 		if ((this->_socket = accept(this->_fd, (struct sockaddr *)&this->_address, (socklen_t*)&this->_addrlen)) < 0)
 		{
 			std::cout << "Error: accept failed" << std::endl;
 			exit(1);
 		}
-		// Select ??
 		if (read(this->_socket, this->_buff, this->_server._client_max_body_size) < 0)
 		{
 			std::cout << "Error: read failed" << std::endl;

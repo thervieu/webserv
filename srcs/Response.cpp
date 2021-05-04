@@ -651,6 +651,7 @@ std::vector<char>		Response::sendResponse()
 			response += this->getRetryAfter();
 		}
 		f_response.assign(response.begin(), response.end());
+		f_response.push_back('\r');
 		f_response.push_back('\n');
 		file_content = this->getContent();
 		std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));

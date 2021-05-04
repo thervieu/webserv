@@ -94,9 +94,9 @@ int			main(int ac, char **av)
 	Config		config(config_file);
 	Server		server;
 
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
 	for (size_t i = 0; i < config.getServers().size(); i++)
-	{
 		server.addSocket(new Socket(config.getServers()[i]));
-	}
 	return (0);
 }

@@ -39,9 +39,9 @@ int main(int argc, char const *argv[])
 	valread = read(sock , buffer, 10240);
 	std::cout << buffer << std::endl;
 
-	send(sock, (char *)&message2.at(0), message2.size(), 0);
-	std::cout << "404 message sent" << std::endl << std::endl;
-	valread = read(sock , buffer, 10240);
-	std::cout << buffer << std::endl;
-	return (0);
+	// send(sock, (char *)&message2.at(0), message2.size(), 0);
+	// std::cout << "404 message sent" << std::endl << std::endl;
+	// valread = read(sock , buffer, 10240);
+	// std::cout << buffer << std::endl;
+	// return (0);
 }
