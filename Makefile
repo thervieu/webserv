@@ -18,7 +18,8 @@ SRCS =	Webserv.cpp		\
 		Client.cpp		\
 		Server.cpp		\
 		Response.cpp	\
-		Request.cpp
+		Request.cpp		\
+		signal.cpp
 
 SRCS_DIR = ./srcs/
 
