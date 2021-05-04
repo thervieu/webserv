@@ -19,12 +19,12 @@ class Server
 		void	addSocket(Socket *socket);
 		void	addClient(Client *client);
 
-		int		acceptSocketDescriptor(int sd, int max_sd, fd_set *read_set, fd_set *write_set);
+		int		acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set, fd_set *write_set);
 		int		receiveConnection(int sd, std::string &request);
 
-		int		getMaxSd(void);
-
-		void	select_loop(void);
+		int				getMaxSd(void);
+		std::string		vecToString(std::vector<char> vector);
+		void			select_loop(void);
 };
 
 #endif

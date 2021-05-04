@@ -68,14 +68,13 @@ void	Config::parseConfig(std::string file)
 		if (splittedLine[0] == "server")
 		{
 			parseServer(lines, i + 1, getNbLastLine(lines, i));
-			i = getNbLastLine(lines, i) + 1;
+			i = getNbLastLine(lines, i);
 		}
 		else
 		{
 			std::cout << "SyntaxError: Unexpected token: " << splittedLine[0] << std::endl;
 			exit(0);
 		}
-		i++;
 	}
 	return ;
 }

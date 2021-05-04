@@ -4,6 +4,10 @@ Socket::Socket(void) : _fd(0), _socket(0), _server(server_info()), _buff(NULL)
 {
 }
 
+Socket::Socket(int fd) : _fd(fd), _server(server_info()), _buff(NULL)
+{
+}
+
 Socket::Socket(const Socket &other): _fd(other._fd), _socket(0), _address(other._address), _addrlen(other._addrlen), _server(other._server), _buff(other._buff)
 {
 }
@@ -51,7 +55,7 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Memory required too high" << std::endl;
 		exit(1);
 	}
-	this->MainLoop();
+	//this->MainLoop();
 }
 
 Socket::~Socket(void)
@@ -60,6 +64,12 @@ Socket::~Socket(void)
 int		Socket::getSocketDescriptor(void)
 {
 	return (_fd);
+}
+
+
+server_info		Socket::getServerConfig(void)
+{
+	return (_server);
 }
 
 void	Socket::MainLoop()

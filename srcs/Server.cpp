@@ -39,7 +39,7 @@ std::string		ft_inet_ntoa(struct in_addr in)
 	return (buffer.str());
 }
 
-int		Server::acceptSocketDescriptor(int sd, int max_sd, fd_set *read_set, fd_set *write_set)
+int		Server::acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set, fd_set *write_set)
 {
 	int 		newfd;
 	struct sockaddr_in	clientaddr;
@@ -53,7 +53,7 @@ int		Server::acceptSocketDescriptor(int sd, int max_sd, fd_set *read_set, fd_set
 	}
 
 	std::cout << "accepted: " << sd << std::endl;
-	addClient(new Client(_sockets[sd], ft_inet_ntoa(clientaddr.sin_addr)));
+	addClient(new Client(_sockets[i], ft_inet_ntoa(clientaddr.sin_addr), newfd));
 	FD_SET(newfd, read_set);
 	FD_SET(newfd, write_set);
 
@@ -70,6 +70,7 @@ int		Server::receiveConnection(int sd, std::string &request)
 	if (rc > 0)
 	{
 		request.append(buffer_recv);
+		 //Verification that content exists \r\n etc ?
 		return (0);
 	}
 	else
@@ -78,7 +79,7 @@ int		Server::receiveConnection(int sd, std::string &request)
 	}
 }
 
-// Thanks to https://www.tenouk.com/Module41.html
+// Thanks to https:www.tenouk.com/Module41.html
 void	Server::select_loop(void)
 {
 	fd_set	read_set;
@@ -89,9 +90,13 @@ void	Server::select_loop(void)
 
 	FD_ZERO(&write_set);
 	FD_ZERO(&read_set);
+	FD_ZERO(&master_write_set);
+	FD_ZERO(&master_read_set);
 	for (size_t i = 0; i < _sockets.size(); i++)
-		FD_SET(_sockets[i]->getSocketDescriptor(), &read_set);
-
+	{
+		std::cout << "FDSET MASTER + " << _sockets[i]->getSocketDescriptor() << std::endl;
+		FD_SET(_sockets[i]->getSocketDescriptor(), &master_read_set);
+	}
 	int max_sd = this->getMaxSd();
 
 	while (1)
@@ -99,27 +104,49 @@ void	Server::select_loop(void)
 		read_set = master_read_set;
 		write_set = master_write_set;
 
-		std::cout << "HERE3" << std::endl;
 		select(max_sd + 1, &read_set, &write_set, NULL, NULL);
-		for (int i = 0; i < getMaxSd(); i++)
+		for (size_t i = 0; i < _sockets.size(); i++)
 		{
 			int sd = this->_sockets[i]->getSocketDescriptor();
 			if (FD_ISSET(sd, &read_set))
-				max_sd = acceptSocketDescriptor(sd, max_sd, &read_set, &write_set);
+			{
+				std::cout << "i = " << i << std::endl;
+				max_sd = acceptSocketDescriptor(i, sd, max_sd, &master_read_set, &master_write_set);
+			}
 		}
-
 		for (size_t client_nb = 0; client_nb < _clients.size(); client_nb++)
 		{
+			// std::cout << "client_nb = " << client_nb << std::endl;
 			Client &client = *_clients[client_nb];
 			int client_sd;
-			client_sd = client.getSocket().getSocketDescriptor();
-
-			if (FD_ISSET(client_sd, &read_set))
+			client_sd = client.getSocketDescriptor();
+			// std::cout << "client_nb = " << client_nb << std::endl;
+			// std::cout << "client size = " << _clients.size() << std::endl;
+			bool bool_treat = false;
+			if (FD_ISSET(client_sd, &write_set) && client.getReceived() == true)
 			{
-				std::cout << "HERE4\n";
+				Response			response;
+				std::vector<char>	message;
+
+				// std::cout << "client is set write sd = " << client_sd << std::endl;
+				response.setRequest(Request(client.getRequest(), client.getServerSocket().getServerConfig()));
+				// std::cout << "setRequest ok" << std::endl;
+				message = response.sendResponse();
+				// std::cout << "sendResponse ok" << std::endl;
+				send(client_sd, &message[0], message.size(), 0);
+				// std::cout << "\nResponse sent !\n" << std::endl;
+				std::cout << "message.size() = " << message.size() << std::endl;
+				
+				bool_treat = true;
+			}
+			// std::cout << "aft write if" << std::endl;
+			if (FD_ISSET(client_sd, &read_set) && bool_treat == false)
+			{
+				// std::cout << "client is set read sd = " << client_sd << std::endl;
 				int rtn = receiveConnection(client_sd, client.getRequest());
 				if (rtn < 0)
 				{
+					// std::cout << "rtn < 0" << std::endl;
 					close(client_sd);
 					FD_CLR(client_sd, &master_read_set);
 					FD_CLR(client_sd, &master_write_set);
@@ -127,9 +154,13 @@ void	Server::select_loop(void)
 						while (FD_ISSET(max_sd, &master_read_set) == false)
 							max_sd -= 1;
 				}
-				client.setReceived(true);
+				else if (rtn == 0)
+				{
+					std::cout << "rtn == 0" << std::endl;
+					client.setReceived(true);
+				}
 			}
-			// call Request.cpp
+			// std::cout << "aft read if" << std::endl;
 		}
 	}
 }

@@ -23,12 +23,14 @@ class Socket
 	public:
 
 		Socket(void);
+		Socket(int fd);
 		Socket(const Socket &other);
 		Socket(server_info _server);
 		~Socket(void);
 
 		int				getSocketDescriptor(void);
 		std::string		getBuffer(void);
+		server_info		getServerConfig(void);
 
 		void			MainLoop(void);
 };

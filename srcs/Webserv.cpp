@@ -90,6 +90,7 @@ int			main(int ac, char **av)
 		std::cout << "Format: ./webserv [path_to_configuration_file]" << std::endl;
 		return (1);
 	}
+	
 	std::string config_file = av[1];
 	Config		config(config_file);
 	Server		server;
@@ -98,5 +99,6 @@ int			main(int ac, char **av)
 	{
 		server.addSocket(new Socket(config.getServers()[i]));
 	}
+	server.select_loop();
 	return (0);
 }

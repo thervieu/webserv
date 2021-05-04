@@ -1,18 +1,24 @@
 #include "../incs/Client.hpp"
 
-Client::Client(const Client &other)
-: _socket(other._socket), _ip(other._ip), _request(other._request), _received(other._received)
+Client::Client(Socket *socket, std::string _addr, int clientFd)
+: Socket(clientFd), _serverSocket(socket), _clientFd(clientFd), _ip(_addr), _request(), _received(false)
 {}
 
-Client::Client(Socket *socket, std::string _addr)
-: _socket(socket), _ip(_addr), _request(), _received(false)
-{
+Client::Client(const Client &other)
+: Socket(other._clientFd), _serverSocket(other._serverSocket), _ip(other._ip), _request(other._request), _received(other._received)
+{}
 
+Client::~Client(void)
+{}
+
+Socket		&Client::getServerSocket(void)
+{
+	return (*_serverSocket);
 }
 
-Socket		&Client::getSocket(void)
+int			Client::getClientFd(void)
 {
-	return (*_socket);
+	return (_clientFd);
 }
 
 std::string	Client::getIP(void)
