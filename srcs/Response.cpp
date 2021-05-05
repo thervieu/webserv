@@ -242,6 +242,8 @@ std::string		Response::getMessage(int code)
 			return ("Created");
 		case 202:
 			return ("Accepted");
+		case 204:
+			return ("No Content");
 		case 301:
 			return ("Moved Permanently");
 		case 302:
@@ -518,10 +520,18 @@ std::string		Response::getTransferEncoding()
 
 std::string		Response::getAllow()
 {
-	std::string	ret;
+	std::string		ret;
+	int				i;
+	unsigned int	j;
 
+	j = -1;
+	i = findLocation(1);
 	ret = "Allow: ";
-	ret += "GET";
+	if (i != -1 && this->_request.getConfig()._locations[i]._methods.size() != 0)
+		while (++j < this->_request.getConfig()._locations[i]._methods.size())
+			ret += this->_request.getConfig()._locations[i]._methods[j];
+	else
+		ret += "GET";
 	return (ret);
 }
 
@@ -534,22 +544,17 @@ std::vector<char>	Response::getContent()
 
 	fd = open(this->_content.c_str(), O_RDONLY);
 	if (fd < -1)
-	{
-		std::cout << "Error: couldn't open " << this->_content << std::endl;
-		exit(0);
-	}
+		this->_content = "ERROR";
 	while ((rtn_value = read(fd, buffer, 1)) > 0)
 		file.push_back(buffer[0]);
+	if (this->_content.compare("ERROR") != 0)
+		close(fd);
 	if (rtn_value < 0)
-	{
-		std::cout << "Error: problem when reading " << this->_content << std::endl;
-		exit(0);
-	}
-	close(fd);
+		this->_content = "ERROR";
 	return (file);
 }
 
-int				Response::findLocation()
+int				Response::findLocation(int type)
 {
 	unsigned int	i;
 
@@ -561,7 +566,7 @@ int				Response::findLocation()
 	}
 	if (i == this->_request.getConfig()._locations.size())
 		return (-1);
-	else if (this->_request.getConfig()._locations[i]._index.compare("") == 0)
+	else if (this->_request.getConfig()._locations[i]._index.compare("") == 0 && type == 0)
 		return (-1);
 	return (i);
 }
@@ -582,47 +587,11 @@ std::string		Response::find_error_page(void)
 	return ("./server-documents/" + this->_request.getConfig()._index);
 }
 
-std::vector<char>		Response::sendResponse()
+std::vector<char>		Response::GETResponse(void)
 {
-	std::string			str;
 	std::string			response;
-	std::vector<char>	f_response;
 	std::vector<char>	file_content;
-	std::ostringstream	convert;
-	int					i;
-	struct stat			filestat;
-
-	//insert algo here...
-
-	// substitute of algo for now
-	this->_content = "." + this->_request.getConfig()._root;
-	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURI();
-	this->_code = 200;
-	this->_encoding_type = "plain";
-	i = 0;
-	convert << this->_request.getConfig()._port;
-	str = this->_request.getConfig()._host + ":" + convert.str();
-	// if (this->_request.getUnknown())
-	// 	this->_code = 501;
-	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
-		this->_code = 505;
-	else if (this->_request.getHost().compare(str) != 0)
-		this->_code = 404;
-	if (stat(this->_content.c_str(), &filestat) == -1)
-		this->_code = 404;
-	else if (S_ISDIR(filestat.st_mode))
-	{
-		if (this->_request.getURI()[this->_request.getURI().size() - 1] != '/')
-		{
-			this->_request.setURI(this->_request.getURI() + "/");
-			this->_content.append("/");
-		}
-		if ((i = this->findLocation()) == -1)
-			this->_content.append(this->_request.getConfig()._index);
-		else
-			this->_content.append(this->_request.getConfig()._locations[i]._index);
-	}
-	// substitute of algo for now
+	std::vector<char>	f_response;
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
@@ -653,8 +622,95 @@ std::vector<char>		Response::sendResponse()
 		f_response.assign(response.begin(), response.end());
 		f_response.push_back('\r');
 		f_response.push_back('\n');
-		file_content = this->getContent();
-		std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
+		if (this->_request.getMethod().compare("GET") == 0)
+		{
+			file_content = this->getContent();
+			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
+		}
 	}
+	return (f_response);
+}
+
+std::vector<char>		Response::POSTResponse(void)
+{
+	std::string			response;
+	std::vector<char>	f_response;
+
+	this->_code = 200;
+	response = this->getCode() + "\r\n";
+	this->_content = "lol.html";
+	response += this->getContentType() + "\r\n";
+	response += this->_request.getRequest();
+	f_response.assign(response.begin(), response.end());
+	return (f_response);}
+
+std::vector<char>		Response::TRACEResponse(void)
+{
+	std::string			response;
+	std::vector<char>	f_response;
+
+	this->_code = 200;
+	response = this->getCode() + "\r\n";
+	this->_content = "lol.html";
+	response += this->getContentType() + "\r\n";
+	response += this->_request.getRequest();
+	f_response.assign(response.begin(), response.end());
+	return (f_response);
+}
+
+std::vector<char>		Response::OPTIONSResponse(void)
+{
+	std::vector<char>	f_response;
+	std::string			response;
+
+	this->_code = 204;
+	response = this->getCode() + "\r\n";
+	response += this->getDate(0) + "\r\n";
+	response += this->getServer() + "\r\n";
+	response += this->getAllow() + "\r\n";
+	return (f_response);
+}
+
+std::vector<char>		Response::sendResponse()
+{
+	std::string			str;
+	std::ostringstream	convert;
+	std::vector<char>	f_response;
+	int					i;
+	struct stat			filestat;
+
+	this->_content = "." + this->_request.getConfig()._root;
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURI();
+	this->_code = 200;
+	this->_encoding_type = "plain";
+	i = 0;
+	convert << this->_request.getConfig()._port;
+	str = this->_request.getConfig()._host + ":" + convert.str();
+	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
+		this->_code = 505;
+	else if (this->_request.getHost().compare(str) != 0)
+		this->_code = 404;
+	if (stat(this->_content.c_str(), &filestat) == -1)
+		this->_code = 404;
+	else if (S_ISDIR(filestat.st_mode))
+	{
+		if (this->_request.getURI()[this->_request.getURI().size() - 1] != '/')
+		{
+			this->_request.setURI(this->_request.getURI() + "/");
+			this->_content.append("/");
+		}
+		if ((i = this->findLocation(0)) == -1)
+			this->_content.append(this->_request.getConfig()._index);
+		else
+			this->_content.append(this->_request.getConfig()._locations[i]._index);
+	}
+	if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
+		f_response = GETResponse();
+	else if (this->_request.getMethod().compare("POST") == 0)
+		f_response = POSTResponse();
+	else if (this->_request.getMethod().compare("TRACE") == 0)
+		f_response = TRACEResponse();
+	else if (this->_request.getMethod().compare("OPTIONS") == 0)
+		f_response = OPTIONSResponse();	
 	return (f_response);
 }

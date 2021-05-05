@@ -9,7 +9,7 @@ Request::Request(Request const &ref) : _method("GET"), _url("/"), _accept_charse
 {
 }
 
-Request::Request(std::string request, server_info config) : _config(config), _unknown(0)
+Request::Request(std::string request, server_info config) : _config(config), _request(request), _unknown(0)
 {
 	std::string				line;
 	std::string::iterator	it;
@@ -76,6 +76,7 @@ Request		&Request::operator=(Request const &rhs)
 	this->_referer = rhs.getReferer();
 	this->_user_agent = rhs.getUserAgent();
 	this->_config = rhs.getConfig();
+	this->_request = rhs.getRequest();
 	return (*this);
 }
 
@@ -209,4 +210,9 @@ std::string		Request::getMethod(void) const
 int				Request::getUnknown(void) const
 {
 	return (this->_unknown);
+}
+
+std::string		Request::getRequest(void) const
+{
+	return (this->_request);
 }

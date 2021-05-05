@@ -10,6 +10,7 @@ class Request
 	private:
 
 		server_info		_config;
+		std::string		_request;
 		std::string		_method;
 		std::string		_url;
 		std::string		_http_version;
@@ -43,6 +44,7 @@ class Request
 		std::string		getMethod(void) const;
 		std::string		getURI(void) const;
 		std::string		getHTTPVersion(void) const;
+		std::string		getRequest(void) const;
 		server_info		getConfig(void) const;
 		int				getUnknown(void) const;
 		void			parsing(std::string str);
