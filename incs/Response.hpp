@@ -29,7 +29,7 @@ class Response
 
 		Response			&operator=(Response const &rhs);
 		void				setRequest(Request request);
-		int					findLocation(int type);
+		int					findLocation(std::string cpy);
 		std::string			itos(int nb);
 		std::string			itos(long nb);
 		std::string			getDate(int type);
@@ -49,6 +49,7 @@ class Response
 		std::string 		getTransferEncoding(void);
 		std::string 		getAllow(void);
 		std::string 		find_error_page(void);
+		std::string			findIndex(void);
 
 		std::vector<char>	GETResponse(void);
 		std::vector<char>	POSTResponse(void);

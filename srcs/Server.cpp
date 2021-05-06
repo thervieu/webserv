@@ -125,6 +125,8 @@ void	Server::select_loop(void)
 
 				response.setRequest(Request(client.getRequest(), client.getServerSocket().getServerConfig()));
 				message = response.sendResponse();
+				// for (std::vector<char>::const_iterator i = message.begin(); i != message.end(); i++)
+				// 	std::cout << *i;
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
 				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
 				// std::cout << "\nResponse sent !\n" << std::endl;

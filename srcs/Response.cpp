@@ -17,12 +17,12 @@ Response::~Response()
 {
 }
 
-void			Response::setRequest(Request request)
+void				Response::setRequest(Request request)
 {
 	this->_request = request;
 }
 
-std::string		Response::itos(int nb)
+std::string			Response::itos(int nb)
 {
 	std::string			ret;
 	std::stringstream	conv;
@@ -32,7 +32,7 @@ std::string		Response::itos(int nb)
 	return (ret);
 }
 
-std::string		Response::itos(long nb)
+std::string			Response::itos(long nb)
 {
 	std::string			ret;
 	std::stringstream	conv;
@@ -42,7 +42,7 @@ std::string		Response::itos(long nb)
 	return (ret);
 }
 
-std::string		Response::getNumberDay(long nbday)
+std::string			Response::getNumberDay(long nbday)
 {
 	long		nbyear;
 	std::string ret;
@@ -168,7 +168,7 @@ std::string		Response::getNumberDay(long nbday)
 	return (ret);
 }
 
-std::string		Response::getDay(long day)
+std::string			Response::getDay(long day)
 {
 	day = day % 7;
 	switch (day)
@@ -192,7 +192,7 @@ std::string		Response::getDay(long day)
 	}
 }
 
-std::string		Response::getDate(int type)
+std::string			Response::getDate(int type)
 {
 	struct timeval	tv;
 	struct timezone	tz;
@@ -232,7 +232,7 @@ std::string		Response::getDate(int type)
 	return (date);
 }
 
-std::string		Response::getMessage(int code)
+std::string			Response::getMessage(int code)
 {
 	switch (code)
 	{
@@ -273,7 +273,7 @@ std::string		Response::getMessage(int code)
 	}
 }
 
-std::string		Response::getCode()
+std::string			Response::getCode()
 {
 	std::string	ret;
 
@@ -283,7 +283,7 @@ std::string		Response::getCode()
 	return (ret);
 }
 
-std::string		Response::getLocation()
+std::string			Response::getLocation()
 {
 	std::string	ret;
 
@@ -291,7 +291,7 @@ std::string		Response::getLocation()
 	return (ret);
 }
 
-std::string		Response::getServer()
+std::string			Response::getServer()
 {
 	std::string ret;
 
@@ -299,7 +299,7 @@ std::string		Response::getServer()
 	return (ret);
 }
 
-std::string		Response::getRetryAfter()
+std::string			Response::getRetryAfter()
 {
 	std::string	ret;
 
@@ -313,7 +313,7 @@ std::string		Response::getRetryAfter()
 	return (ret);
 }
 
-std::string		Response::getLastModified()
+std::string			Response::getLastModified()
 {
 	std::string	ret;
 	struct stat	time;
@@ -326,7 +326,7 @@ std::string		Response::getLastModified()
 	return (ret);
 }
 
-std::string		Response::getContentLength()
+std::string			Response::getContentLength()
 {
 	std::string	ret;
 	struct stat	stt;
@@ -337,7 +337,7 @@ std::string		Response::getContentLength()
 	return (ret);
 }
 
-std::string		Response::getExtension(std::string extension)
+std::string			Response::getExtension(std::string extension)
 {
 	if (extension.compare(".aac") == 0)
 		return ("audio/aac");
@@ -477,7 +477,7 @@ std::string		Response::getExtension(std::string extension)
 		return ("text/plain");
 }
 
-std::string		Response::getContentType()
+std::string			Response::getContentType()
 {
 	std::string				ret;
 	std::string::iterator	it;
@@ -492,7 +492,7 @@ std::string		Response::getContentType()
 	return (ret);
 }
 
-std::string		Response::getContentLanguage()
+std::string			Response::getContentLanguage()
 {
 	std::string	ret;
 
@@ -500,7 +500,7 @@ std::string		Response::getContentLanguage()
 	return (ret);
 }
 
-std::string		Response::getWWWAuthentificate()
+std::string			Response::getWWWAuthentificate()
 {
 	std::string ret;
 
@@ -508,7 +508,7 @@ std::string		Response::getWWWAuthentificate()
 	return (ret);
 }
 
-std::string		Response::getTransferEncoding()
+std::string			Response::getTransferEncoding()
 {
 	std::string ret;
 
@@ -518,20 +518,29 @@ std::string		Response::getTransferEncoding()
 	return (ret);
 }
 
-std::string		Response::getAllow()
+std::string			Response::getAllow()
 {
+	std::string		cpy;
 	std::string		ret;
 	int				i;
 	unsigned int	j;
 
-	j = -1;
-	i = findLocation(1);
-	ret = "Allow: ";
-	if (i != -1 && this->_request.getConfig()._locations[i]._methods.size() != 0)
-		while (++j < this->_request.getConfig()._locations[i]._methods.size())
-			ret += this->_request.getConfig()._locations[i]._methods[j];
-	else
-		ret += "GET";
+	ret = "Allow:";
+	cpy.assign(this->_content.begin() + 18, this->_content.end());
+	while (ret.size() == 6 && cpy.size() > 0)
+	{
+		j = -1;
+		i = findLocation(cpy);
+		if (i != -1 && this->_request.getConfig()._locations[i]._methods.size() != 0)
+			while (++j < this->_request.getConfig()._locations[i]._methods.size())
+				ret += " " + this->_request.getConfig()._locations[i]._methods[j];
+		do
+		{
+			cpy = cpy.substr(0, cpy.size() - 1);
+		} while (cpy[cpy.size() - 1] != '/' && cpy.size() > 0);
+	}
+	if (ret.size() == 6)
+		ret += " GET HEAD TRACE OPTIONS";
 	return (ret);
 }
 
@@ -554,24 +563,20 @@ std::vector<char>	Response::getContent()
 	return (file);
 }
 
-int				Response::findLocation(int type)
+int					Response::findLocation(std::string cpy)
 {
 	unsigned int	i;
 
 	i = 0;
 	while (i < this->_request.getConfig()._locations.size() &&
-		this->_request.getConfig()._locations[i]._name.compare(this->_request.getURI()) != 0)
-	{
+			this->_request.getConfig()._locations[i]._name.compare(cpy) != 0)
 		i++;
-	}
 	if (i == this->_request.getConfig()._locations.size())
-		return (-1);
-	else if (this->_request.getConfig()._locations[i]._index.compare("") == 0 && type == 0)
 		return (-1);
 	return (i);
 }
 
-std::string		Response::find_error_page(void)
+std::string			Response::find_error_page(void)
 {
 	unsigned int		i;
 	std::ostringstream	convert;
@@ -587,7 +592,32 @@ std::string		Response::find_error_page(void)
 	return ("./server-documents/" + this->_request.getConfig()._index);
 }
 
-std::vector<char>		Response::GETResponse(void)
+std::string			Response::findIndex(void)
+{
+	std::string		cpy;
+	std::string		ret;
+	int				i;
+
+	ret = "";
+	cpy.assign(this->_content.begin() + 18, this->_content.end());
+	while (ret.size() == 0 && cpy.size() > 0)
+	{
+		i = findLocation(cpy);
+		if (i != -1 && this->_request.getConfig()._locations[i]._index.compare("") != 0)
+			ret = "./server-documents/" + this->_request.getConfig()._locations[i]._name + this->_request.getConfig()._locations[i]._index;
+		do
+		{
+			cpy = cpy.substr(0, cpy.size() - 1);
+		} while (cpy[cpy.size() - 1] != '/' && cpy.size() > 0);
+	}
+	if (ret.size() == 0 && this->_request.getConfig()._index.compare("") != 0)
+		ret = "./server-documents/" + this->_request.getConfig()._index;
+	if (ret.size() == 0)
+		ret = "./server-documents/index.html";
+	return (ret);
+}
+
+std::vector<char>	Response::GETResponse(void)
 {
 	std::string			response;
 	std::vector<char>	file_content;
@@ -699,10 +729,7 @@ std::vector<char>		Response::sendResponse()
 			this->_request.setURI(this->_request.getURI() + "/");
 			this->_content.append("/");
 		}
-		if ((i = this->findLocation(0)) == -1)
-			this->_content.append(this->_request.getConfig()._index);
-		else
-			this->_content.append(this->_request.getConfig()._locations[i]._index);
+		this->_content = this->findIndex();
 	}
 	if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
 		f_response = GETResponse();
