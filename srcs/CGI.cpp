@@ -70,6 +70,7 @@ std::string executeCGI(void)
 		close(_pipe[0]);
 		write(_pipe[1], content, content.length());
 		close(_pipe[1]);
+		waitpid(-1, NULL, 0); // wait for any child to die but since we only have one it's ok
 		//free args
 	}
 	return (readFile("tmp/cgi_file"));
