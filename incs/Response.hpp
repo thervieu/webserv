@@ -4,6 +4,7 @@
 
 # include "Webserv.hpp"
 # include "Request.hpp"
+//# include "CGI.hpp"
 
 # define SEC_PER_MIN 60
 # define SEC_PER_HOUR 3600
@@ -19,6 +20,7 @@ class Response
 		std::string		_encoding_type;
 		std::string		_content;
 		int				_code;
+		location		_CGILocation;
 
 	public:
 

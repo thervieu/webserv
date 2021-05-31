@@ -700,6 +700,49 @@ std::vector<char>		Response::OPTIONSResponse(void)
 	response += this->getAllow() + "\r\n";
 	return (f_response);
 }
+/*
+location	Response::getCGILocation(std::string url, std::vector<location> locations)
+{
+	for (size_t i = 0; i < locations.size(); i++)
+	{
+		if (locations[i]._name == url)
+			return (locations[i]);
+	}
+
+	size_t max_len = 0;
+	size_t max_index = 0;
+
+	for (size_t i = 0; i < locations.size(); i++)
+	{
+		if (url.rfind(locations[i]._name, 0) == 0)
+		{
+			if (locations[i]._name.size() > max_len)
+			{
+				max_index = i;
+				max_len = locations[i]._name.size();
+			}
+		}
+	}
+	return (locations[max_index]);
+}
+
+bool		Response::CGI_CALL(std::string url, location loc)
+{
+	std::string formatURL = url;
+	size_t i = 0;
+
+	formatURL.replace(0, loc._name.size(), "/");
+	std::cout << "formatURL = |" << formatURL << "|" << td::endl;
+	formatURL = replace(formatURL, "//", "/");
+	std::cout << "formatURL = |" << formatURL << "|" << td::endl;
+	while (formatURL[i] && formatURL[i] != '?')
+		i++;
+	formatURL = std::string(formatURL, 0, i);
+
+
+
+}
+*/
 
 std::vector<char>		Response::sendResponse()
 {
@@ -731,6 +774,11 @@ std::vector<char>		Response::sendResponse()
 		}
 		this->_content = this->findIndex();
 	}
+	/*//CGI
+	if (CGI_call(_request.getURI(), getCGILocation(_request.getURI(), _request.getConfig().locations)))
+	{
+		std::cout << "CGI_CALL" << std::endl;
+	}*/
 	if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
 		f_response = GETResponse();
 	else if (this->_request.getMethod().compare("POST") == 0)
