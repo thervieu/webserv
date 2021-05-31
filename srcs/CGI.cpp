@@ -13,6 +13,10 @@ CGI::~CGI(void)
 {
 }
 
+// some helpful links
+// https://cmd.inp.nsk.su/old/cmd2/manuals/unix/UNIX_Unleashed/ch20.htm
+// https://programmer.help/blogs/implement-simple-web-server-c-language.html
+// https://www.classes.cs.uchicago.edu/archive/1999/winter/CS219/projects/project2/project2.html
 std::string executeCGI(void)
 {
 	int _pipe[2];
