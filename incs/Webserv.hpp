@@ -11,7 +11,7 @@
 # include <ctime>
 # include <sys/time.h>
 # include <signal.h>
-
+# include <cstdio>
 # include <sstream>
 # include <ostream>
 # include <iostream>

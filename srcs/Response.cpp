@@ -672,34 +672,51 @@ std::vector<char>		Response::POSTResponse(void)
 	response += this->getContentType() + "\r\n";
 	response += this->_request.getRequest();
 	f_response.assign(response.begin(), response.end());
-	return (f_response);}
+	return (f_response);
+}
 
-std::vector<char>		Response::TRACEResponse(void)
+std::vector<char>		Response::DELETEResponse(void)
 {
 	std::string			response;
 	std::vector<char>	f_response;
 
-	this->_code = 200;
+	if (std::remove(this->_content.c_str()) != 0)
+		this->_code = 404;
+	else
+		this->_code = 204;
 	response = this->getCode() + "\r\n";
-	this->_content = "lol.html";
-	response += this->getContentType() + "\r\n";
-	response += this->_request.getRequest();
+	response += this->getDate(0) + "\r\n";
 	f_response.assign(response.begin(), response.end());
 	return (f_response);
 }
 
-std::vector<char>		Response::OPTIONSResponse(void)
-{
-	std::vector<char>	f_response;
-	std::string			response;
 
-	this->_code = 204;
-	response = this->getCode() + "\r\n";
-	response += this->getDate(0) + "\r\n";
-	response += this->getServer() + "\r\n";
-	response += this->getAllow() + "\r\n";
-	return (f_response);
-}
+// std::vector<char>		Response::TRACEResponse(void)
+// {
+// 	std::string			response;
+// 	std::vector<char>	f_response;
+
+// 	this->_code = 200;
+// 	response = this->getCode() + "\r\n";
+// 	this->_content = "lol.html";
+// 	response += this->getContentType() + "\r\n";
+// 	response += this->_request.getRequest();
+// 	f_response.assign(response.begin(), response.end());
+// 	return (f_response);
+// }
+
+// std::vector<char>		Response::OPTIONSResponse(void)
+// {
+// 	std::vector<char>	f_response;
+// 	std::string			response;
+
+// 	this->_code = 204;
+// 	response = this->getCode() + "\r\n";
+// 	response += this->getDate(0) + "\r\n";
+// 	response += this->getServer() + "\r\n";
+// 	response += this->getAllow() + "\r\n";
+// 	return (f_response);
+// }
 /*
 location	Response::getCGILocation(std::string url, std::vector<location> locations)
 {
@@ -738,8 +755,6 @@ bool		Response::CGI_CALL(std::string url, location loc)
 	while (formatURL[i] && formatURL[i] != '?')
 		i++;
 	formatURL = std::string(formatURL, 0, i);
-
-
 
 }
 */
@@ -783,9 +798,11 @@ std::vector<char>		Response::sendResponse()
 		f_response = GETResponse();
 	else if (this->_request.getMethod().compare("POST") == 0)
 		f_response = POSTResponse();
-	else if (this->_request.getMethod().compare("TRACE") == 0)
-		f_response = TRACEResponse();
-	else if (this->_request.getMethod().compare("OPTIONS") == 0)
-		f_response = OPTIONSResponse();	
+	else if (this->_request.getMethod().compare("DELETE") == 0)
+		f_response = DELETEResponse();
+	// else if (this->_request.getMethod().compare("TRACE") == 0)
+	// 	f_response = TRACEResponse();
+	// else if (this->_request.getMethod().compare("OPTIONS") == 0)
+	// 	f_response = OPTIONSResponse();	
 	return (f_response);
 }

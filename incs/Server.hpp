@@ -21,6 +21,7 @@ class Server
 
 		int		acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set, fd_set *write_set);
 		int		receiveConnection(int sd, std::string &request);
+		int		getSocket(int i);
 
 		int				getMaxSd(void);
 		std::string		vecToString(std::vector<char> vector);

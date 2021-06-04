@@ -5,11 +5,11 @@ void	signal_handler(int signum)
 	if (signum == SIGINT)
 	{
 		std::cout << "ctrl-c detected, closing application..." << std::endl;
-		exit(0);
+		throw std::exception();
 	}
 	if (signum == SIGQUIT)
 	{
 		std::cout << "ctrl-d detected, closing application..." << std::endl;
-		exit(0);
+		throw std::exception();
 	}
 }

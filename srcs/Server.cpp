@@ -153,3 +153,8 @@ void	Server::select_loop(void)
 		}
 	}
 }
+
+int		Server::getSocket(int i)
+{
+	return (this->_sockets[i]->getSocketDescriptor());
+}

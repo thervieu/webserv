@@ -97,10 +97,17 @@ int			main(int ac, char **av)
 
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, signal_handler);
-	for (size_t i = 0; i < config.getServers().size(); i++)
+	try
 	{
-		server.addSocket(new Socket(config.getServers()[i]));
+		for (size_t i = 0; i < config.getServers().size(); i++)
+			server.addSocket(new Socket(config.getServers()[i]));
+		server.select_loop();
 	}
-	server.select_loop();
+	catch(const std::exception& e)
+	{
+		std::cerr << "closing server now" << std::endl;
+		for (size_t i = 0; i < config.getServers().size(); i++)
+			close(server.getSocket(i));
+	}
 	return (0);
 }
