@@ -1,4 +1,5 @@
 #include "../incs/Server.hpp"
+#include <strings.h>
 
 Server::Server(void)
 {}
@@ -62,21 +63,90 @@ int		Server::acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set,
 	return (max_sd);
 }
 
+int 	isContentWhole(std::string request)
+{
+	size_t pos = 0;
+	size_t find_pos = 0;
+	size_t end_pos = request.find("\n");
+
+
+	while (end_pos != std::string::npos)
+	{
+		std::string	l = request.substr(pos, end_pos - pos);
+
+		if ((find_pos = l.find("Transfer-Encoding: chunked")) != std::string::npos && find_pos == 0)
+			return (2);
+		else if ((find_pos = l.find("Content")) != std::string::npos && find_pos == 0)
+			return (1);
+		else if ((find_pos = l.find("\r\n\r\n")) != std::string::npos && find_pos == 0)
+			return (0);
+
+		pos = end_pos + 1;
+		end_pos = request.find("\n", pos);
+	}
+	return (0);
+
+}
+
+static size_t getContentLen(std::string request)
+{
+		size_t pos_in = 0;
+	std::string line;
+
+	size_t pos = 0;
+	size_t end = request.find("\n");
+	while (end != std::string::npos)
+	{
+		line = request.substr(pos, end - pos);
+		if (((pos_in = line.find("Content-Length")) != std::string::npos)
+			&& pos_in == 0)
+			return (atoi(line.substr(line.find(":") + 2, line.length()).c_str()));
+		if ((pos_in = request.find("\r\n\r\n")) != std::string::npos
+			&& pos_in == pos)
+			break;
+		pos = end + 1;
+		end = request.find("\n", pos);
+	}
+	return (0);
+}
+
 int		Server::receiveConnection(int sd, std::string &request)
 {
-	char buffer_recv[10000 + 1];
+	char buffer_recv[BUFFER_SIZE + 1];
+	bzero(buffer_recv, BUFFER_SIZE + 1);
+
 	int rc = 0;
-    rc = read(sd, buffer_recv, 10000);
+    rc = read(sd, buffer_recv, BUFFER_SIZE);
+	
 	if (rc > 0)
 	{
 		request.append(buffer_recv);
-		 //Verification that content exists \r\n etc ?
-		return (0);
+		// Verification that content exists \r\n etc
+
+		int _complete = isContentWhole(request);
+		size_t find_pos;
+		if ((find_pos = request.find("\r\n\r\n")) != std::string::npos && _complete == 0)
+			return (0);
+
+		if (_complete > 0)
+		{
+			std::string rest = request.substr(find_pos + 4, request.length() - (find_pos + 4));
+			std::string to_find = "\r\n\r\n";
+			//https://fr.wikipedia.org/wiki/Chunked_transfer_encoding
+			if (_complete == 2)
+				to_find = "0" + to_find;
+			if ((find_pos = rest.find(to_find)) != std::string::npos)
+			{
+				if (_complete == 2 && (find_pos == 0 || (rest[find_pos - 1] == '\n' && rest[find_pos - 2] == '\r')))
+					return (0);
+			}
+		}
 	}
 	else
 	{
 		return (-1);
 	}
+	return (1);
 }
 
 // Thanks to https:www.tenouk.com/Module41.html
@@ -131,6 +201,8 @@ void	Server::select_loop(void)
 				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
 				// std::cout << "\nResponse sent !\n" << std::endl;
 				
+				client.setReceived(false);
+				client.getRequest().clear();
 				bool_treat = true;
 			}
 			if (FD_ISSET(client_sd, &read_set) && bool_treat == false)
@@ -147,6 +219,7 @@ void	Server::select_loop(void)
 				}
 				else if (rtn == 0)
 				{
+					std::cout << "\nTRUE\n";
 					client.setReceived(true);
 				}
 			}

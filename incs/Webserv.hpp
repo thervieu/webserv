@@ -27,6 +27,6 @@ std::vector<std::string>	splitSpaces(std::string line);
 std::string					readFile(std::string _fileName);
 void						signal_handler(int signum);
 
-#define BUFFER_SIZE 10000
+#define BUFFER_SIZE 1000000
 
 #endif
