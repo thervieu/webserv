@@ -95,6 +95,9 @@ int		Server::receiveConnection(int sd, std::string &request)
 
 	int rc = 0;
     rc = read(sd, buffer_recv, BUFFER_SIZE);
+	std::cout << "ret read = " << rc << std::endl;
+	std::cout << "REQUEST BEF = |" << request << "|\n";
+	std::cout << "BUFFER = |" << buffer_recv << "|\n";
 	
 	if (rc > 0)
 	{
@@ -197,6 +200,7 @@ void	Server::select_loop(void)
 				}
 				else if (rtn == 0)
 				{
+					std::cout << "\nTRUE\n";
 					client.setReceived(true);
 				}
 			}
