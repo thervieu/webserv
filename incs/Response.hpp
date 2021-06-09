@@ -20,7 +20,7 @@ class Response
 		std::string		_encoding_type;
 		std::string		_content;
 		int				_code;
-		location		_CGILocation;
+		location		_location;
 
 	public:
 
@@ -53,11 +53,17 @@ class Response
 		std::string 		find_error_page(void);
 		std::string			findIndex(void);
 
+
+		location			getLocation(std::string url, std::vector<location> locations);
+
+		bool				isAllowedMethod(void);
+
 		std::vector<char>	GETResponse(void);
 		std::vector<char>	POSTResponse(void);
 		std::vector<char>	DELETEResponse(void);
 		// std::vector<char>	TRACEResponse(void);
 		// std::vector<char>	OPTIONSResponse(void);
+		std::vector<char>	wrongMethodReponse(void);
 
 		std::vector<char>	sendResponse(void);
 		std::vector<char>	getContent(void);
