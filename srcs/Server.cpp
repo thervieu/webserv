@@ -88,28 +88,6 @@ int 	isContentWhole(std::string request)
 
 }
 
-static size_t getContentLen(std::string request)
-{
-		size_t pos_in = 0;
-	std::string line;
-
-	size_t pos = 0;
-	size_t end = request.find("\n");
-	while (end != std::string::npos)
-	{
-		line = request.substr(pos, end - pos);
-		if (((pos_in = line.find("Content-Length")) != std::string::npos)
-			&& pos_in == 0)
-			return (atoi(line.substr(line.find(":") + 2, line.length()).c_str()));
-		if ((pos_in = request.find("\r\n\r\n")) != std::string::npos
-			&& pos_in == pos)
-			break;
-		pos = end + 1;
-		end = request.find("\n", pos);
-	}
-	return (0);
-}
-
 int		Server::receiveConnection(int sd, std::string &request)
 {
 	char buffer_recv[BUFFER_SIZE + 1];
@@ -219,7 +197,6 @@ void	Server::select_loop(void)
 				}
 				else if (rtn == 0)
 				{
-					std::cout << "\nTRUE\n";
 					client.setReceived(true);
 				}
 			}
