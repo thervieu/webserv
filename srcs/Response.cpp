@@ -522,18 +522,16 @@ std::string			Response::getAllow()
 {
 	std::string		cpy;
 	std::string		ret;
-	int				i;
-	unsigned int	j;
+	unsigned int	i;
 
 	ret = "Allow:";
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
 	while (ret.size() == 6 && cpy.size() > 0)
 	{
-		j = -1;
-		i = findLocation(cpy);
-		if (i != -1 && this->_request.getConfig()._locations[i]._methods.size() != 0)
-			while (++j < this->_request.getConfig()._locations[i]._methods.size())
-				ret += " " + this->_request.getConfig()._locations[i]._methods[j];
+		i = -1;
+		if (this->_location._methods.size() != 0)
+			while (++i < this->_location._methods.size())
+				ret += " " + this->_location._methods[i];
 		do
 		{
 			cpy = cpy.substr(0, cpy.size() - 1);
@@ -563,19 +561,6 @@ std::vector<char>	Response::getContent()
 	return (file);
 }
 
-int					Response::findLocation(std::string cpy)
-{
-	unsigned int	i;
-
-	i = 0;
-	while (i < this->_request.getConfig()._locations.size() &&
-			this->_request.getConfig()._locations[i]._name.compare(cpy) != 0)
-		i++;
-	if (i == this->_request.getConfig()._locations.size())
-		return (-1);
-	return (i);
-}
-
 std::string			Response::find_error_page(void)
 {
 	unsigned int		i;
@@ -596,15 +581,13 @@ std::string			Response::findIndex(void)
 {
 	std::string		cpy;
 	std::string		ret;
-	int				i;
 
 	ret = "";
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
 	while (ret.size() == 0 && cpy.size() > 0)
 	{
-		i = findLocation(cpy);
-		if (i != -1 && this->_request.getConfig()._locations[i]._index.compare("") != 0)
-			ret = "./server-documents/" + this->_request.getConfig()._locations[i]._name + this->_request.getConfig()._locations[i]._index;
+		if (this->_location._index.compare("") != 0)
+			ret = "./server-documents/" + this->_location._name + this->_location._index;
 		do
 		{
 			cpy = cpy.substr(0, cpy.size() - 1);
@@ -613,7 +596,10 @@ std::string			Response::findIndex(void)
 	if (ret.size() == 0 && this->_request.getConfig()._index.compare("") != 0)
 		ret = "./server-documents/" + this->_request.getConfig()._index;
 	if (ret.size() == 0)
+	{
 		ret = "./server-documents/index.html";
+		//std::cout << "INDEX_HTML\n";
+	}
 	return (ret);
 }
 
@@ -654,6 +640,7 @@ std::vector<char>	Response::GETResponse(void)
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0)
 		{
+			//std::cout << "CONTENT_PATH 1 = |" << this->_content << "|\n";
 			file_content = this->getContent();
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 		}
@@ -706,24 +693,13 @@ std::vector<char>		Response::wrongMethodReponse(void)
 	response += this->getContentLength() + "\r\n";
 	response += this->getContentLanguage() + "\r\n";
 	response += this->getLastModified() + "\r\n";
-
-	std::string allowed = "Allow: ";
-
-	for (size_t i = 0; i < _location._methods.size(); i++)
-	{
-		allowed += _location._methods[i];
-		if (i < _location._methods.size() - 1)
-			allowed += ", ";
-	}
-	allowed += "\r\n";
-	response += allowed;
+	response += this-> getAllow() + "\r\n";
 
 
 	f_response.assign(response.begin(), response.end());
 
-	std::vector<char>	file_content;
-
-	file_content = this->getContent();
+	//std::cout << "CONTENT_PATH 2 = |" << this->_content << "|\n";
+	std::vector<char>	file_content = this->getContent();
 	std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 
 	f_response.push_back('\r');
@@ -805,7 +781,6 @@ bool Response::isAllowedMethod(void)
 {
 	for (size_t i = 0; i < _location._methods.size(); i++)
 	{
-		std::cout << _location._methods[i] << "\n";
 		if (_request.getMethod().compare(_location._methods[i]) == 0)
 			return (true);
 	}
@@ -820,7 +795,7 @@ std::vector<char>		Response::sendResponse()
 	int					i;
 	struct stat			filestat;
 
-	this->_location =  getLocation(_request.getURI(), _request.getConfig()._locations);
+	this->_location = getLocation(_request.getURI(), _request.getConfig()._locations);
 	this->_content = "." + this->_request.getConfig()._root;
 	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURI();
 	this->_code = 200;
@@ -832,6 +807,7 @@ std::vector<char>		Response::sendResponse()
 		this->_code = 505;
 	else if (this->_request.getHost().compare(str) != 0)
 		this->_code = 404;
+	std::cout << "CONTENT_PATH = " << this->_content << "\n";
 	if (stat(this->_content.c_str(), &filestat) == -1)
 		this->_code = 404;
 	else if (S_ISDIR(filestat.st_mode))

@@ -381,7 +381,6 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
 			exit(1);
 		}
-		std::cout << "location size = " << _loc._client_max_body_size << std::endl;
 	}
 	return ;
 }
