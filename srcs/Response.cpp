@@ -581,27 +581,15 @@ std::string			Response::findIndex(void)
 {
 	std::string		cpy;
 	std::string		ret;
-	location		tmp_loc;
 
 	ret = "";
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
-	while (ret.size() == 0 && cpy.size() > 0)
-	{
-		tmp_loc = getLocation(cpy, this->_request.getConfig()._locations);
-		if (tmp_loc._index.compare("") != 0)
-			ret = "./server-documents/" + tmp_loc._name + tmp_loc._index;
-		do
-		{
-			cpy = cpy.substr(0, cpy.size() - 1);
-		} while (cpy[cpy.size() - 1] != '/' && cpy.size() > 0);
-	}
-	if (ret.size() == 0 && this->_request.getConfig()._index.compare("") != 0)
-		ret = "./server-documents/" + this->_request.getConfig()._index;
-	if (ret.size() == 0)
-	{
-		ret = "./server-documents/index.html";
-		//std::cout << "INDEX_HTML\n";
-	}
+	if (this->_location._index.compare("") != 0)
+		ret = "./server-documents/" + this->_location._name + this->_location._index;
+	else if (this->_location._autoindex == true)
+		ret = "autoindex";
+	else
+		ret = "forbidden";
 	return (ret);
 }
 
@@ -622,7 +610,7 @@ std::vector<char>	Response::GETResponse(void)
 			response += this->getAllow() + "\r\n";
 		if (this->_code == 429 || this->_code == 504)
 			response += this->getRetryAfter() + "\r\n";
-		if ((this->_code > 500 && this->_code < 600) || this->_code == 404 || this->_code == 405)
+		if ((this->_code > 500 && this->_code < 600) || this->_code == 404 || this->_code == 405 || this->_code == 403)
 		{
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
@@ -642,9 +630,19 @@ std::vector<char>	Response::GETResponse(void)
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0)
 		{
+			if (this->_content == "autoindex")
+			{
+				f_response.push_back(':');
+				f_response.push_back(')');
+				f_response.push_back('\r');
+				f_response.push_back('\n');
+			}
+			else
+			{
+				file_content = this->getContent();
+				std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
+			}
 			//std::cout << "CONTENT_PATH 1 = |" << this->_content << "|\n";
-			file_content = this->getContent();
-			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 		}
 	}
 	return (f_response);
@@ -686,16 +684,16 @@ std::vector<char>		Response::wrongMethodReponse(void)
 	std::vector<char>	file_content;
 
 	this->_code = 405;
+	this->_content = "." + this->_request.getConfig()._root;
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
 	response = this->getCode() + "\r\n";
 	response += this->getDate(0) + "\r\n";
 	response += this->getServer() + "\r\n";
 	response += this->getContentType() + "\r\n";
 	response += this->getContentLength() + "\r\n";
 	response += this->getContentLanguage() + "\r\n";
-	response += this->getLastModified() + "\r\n";
-	response += this-> getAllow() + "\r\n";
+	response += this->getLastModified() + "\r\n\r\n";
 	f_response.assign(response.begin(), response.end());
-
 	//std::cout << "CONTENT_PATH 2 = |" << this->_content << "|\n";
 	file_content = this->getContent();
 	std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
@@ -814,6 +812,8 @@ std::vector<char>		Response::sendResponse()
 		}
 		this->_location = getLocation(_request.getURI(), _request.getConfig()._locations);
 		this->_content = this->findIndex();
+		if (this->_content.compare("forbidden") == 0)
+			this->_code = 403;
 	}
 	this->_location = getLocation(_request.getURI(), _request.getConfig()._locations);
 	//CGI
@@ -833,5 +833,7 @@ std::vector<char>		Response::sendResponse()
 		f_response = TRACEResponse();
 	else if (this->_request.getMethod().compare("OPTIONS") == 0)
 		f_response = OPTIONSResponse();	
+	for (size_t i = 0; i < f_response.size(); i++)
+		std::cout << f_response[i];
 	return (f_response);
 }
