@@ -85,7 +85,29 @@ int 	isContentWhole(std::string request)
 		end_pos = request.find("\n", pos);
 	}
 	return (0);
+}
 
+size_t getContentLen(std::string request)
+{
+	size_t pos = 0;
+	size_t find_pos = 0;
+	size_t end_pos = request.find("\n");
+
+
+	while (end_pos != std::string::npos)
+	{
+		std::string	l = request.substr(pos, end_pos - pos);
+
+		if ((find_pos = l.find("Content-Length:")) != std::string::npos && find_pos == 0)
+			return (atoi(l.substr(l.find(":") + 2, l.length()).c_str()));
+		else if ((find_pos = l.find("\r\n\r\n")) != std::string::npos && find_pos == 0)
+			return (0);
+
+
+		pos = end_pos + 1;
+		end_pos = request.find("\n", pos);
+	}
+	return (0);
 }
 
 int		Server::receiveConnection(int sd, std::string &request)
@@ -95,16 +117,18 @@ int		Server::receiveConnection(int sd, std::string &request)
 
 	int rc = 0;
     rc = read(sd, buffer_recv, BUFFER_SIZE);
-	//std::cout << "ret read = " << rc << std::endl;
-	//std::cout << "REQUEST BEF = |" << request << "|\n";
-	//std::cout << "BUFFER = |" << buffer_recv << "|\n";
+	// std::cout << "ret read = " << rc << std::endl;
+	// std::cout << "REQUEST BEF = |" << request << "|\n";
+	// std::cout << "BUFFER = |" << buffer_recv << "|\n";
 	
 	if (rc > 0)
 	{
 		request.append(buffer_recv);
+		//std::cout << "REQUEST AFT = |" << request << "|\n";
 		// Verification that content exists \r\n etc
 
 		int _complete = isContentWhole(request);
+		//std::cout << "complete = |" << _complete << "|\n";
 		size_t find_pos;
 		if ((find_pos = request.find("\r\n\r\n")) != std::string::npos && _complete == 0)
 			return (0);
@@ -112,13 +136,18 @@ int		Server::receiveConnection(int sd, std::string &request)
 		if (_complete > 0)
 		{
 			std::string rest = request.substr(find_pos + 4, request.length() - (find_pos + 4));
+			//std::cout << "rest = |" << rest << "|\n";
+
+			if (_complete == 1 && (rest.length() == getContentLen(request)))
+				return (0);
+			
 			std::string to_find = "\r\n\r\n";
 			//https://fr.wikipedia.org/wiki/Chunked_transfer_encoding
 			if (_complete == 2)
 				to_find = "0" + to_find;
 			if ((find_pos = rest.find(to_find)) != std::string::npos)
 			{
-				if (_complete == 2 && (find_pos == 0 || (rest[find_pos - 1] == '\n' && rest[find_pos - 2] == '\r')))
+				if (_complete == 1  || (_complete == 2 && (find_pos == 0 || (rest[find_pos - 1] == '\n' && rest[find_pos - 2] == '\r'))))
 					return (0);
 			}
 		}
@@ -173,11 +202,9 @@ void	Server::select_loop(void)
 			{
 				Response			response;
 				std::vector<char>	message;
-
+				
 				response.setRequest(Request(client.getRequest(), client.getServerSocket().getServerConfig()));
 				message = response.sendResponse();
-				// for (std::vector<char>::const_iterator i = message.begin(); i != message.end(); i++)
-				// 	std::cout << *i;
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
 				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
 				// std::cout << "\nResponse sent !\n" << std::endl;
