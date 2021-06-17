@@ -585,19 +585,13 @@ std::vector<char>	Response::getAutoindex(void)
 		this->_content = "ERROR";
 	while ((rtn_value = read(fd, buffer, 1)) > 0)
 		rep.push_back(buffer[0]);
+	std::cout << "autoindex with $ = |" << rep << "|\n";
 	if (this->_content.compare("ERROR") != 0)
 		close(fd);
 	if (rtn_value < 0)
 		this->_content = "ERROR";
 
-<<<<<<< HEAD
-	rep = "Index of ";
-	rep += this->_location._name + "\n\n";
 	file_to_open = this->_root + this->_location._name;
-=======
-	//open current directory
-	file_to_open = "./server-documents" + this->_location._name;
->>>>>>> a4f7e617ff27bd9eae3b8232c2ebc8f72146e962
 	directory = opendir(file_to_open.c_str());
 	if (directory == NULL || this->_content.compare("ERROR") == 0)
 	{
