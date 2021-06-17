@@ -162,6 +162,7 @@ int		Server::receiveConnection(int sd, std::string &request)
 // Thanks to https:www.tenouk.com/Module41.html
 void	Server::select_loop(void)
 {
+	std::cout << "first line loop sockets size = |" << _sockets.size() << "|\n";
 	fd_set	read_set;
 	fd_set	master_read_set;
 	
@@ -183,7 +184,7 @@ void	Server::select_loop(void)
 		read_set = master_read_set;
 		write_set = master_write_set;
 
-		std::cout << "bef select\n";
+		// std::cout << "bef select sockets size = |" << _sockets.size() << "|\n";
 		select(max_sd + 1, &read_set, &write_set, NULL, NULL);
 		for (size_t i = 0; i < _sockets.size(); i++)
 		{
@@ -199,7 +200,7 @@ void	Server::select_loop(void)
 			int client_sd;
 			client_sd = client.getSocketDescriptor();
 			bool bool_treat = false;
-			std::cout << "client nb = |" << client_nb << "| clients len = |" << _clients.size() << "|\nCheck FD_ISSET client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
+			// std::cout << "client nb = |" << client_nb << "| clients len = |" << _clients.size()<< "| sockets len = |" << _sockets.size() << "|\nCheck FD_ISSET client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
 			if (FD_ISSET(client_sd, &write_set) && client.getReceived() == true)
 			{
 				Response			response;
@@ -220,31 +221,31 @@ void	Server::select_loop(void)
 			if (FD_ISSET(client_sd, &read_set) && bool_treat == false)
 			{
 				int rtn = receiveConnection(client_sd, client.getRequest());
-				std::cout << "rtn receive = |" << rtn << "|\n";
+				// std::cout << "rtn receive = |" << rtn << "|\n";
 				if (rtn < 0)
 				{
-					std::cout << "bad rtn\n";
+					// std::cout << "bad rtn\n";
 					close(client_sd);
-					std::cout << "client sd closed rtn\n";
+					// std::cout << "client sd closed rtn\n";
 					FD_CLR(client_sd, &master_read_set);
-					std::cout << "fdclr read\n";
+					// std::cout << "fdclr read\n";
 					FD_CLR(client_sd, &master_write_set);
-					std::cout << "fdclr write\n";
+					// std::cout << "fdclr write\n";
 					if (client_sd == max_sd)
 						while (FD_ISSET(max_sd, &master_read_set) == false)
 							max_sd -= 1;
-					std::cout << "max sd -=\n";
+					// std::cout << "max sd -=\n";
 					delete _clients[client_nb];
-					std::cout << "delete\n";
+					// std::cout << "delete\n";
 					_clients.erase(_clients.begin() + client_nb);
-					std::cout << "erase\n";
+					// std::cout << "erase\n";
 					client_nb--;
-					std::cout << "client_nb--\n";
+					// std::cout << "client_nb--\n";
 				}
 				else if (rtn == 0)
 				{
 					client.setReceived(true);
-					std::cout << "rtn = 0  client nb = |" << client_nb << "| clients len = |" << _clients.size() << "| client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
+					// std::cout << "rtn = 0  client nb = |" << client_nb << "| clients len = |" << _clients.size() << "| client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
 				}
 			}
 		}

@@ -105,7 +105,6 @@ int			main(int ac, char **av)
 	}
 	catch(const std::exception& e)
 	{
-		std::cout << "closing server now" << std::endl;
 		std::cerr << "closing server now" << std::endl;
 		for (size_t i = 0; i < config.getServers().size(); i++)
 			close(server.getSocket(i));
