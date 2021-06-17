@@ -563,43 +563,65 @@ std::vector<char>	Response::getContent()
 
 std::vector<char>	Response::getAutoindex(void)
 {
-	size_t				i;
-	DIR					*directory;
-	struct dirent		*file;
-	std::string			rep;
-	std::stringstream	ss;
-	std::string			file_to_open;
+	size_t						pos;
+	size_t						pos2;
+	DIR							*directory;
+	struct dirent				*file;
+	std::stringstream			ss;
+	std::string					rep;
+	std::string					file_to_open;
+	std::string					repeated_line;
+	std::string					tmp;
+	std::vector<std::string>	repeated_lines;
+	char						buffer[1];
+	int							rtn_value;
+	int 						fd;
 
-	rep = "Index of ";
-	rep += this->_location._name + "\n\n";
+	//open html template
+	fd = open("./srcs/autoindex.html", O_RDONLY);
+	if (fd < -1)
+		this->_content = "ERROR";
+	while ((rtn_value = read(fd, buffer, 1)) > 0)
+		rep.push_back(buffer[0]);
+	if (this->_content.compare("ERROR") != 0)
+		close(fd);
+	if (rtn_value < 0)
+		this->_content = "ERROR";
+
+	//open current directory
 	file_to_open = "./server-documents" + this->_location._name;
 	directory = opendir(file_to_open.c_str());
-	if (directory == NULL)
+	if (directory == NULL || this->_content.compare("ERROR") == 0)
 	{
-		rep = this->_location._name.c_str();//"ERROR: directory could not be opened.";
+		rep = "ERROR: directory could not be opened.";
 		return (std::vector<char>(rep.begin(), rep.end()));
 	}
-	i = -1;
-	while (++i < 60)
-		rep += '_';
-	rep += "\n\n";
+
+	//replace html variables
+	while ((pos = rep.find("$d_name", 0)) != std::string::npos)
+		rep.replace(pos, strlen("$d_name"), this->_location._name);
+	pos = rep.find("$repeat");
+	pos2 = rep.find("\n", pos);
+	repeated_line = rep.substr(pos, pos2 - pos + 1);
 	while ((file = readdir(directory)) != NULL)
 	{
+		tmp = repeated_line;
+		tmp.replace(0, strlen("$repeat"), "");
 		ss.str("");
 		ss.clear();
-		i = 0;
-		rep += file->d_name;
-		rep += ' ';
-		i = strlen(file->d_name) + 1;
-		while (i++ < 50)
-			rep += ' ';
 		ss << file->d_reclen;
-		rep += ss.str() + "KB\n";
+		tmp.replace(tmp.find("$size"), strlen("$size"), ss.str());
+		while ((pos = tmp.find("$name")) != std::string::npos)
+			tmp.replace(pos, strlen("$name"), file->d_name);
+		repeated_lines.push_back(tmp);
 	}
-	rep += "\n";
-	i = 0;
-	while (++i < 60)
-		rep += '_';
+	std::sort(repeated_lines.begin(), repeated_lines.end());
+	tmp = "";
+	for (size_t i = 0; i < repeated_lines.size(); i++)
+		tmp.append(repeated_lines[i]);
+	pos = rep.find("$repeat");
+	pos2 = rep.find("\n", pos);
+	rep.replace(pos, pos2 - pos + 1, tmp);
 	return (std::vector<char>(rep.begin(), rep.end()));
 }
 
@@ -629,7 +651,7 @@ std::string			Response::findIndex(void)
 	if (this->_location._index.compare("") != 0)
 		ret = "./server-documents/" + this->_location._name + this->_location._index;
 	else if (this->_location._autoindex == true)
-		ret = "autoindex";
+		ret = "autoindex.html";
 	else
 		ret = "forbidden";
 	return (ret);
@@ -660,7 +682,7 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\r\n";
-		if (this->_content.compare("autoindex") == 0)
+		if (this->_content.compare("autoindex.html") == 0)
 		{
 			file_content = this->getAutoindex();
 			ss << file_content.size();
@@ -680,7 +702,7 @@ std::vector<char>	Response::GETResponse(void)
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0)
 		{
-			if (this->_content != "autoindex")
+			if (this->_content != "autoindex.html")
 				file_content = this->getContent();
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 		}

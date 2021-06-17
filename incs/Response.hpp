@@ -6,6 +6,8 @@
 # include "Request.hpp"
 # include <dirent.h>
 # include <string.h>
+# include <bits/stdc++.h>
+# include <algorithm>
 //# include "CGI.hpp"
 
 # define SEC_PER_MIN 60
