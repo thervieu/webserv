@@ -585,7 +585,6 @@ std::vector<char>	Response::getAutoindex(void)
 		this->_content = "ERROR";
 	while ((rtn_value = read(fd, buffer, 1)) > 0)
 		rep.push_back(buffer[0]);
-	std::cout << "autoindex with $ = |" << rep << "|\n";
 	if (this->_content.compare("ERROR") != 0)
 		close(fd);
 	if (rtn_value < 0)

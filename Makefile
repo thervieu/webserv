@@ -6,7 +6,7 @@
 #    By: user42 <user42@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/19 14:45:55 by user42            #+#    #+#              #
-#    Updated: 2021/05/04 11:14:37 by user42           ###   ########.fr        #
+#    Updated: 2021/06/17 17:24:45 by user42           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ SRCS =	Webserv.cpp		\
 		Server.cpp		\
 		Response.cpp	\
 		Request.cpp		\
-		signal.cpp
+		Signal.cpp
 
 SRCS_DIR = ./srcs/
 

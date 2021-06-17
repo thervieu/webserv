@@ -167,7 +167,6 @@ int		Server::receiveConnection(int sd, std::string &request)
 // Thanks to https:www.tenouk.com/Module41.html
 void	Server::select_loop(void)
 {
-	std::cout << "first line loop sockets size = |" << _sockets.size() << "|\n";
 	fd_set	read_set;
 	fd_set	master_read_set;
 	

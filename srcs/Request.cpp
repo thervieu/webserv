@@ -16,7 +16,7 @@ Request::Request(std::string request, server_info config) : _config(config), _re
 	std::string::iterator	ite;
 	int						i;
 
-	std::cout << "Request class init str = |" << request << "|\n";
+	std::cout << request << std::endl;
 	//method
 	i = 0;
 	while (request[i] == ' ')
