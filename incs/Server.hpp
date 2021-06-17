@@ -26,6 +26,7 @@ class Server
 		int				getMaxSd(void);
 		std::string		vecToString(std::vector<char> vector);
 		void			select_loop(void);
+		void 			endServer(void);
 };
 
 #endif

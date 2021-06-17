@@ -21,6 +21,11 @@ void	Server::addClient(Client *client)
 	_clients.push_back(client);
 }
 
+int		Server::getSocket(int i)
+{
+	return (this->_sockets[i]->getSocketDescriptor());
+}
+
 int		Server::getMaxSd(void)
 {
 	return (_sockets[_sockets.size() - 1]->getSocketDescriptor());
@@ -252,7 +257,17 @@ void	Server::select_loop(void)
 	}
 }
 
-int		Server::getSocket(int i)
+void Server::endServer(void)
 {
-	return (this->_sockets[i]->getSocketDescriptor());
+	for (size_t client_nb = 0; client_nb < _clients.size(); client_nb++)
+	{
+		close(_clients[client_nb]->getServerSocket().getSocketDescriptor());
+		delete _clients[client_nb];
+	}
+
+	for (size_t socket_nb = 0; socket_nb < _sockets.size(); socket_nb++)
+	{
+		close(_sockets[socket_nb]->getSocketDescriptor());
+		delete _sockets[socket_nb];
+	}
 }
