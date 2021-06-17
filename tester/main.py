@@ -20,6 +20,8 @@ def check_test(port: int, name_test: str, test: Callable) -> None:
 
 def run(port: int) -> None:
 	"""run tests"""
+	check_test(port, "GET / ", simple_get_index)
+	check_test(port, "GET /auto ", get_autoindex_subdir)
 
 
 
