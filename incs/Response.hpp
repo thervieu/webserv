@@ -21,6 +21,7 @@ class Response
 		Request			_request;
 		std::string		_encoding_type;
 		std::string		_content;
+		std::string		_root;
 		int				_code;
 		location		_location;
 

@@ -326,6 +326,8 @@ std::string			Response::getLastModified()
 	return (ret);
 }
 
+#include <string.h>
+
 std::string			Response::getContentLength()
 {
 	std::string	ret;
@@ -572,7 +574,7 @@ std::vector<char>	Response::getAutoindex(void)
 
 	rep = "Index of ";
 	rep += this->_location._name + "\n\n";
-	file_to_open = "./server-documents" + this->_location._name;
+	file_to_open = this->_root + this->_location._name;
 	directory = opendir(file_to_open.c_str());
 	if (directory == NULL)
 	{
@@ -616,7 +618,7 @@ std::string			Response::find_error_page(void)
 		i += 2;
 	if (i < this->_request.getConfig()._error_pages.size())
 		return (this->_request.getConfig()._error_pages[i + 1]);
-	return ("./server-documents/" + this->_request.getConfig()._index);
+	return (this->_root + this->_request.getConfig()._index);
 }
 
 std::string			Response::findIndex(void)
@@ -627,7 +629,7 @@ std::string			Response::findIndex(void)
 	ret = "";
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
 	if (this->_location._index.compare("") != 0)
-		ret = "./server-documents/" + this->_location._name + this->_location._index;
+		ret = this->_root + this->_location._name + this->_location._index;
 	else if (this->_location._autoindex == true)
 		ret = "autoindex";
 	else
@@ -828,6 +830,10 @@ std::vector<char>		Response::sendResponse()
 	int					i;
 	struct stat			filestat;
 
+	this->_root = "." + this->_request.getConfig()._root;
+	// std::cout << "ROOT = |" << _root << "\n";
+	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
+	// std::cout << "ROOT SUBSTR = |" << _root << "\n";
 	this->_content = "." + this->_request.getConfig()._root;
 	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURI();
 	this->_code = 200;
