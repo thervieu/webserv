@@ -4,6 +4,8 @@
 
 # include "Webserv.hpp"
 # include "Request.hpp"
+# include <dirent.h>
+# include <string.h>
 //# include "CGI.hpp"
 
 # define SEC_PER_MIN 60
@@ -52,10 +54,7 @@ class Response
 		std::string 		getAllow(void);
 		std::string 		find_error_page(void);
 		std::string			findIndex(void);
-
-
 		location			getLocation(std::string url, std::vector<location> locations);
-
 		bool				isAllowedMethod(void);
 
 		std::vector<char>	GETResponse(void);
@@ -67,6 +66,7 @@ class Response
 
 		std::vector<char>	sendResponse(void);
 		std::vector<char>	getContent(void);
+		std::vector<char>	getAutoindex(void);
 };
 
 #endif

@@ -561,6 +561,48 @@ std::vector<char>	Response::getContent()
 	return (file);
 }
 
+std::vector<char>	Response::getAutoindex(void)
+{
+	size_t				i;
+	DIR					*directory;
+	struct dirent		*file;
+	std::string			rep;
+	std::stringstream	ss;
+	std::string			file_to_open;
+
+	rep = "Index of ";
+	rep += this->_location._name + "\n\n";
+	file_to_open = "./server-documents" + this->_location._name;
+	directory = opendir(file_to_open.c_str());
+	if (directory == NULL)
+	{
+		rep = this->_location._name.c_str();//"ERROR: directory could not be opened.";
+		return (std::vector<char>(rep.begin(), rep.end()));
+	}
+	i = -1;
+	while (++i < 60)
+		rep += '_';
+	rep += "\n\n";
+	while ((file = readdir(directory)) != NULL)
+	{
+		ss.str("");
+		ss.clear();
+		i = 0;
+		rep += file->d_name;
+		rep += ' ';
+		i = strlen(file->d_name) + 1;
+		while (i++ < 50)
+			rep += ' ';
+		ss << file->d_reclen;
+		rep += ss.str() + "KB\n";
+	}
+	rep += "\n";
+	i = 0;
+	while (++i < 60)
+		rep += '_';
+	return (std::vector<char>(rep.begin(), rep.end()));
+}
+
 std::string			Response::find_error_page(void)
 {
 	unsigned int		i;
@@ -598,6 +640,7 @@ std::vector<char>	Response::GETResponse(void)
 	std::string			response;
 	std::vector<char>	file_content;
 	std::vector<char>	f_response;
+	std::stringstream	ss;
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
@@ -617,7 +660,14 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\r\n";
-		response += this->getContentLength() + "\r\n";
+		if (this->_content.compare("autoindex") == 0)
+		{
+			file_content = this->getAutoindex();
+			ss << file_content.size();
+			response += "Content-Length: " + ss.str() + "\r\n";
+		}
+		else
+			response += this->getContentLength() + "\r\n";
 		response += this->getContentLanguage() + "\r\n";
 		response += this->getLastModified() + "\r\n";
 		if (this->_code == 301 || this->_code == 302)
@@ -630,19 +680,9 @@ std::vector<char>	Response::GETResponse(void)
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0)
 		{
-			if (this->_content == "autoindex")
-			{
-				f_response.push_back(':');
-				f_response.push_back(')');
-				f_response.push_back('\r');
-				f_response.push_back('\n');
-			}
-			else
-			{
+			if (this->_content != "autoindex")
 				file_content = this->getContent();
-				std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
-			}
-			//std::cout << "CONTENT_PATH 1 = |" << this->_content << "|\n";
+			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 		}
 	}
 	return (f_response);
@@ -697,8 +737,6 @@ std::vector<char>		Response::wrongMethodReponse(void)
 	//std::cout << "CONTENT_PATH 2 = |" << this->_content << "|\n";
 	file_content = this->getContent();
 	std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
-	f_response.push_back('\r');
-	f_response.push_back('\n');
 	return (f_response);
 }
 
