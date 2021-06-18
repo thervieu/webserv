@@ -4,6 +4,11 @@ from typing import Callable
 import os
 import sys
 
+DEFAULT = "\033[39m"
+GREEN = "\033[32m"
+RED = "\033[31m"
+
+
 def check_test(port: int, name_test: str, test: Callable) -> None:
 	try:
 		str_result = test(port)
@@ -11,17 +16,21 @@ def check_test(port: int, name_test: str, test: Callable) -> None:
 		str_result = "couldn't connect"
 
 	if (len(str_result) == 0):
-		check = "V"
+		check = GREEN + "V" + DEFAULT
 	else:
-		check = "X"
+		check = RED + "X" + DEFAULT
 	
-	print("test : {} | result : {} {}".format(name_test, check, str_result).encode('utf-8'))
+	print("test : {:35} | result : {} {}".format(name_test, check, str_result))
 
 
 def run(port: int) -> None:
 	"""run tests"""
 	check_test(port, "GET / ", simple_get_index)
 	check_test(port, "GET /auto ", get_autoindex_subdir)
+	check_test(port, "GET /forbidden ", get_forbidden_dir)
+	check_test(port, "GET / ports 8080 and 8081", get_index_two_ports)
+	check_test(port, "GET / 50 times ", fifty_get_root)
+	check_test(port, "POST / (method not authorized) ", wrong_method)
 
 if (__name__ == "__main__"):
 	if (len(sys.argv) != 2):
