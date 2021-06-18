@@ -66,6 +66,8 @@ def fifty_get_root(port: int) -> str:
 """ 20 workers doing 100 GET requests on /"""
 
 def one_hundred_get_requests(port: int, nb: int) -> None:
+	if nb % 2 == 0:
+		port += 1
 	for i in range(100):
 		# print("worker {} | test {}".format(str(nb), str(i)))
 		r = requests.get("http://localhost:" + str(port))
