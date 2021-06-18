@@ -1,5 +1,6 @@
 import requests
 import threading
+import time
 
 def simple_get_index(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port))
@@ -65,8 +66,12 @@ def fifty_get_root(port: int) -> str:
 
 """ 20 workers doing 100 GET requests on /"""
 
+sem = threading.Semaphore()
+
 def one_hundred_get_requests(port: int, nb: int) -> None:
 	for i in range(100):
+		# print("worker {} | test {}".format(str(nb), str(i)))
+		sem.acquire()
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
 			print("worker" + i + ": Bad status code")
@@ -74,13 +79,16 @@ def one_hundred_get_requests(port: int, nb: int) -> None:
 			print("worker" + i + ": Bad Content")
 		if (r.headers['Content-Length'] != "14"):
 			print("worker" + i + ": Bad Content-Length")
+		sem.release()
 	print("worker {} has finished all his tasks".format(str(nb)))
 
 def stress_test(port: int) -> str:
 	threads = []
 
 	for i in range(20):
-		thread = threading.Thread(one_hundred_get_requests(port, i))
+		thread = threading.Thread(target=one_hundred_get_requests, args=(port, i))
+		threads.append(thread)
+		thread.start()
 	for thread in threads:
 		thread.join()
 	return ""
