@@ -66,7 +66,6 @@ def fifty_get_root(port: int) -> str:
 """ 20 workers doing 100 GET requests on /"""
 
 def one_hundred_get_requests(port: int, nb: int) -> None:
-	# print("worker {} starts working".format(str(i)))
 	for i in range(100):
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
@@ -75,7 +74,7 @@ def one_hundred_get_requests(port: int, nb: int) -> None:
 			print("worker" + i + ": Bad Content")
 		if (r.headers['Content-Length'] != "14"):
 			print("worker" + i + ": Bad Content-Length")
-	# print("worker {} has finished all his tasks".format(str(i)))
+	print("worker {} has finished all his tasks".format(str(nb)))
 
 def stress_test(port: int) -> str:
 	threads = []
