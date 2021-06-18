@@ -1,4 +1,5 @@
 import requests
+import threading
 
 def simple_get_index(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port))
@@ -59,6 +60,30 @@ def fifty_get_root(port: int) -> str:
 			return "Bad Content"
 		if (r.headers['Content-Length'] != "14"):
 			return "Bad Content-Length"
+	return ""
+
+
+""" 20 workers doing 100 GET requests on /"""
+
+def one_hundred_get_requests(port: int, nb: int) -> None:
+	# print("worker {} starts working".format(str(i)))
+	for i in range(100):
+		r = requests.get("http://localhost:" + str(port))
+		if (r.status_code != 200):
+			print("worker" + i + ": Bad status code")
+		if (r.text != "Hello World !\n"):
+			print("worker" + i + ": Bad Content")
+		if (r.headers['Content-Length'] != "14"):
+			print("worker" + i + ": Bad Content-Length")
+	# print("worker {} has finished all his tasks".format(str(i)))
+
+def stress_test(port: int) -> str:
+	threads = []
+
+	for i in range(20):
+		thread = threading.Thread(one_hundred_get_requests(port, i))
+	for thread in threads:
+		thread.join()
 	return ""
 
 def wrong_method(port: int) -> str:
