@@ -574,6 +574,7 @@ std::vector<char>	Response::getAutoindex(void)
 	std::string					file_to_open;
 	std::string					repeated_line;
 	std::string					tmp;
+	std::string					str;
 	std::vector<std::string>	repeated_lines;
 	char						buffer[1];
 	int							rtn_value;
@@ -590,6 +591,7 @@ std::vector<char>	Response::getAutoindex(void)
 	if (rtn_value < 0)
 		this->_content = "ERROR";
 
+	//open directory
 	file_to_open = this->_root + this->_location._name;
 	directory = opendir(file_to_open.c_str());
 	if (directory == NULL || this->_content.compare("ERROR") == 0)
@@ -612,8 +614,9 @@ std::vector<char>	Response::getAutoindex(void)
 		ss.clear();
 		ss << file->d_reclen;
 		tmp.replace(tmp.find("$size"), strlen("$size"), ss.str());
-		while ((pos = tmp.find("$name")) != std::string::npos)
-			tmp.replace(pos, strlen("$name"), file->d_name);
+		str = this->_location._name + file->d_name;
+		tmp.replace(tmp.find("$name"), strlen("$name"), str);
+		tmp.replace(tmp.find("$name"), strlen("$name"), file->d_name);
 		repeated_lines.push_back(tmp);
 	}
 	std::sort(repeated_lines.begin(), repeated_lines.end());

@@ -9,6 +9,7 @@ class Request
 
 	private:
 
+		std::vector<std::string>	_arguments;
 		server_info		_config;
 		std::string		_request;
 		std::string		_method;

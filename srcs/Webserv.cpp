@@ -12,7 +12,7 @@ bool		isSkippable(std::string line)
 std::string		readFile(std::string _fileName)
 {
 	char buffer[BUFFER_SIZE + 1];
-	std::string rtn;
+	std::string rtn("");
 	int rtn_value;
 	int fd;
 
@@ -22,7 +22,7 @@ std::string		readFile(std::string _fileName)
 		std::cout << "Error: couldn't open " << _fileName << std::endl;
 		exit(0);
 	}
-	while ((rtn_value = read(fd, buffer, BUFFER_SIZE)) > 0)
+	while ((rtn_value = read(fd, &buffer, BUFFER_SIZE)) > 0)
 	{
 		rtn += buffer;
 	}

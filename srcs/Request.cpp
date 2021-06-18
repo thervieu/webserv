@@ -1,17 +1,18 @@
 
 # include "../incs/Request.hpp"
 
-Request::Request() : _method("GET"), _url("/"), _accept_charsets("basic"), _accept_language("fr-FR"), _host("localhost"), _referer("/"), _user_agent("/"), _unknown(0)
+Request::Request() :  _method("GET"), _url("/"), _accept_charsets("basic"), _accept_language("fr-FR"), _host("localhost"), _referer("/"), _user_agent("/"), _unknown(0)
 {
 }
 
-Request::Request(Request const &ref) : _method("GET"), _url("/"), _accept_charsets(ref._accept_charsets), _accept_language(ref._accept_language), _host(ref._host), _referer(ref._referer), _user_agent(ref._user_agent), _unknown(ref._unknown)
+Request::Request(Request const &ref) :  _method("GET"), _url("/"), _accept_charsets(ref._accept_charsets), _accept_language(ref._accept_language), _host(ref._host), _referer(ref._referer), _user_agent(ref._user_agent), _unknown(ref._unknown)
 {
 }
 
-Request::Request(std::string request, server_info config) : _config(config), _request(request), _unknown(0)
+Request::Request(std::string request, server_info config) :   _config(config), _request(request), _unknown(0)
 {
 	std::string				line;
+	std::string				tmp;
 	std::string::iterator	it;
 	std::string::iterator	ite;
 	int						i;
@@ -35,10 +36,38 @@ Request::Request(std::string request, server_info config) : _config(config), _re
 	if (request[i] == '\0')
 		return ;
 	it = request.begin() + i;
-	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
+	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0' && request[i] != '?')
 		++i;
 	ite = request.begin() + i;
 	this->_url.assign(it, ite);
+	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
+		++i;
+	//arguments
+	// if (request[i] == '?')
+	// {
+	// 	++i;
+	// 	while (_request[i] != ' ')
+	// 	{
+	// 		if (_request[i] == '&')
+	// 			++i;
+	// 		while (_request[i] != ' ' && _request[i] != '&')
+	// 		{
+	// 			it = _request.begin() + i;
+	// 			while (_request[i] != ' ' && _request[i] != '=')
+	// 				i++;
+	// 			ite = _request.begin() + i;
+	// 			this->_arguments.push_back(std::string(it, ite));
+	// 			++i;
+	// 			ite = _request.begin() + i;
+	// 			while (_request[i] != ' ' && _request[i] != '&')
+	// 				i++;
+	// 			it = _request.begin() + i;
+	// 			this->_arguments.push_back(std::string(ite, it));
+	// 		}
+	// 	}
+	// }
+//	for (size_t i = 0; i < this->_arguments.size(); i++)
+//		std::cout << _arguments[i] << std::endl;
 
 	//http version
 	while (request[i] == ' ')
