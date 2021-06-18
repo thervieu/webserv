@@ -6,7 +6,7 @@
 #    By: user42 <user42@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/19 14:45:55 by user42            #+#    #+#              #
-#    Updated: 2021/06/17 17:24:45 by user42           ###   ########.fr        #
+#    Updated: 2021/06/18 15:28:54 by user42           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,8 @@ $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp $(INCS)
 
 $(NAME): $(OBJS)
 	@clang++ $(FLAGS) -o $(NAME) $(OBJS)
-	@echo "Exec created"
+	@echo "Exec 'webserv' created"
+	@echo "\nUsage: './webserv confs/configuration_file"
 
 all: $(NAME)
 
@@ -53,3 +54,8 @@ fclean: clean
 	@echo "Exec removed"
 
 re: fclean all
+
+test: $(NAME)
+	@echo "\nplease launch the python tester by executing 'python3 tester_srcs/main.py 8080' in another terminal"
+	@echo "executing: './webserv/confs/tester.conf"
+	@./webserv confs/tester.conf

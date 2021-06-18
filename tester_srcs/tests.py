@@ -80,7 +80,7 @@ def one_hundred_get_requests(port: int, nb: int) -> None:
 	print("worker {} has finished all his tasks".format(str(nb)))
 
 def stress_test(port: int) -> str:
-	print("Please wait 10 seconds for the stress test to finish ...")
+	print("Please wait a few seconds for the stress test to finish ...")
 	threads = []
 
 	for i in range(20):
