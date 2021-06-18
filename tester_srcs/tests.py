@@ -34,6 +34,14 @@ def get_forbidden_dir(port: int) -> str:
 		return "Bad status code"
 	return ""
 
+def get_404(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/nonsense")
+	if (r.status_code != 404):
+		return "Bad status code"
+	if (r.text.find("This is a 404 error page") == -1):
+		return "Bad Content"
+	return ""
+
 def get_autoindex_subdir(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port) + "/auto")
 	if (r.status_code != 200):
