@@ -61,7 +61,7 @@ Request::Request(std::string request, server_info config) :   _config(config), _
 				this->_arguments.push_back(std::string(it, ite));
 				++i;
 				ite = request.begin() + i;
-				while (_request[i] != ' ' && _request[i] != '&')
+				while (request[i] != ' ' && request[i] != '&')
 					i++;
 				it = request.begin() + i;
 				this->_arguments.push_back(std::string(ite, it));
@@ -121,14 +121,18 @@ void		Request::parsing(std::string str)
 	while (*it != '\0')
 	{
 		while (*it == ' ' || *it == '\n' || *it == '\r')
+		{
+			if (*it == '\r')
+				this->_unknown = 2;
 			++it;
+		}
 		if (*it == '\0')
 			return ;
 		ite = it;
 		while (*it != '\n' && *it != '\0')
 			++it;
 		line.assign(ite, it);
-		if (this->_unknown == 2)
+		if (this->_unknown == 2 && this->_method.compare("POST") == 0)
 			this->ParseBody(line);
 		else if (setHeader(line) == -2)
 			this->_unknown = 2;
@@ -150,6 +154,7 @@ int			Request::setHeader(std::string str)
 	ite = it;
 	while (*ite != '\n' && *ite != '\0' && *ite != '\r')
 		++ite;
+	std::cout << line << std::endl;
 	if (line.compare("Accept-Charset:") == 0)
 		this->setAcceptCharsets(std::string(it, ite));
 	else if (line.compare("Accept-Language:") == 0)
@@ -160,7 +165,7 @@ int			Request::setHeader(std::string str)
 		this->setReferer(std::string(it, ite));
 	else if (line.compare("User-Agent:") == 0)
 		this->setUserAgent(std::string(it, ite));
-	else if (line.compare("") == 0)
+	else if (line.compare("\r") == 0)
 		return (-2);
 	else
 		return (-1);
@@ -264,20 +269,21 @@ void			Request::ParseBody(std::string request)
 	std::string::iterator	ite;
 
 	i = 0;
-	while (request[i] != ' ')
+	std::cout << request << std::endl;
+	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
 	{
 		if (request[i] == '&')
 			++i;
-		while (request[i] != ' ' && request[i] != '&')
+		while (request[i] != '\r' && request[i] != '\n' && request[i] != 0 && request[i] != '&')
 		{
 			it = request.begin() + i;
-			while (request[i] != ' ' && request[i] != '=')
+			while (request[i] != '\r' && request[i] != '\n' && request[i] != '=')
 				i++;
 			ite = request.begin() + i;
 			this->_arguments.push_back(std::string(it, ite));
 			++i;
 			ite = request.begin() + i;
-			while (_request[i] != ' ' && _request[i] != '&')
+			while (request[i] != '\r' && request[i] != '\n' && request[i] != '&' && request[i] != '\0')
 				i++;
 			it = request.begin() + i;
 			this->_arguments.push_back(std::string(ite, it));

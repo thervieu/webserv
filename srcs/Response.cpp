@@ -744,7 +744,7 @@ std::vector<char>	Response::GETResponse(void)
 		f_response.assign(response.begin(), response.end());
 		f_response.push_back('\r');
 		f_response.push_back('\n');
-		if (this->_request.getMethod().compare("GET") == 0)
+		if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("POST") == 0)
 		{
 			if (this->_content != "autoindex.html")
 			{
@@ -759,16 +759,7 @@ std::vector<char>	Response::GETResponse(void)
 
 std::vector<char>		Response::POSTResponse(void)
 {
-	std::string			response;
-	std::vector<char>	f_response;
-
-	this->_code = 200;
-	response = this->getCode() + "\r\n";
-	this->_content = "lol.html";
-	response += this->getContentType() + "\r\n";
-	response += this->_request.getRequest();
-	f_response.assign(response.begin(), response.end());
-	return (f_response);
+	return (GETResponse());
 }
 
 std::vector<char>		Response::DELETEResponse(void)
