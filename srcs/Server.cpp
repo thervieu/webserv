@@ -58,7 +58,7 @@ int		Server::acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set,
 		exit(1);
 	}
 
-	std::cout << "accepted: " << sd << std::endl;
+	// std::cout << "accepted: " << sd << std::endl;
 	addClient(new Client(_sockets[i], ft_inet_ntoa(clientaddr.sin_addr), newfd));
 	FD_SET(newfd, read_set);
 	FD_SET(newfd, write_set);

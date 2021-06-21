@@ -154,7 +154,7 @@ int			Request::setHeader(std::string str)
 	ite = it;
 	while (*ite != '\n' && *ite != '\0' && *ite != '\r')
 		++ite;
-	std::cout << line << std::endl;
+	// std::cout << line << std::endl;
 	if (line.compare("Accept-Charset:") == 0)
 		this->setAcceptCharsets(std::string(it, ite));
 	else if (line.compare("Accept-Language:") == 0)

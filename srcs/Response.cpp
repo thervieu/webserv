@@ -853,22 +853,23 @@ location	Response::getLocation(std::string url, std::vector<location> locations)
 	return (locations[max_index]);
 }
 
-/*
-bool		Response::CGI_CALL(std::string url, location loc)
+
+bool		Response::IsCGICalled(std::string url)
 {
-	std::string formatURL = url;
-	size_t i = 0;
+	size_t dot;
 
-	formatURL.replace(0, loc._name.size(), "/");
-	std::cout << "formatURL = |" << formatURL << "|" << td::endl;
-	formatURL = replace(formatURL, "//", "/");
-	std::cout << "formatURL = |" << formatURL << "|" << td::endl;
-	while (formatURL[i] && formatURL[i] != '?')
-		i++;
-	formatURL = std::string(formatURL, 0, i);
-
+	dot = url.rfind(".");
+	if (dot == std::string::npos)
+		return (false);
+	std::string extension = url.substr(dot, url.length() - dot);
+	std::cout << "extension_url = |" << extension << "|\n";
+	for (size_t i = 0; i < _location._cgi_extensions.size(); i++)
+	{
+		if (extension.compare(_location._cgi_extensions[i])  == 0)
+		return (true);
+	}
+	return (false);
 }
-*/
 
 bool Response::isAllowedMethod(void)
 {
@@ -919,10 +920,10 @@ std::vector<char>		Response::sendResponse()
 	}
 	this->_location = getLocation(_request.getURI(), _request.getConfig()._locations);
 	//CGI
-	/*if (CGI_call(_request.getURI(), _location))
+	if (IsCGICalled(_request.getURI()))
 	{
 		std::cout << "CGI_CALL" << std::endl;
-	}*/
+	}
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
@@ -934,7 +935,7 @@ std::vector<char>		Response::sendResponse()
 	else if (this->_request.getMethod().compare("TRACE") == 0)
 		f_response = TRACEResponse();
 	else if (this->_request.getMethod().compare("OPTIONS") == 0)
-		f_response = OPTIONSResponse();	
+		f_response = OPTIONSResponse();
 	for (size_t i = 0; i < f_response.size(); i++)
 		std::cout << f_response[i];
 	return (f_response);

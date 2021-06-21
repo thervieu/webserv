@@ -58,6 +58,7 @@ class Response
 		std::string 		find_error_page(void);
 		std::string			findIndex(void);
 		location			getLocation(std::string url, std::vector<location> locations);
+		bool				IsCGICalled(std::string url);
 		bool				isAllowedMethod(void);
 
 		std::vector<char>	GETResponse(void);
