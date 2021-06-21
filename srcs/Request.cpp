@@ -128,8 +128,10 @@ void		Request::parsing(std::string str)
 		while (*it != '\n' && *it != '\0')
 			++it;
 		line.assign(ite, it);
-		if (setHeader(line) == -1)
-			this->_unknown = 1;
+		if (this->_unknown == 2)
+			this->ParseBody(line);
+		else if (setHeader(line) == -2)
+			this->_unknown = 2;
 	}
 }
 
@@ -158,6 +160,8 @@ int			Request::setHeader(std::string str)
 		this->setReferer(std::string(it, ite));
 	else if (line.compare("User-Agent:") == 0)
 		this->setUserAgent(std::string(it, ite));
+	else if (line.compare("") == 0)
+		return (-2);
 	else
 		return (-1);
 	return (0);
@@ -251,4 +255,32 @@ std::string		Request::getRequest(void) const
 std::vector<std::string>	Request::getArguments(void) const
 {
 	return (this->_arguments);
+}
+
+void			Request::ParseBody(std::string request)
+{
+	int		i;
+	std::string::iterator	it;
+	std::string::iterator	ite;
+
+	i = 0;
+	while (request[i] != ' ')
+	{
+		if (request[i] == '&')
+			++i;
+		while (request[i] != ' ' && request[i] != '&')
+		{
+			it = request.begin() + i;
+			while (request[i] != ' ' && request[i] != '=')
+				i++;
+			ite = request.begin() + i;
+			this->_arguments.push_back(std::string(it, ite));
+			++i;
+			ite = request.begin() + i;
+			while (_request[i] != ' ' && _request[i] != '&')
+				i++;
+			it = request.begin() + i;
+			this->_arguments.push_back(std::string(ite, it));
+		}
+	}
 }

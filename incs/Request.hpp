@@ -38,6 +38,7 @@ class Request
 		void			setUserAgent(std::string header);
 		void			setURI(std::string str);
 		std::vector<std::string>	getArguments(void) const;
+		void	ParseBody(std::string body);
 		std::string		getAcceptCharsets(void) const;
 		std::string		getAcceptLanguage(void) const;
 		std::string		getHost(void) const;

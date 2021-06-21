@@ -679,25 +679,22 @@ std::vector<char>	Response::changeContent(std::vector<char> content)
 			it = content.begin() + j;
 			while (content[j] != '$' && content[j] != '\0')
 				++j;
+			if (content[j] == 0)
+				break;
 			ite = content.begin() + j;
 			to_change.assign(it, ite);
-			content.erase(it - 1, ite + 1);
 			i = 0;
-			it = content.begin() + j - to_change.length() - 1;
-			j = 0;
 			while (i < arguments.size())
 			{
 				if (arguments[i].compare(to_change) == 0)
 				{
+					content.erase(it - 1, ite + 1);
+					it = content.begin() + j - to_change.length() - 1;
+					j = 0;
 					content.insert(it, arguments[i + 1].begin(), arguments[i + 1].end());
 					break;
 				}
 				i += 2;
-			}
-			if (i >= arguments.size())
-			{
-				tmp = "Random";
-				content.insert(it, tmp.begin(), tmp.end());
 			}
 		}
 	}
