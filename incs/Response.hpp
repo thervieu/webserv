@@ -70,6 +70,7 @@ class Response
 		std::vector<char>	sendResponse(void);
 		std::vector<char>	getContent(void);
 		std::vector<char>	getAutoindex(void);
+		std::vector<char>	changeContent(std::vector<char> array);
 };
 
 #endif

@@ -661,6 +661,49 @@ std::string			Response::findIndex(void)
 	return (ret);
 }
 
+std::vector<char>	Response::changeContent(std::vector<char> content)
+{
+	size_t						i;
+	std::vector<std::string>	arguments;
+	std::string					to_change;
+	std::vector<char>::iterator		it;
+	std::vector<char>::iterator		ite;
+	std::string					tmp;
+
+	arguments = this->_request.getArguments();
+	for (size_t j = 0; j < content.size(); j++)
+	{
+		if (content[j] == '$')
+		{
+			++j;
+			it = content.begin() + j;
+			while (content[j] != '$' && content[j] != '\0')
+				++j;
+			ite = content.begin() + j;
+			to_change.assign(it, ite);
+			content.erase(it - 1, ite + 1);
+			i = 0;
+			it = content.begin() + j - to_change.length() - 1;
+			j = 0;
+			while (i < arguments.size())
+			{
+				if (arguments[i].compare(to_change) == 0)
+				{
+					content.insert(it, arguments[i + 1].begin(), arguments[i + 1].end());
+					break;
+				}
+				i += 2;
+			}
+			if (i >= arguments.size())
+			{
+				tmp = "Random";
+				content.insert(it, tmp.begin(), tmp.end());
+			}
+		}
+	}
+	return (content);
+}
+
 std::vector<char>	Response::GETResponse(void)
 {
 	std::string			response;
@@ -707,7 +750,10 @@ std::vector<char>	Response::GETResponse(void)
 		if (this->_request.getMethod().compare("GET") == 0)
 		{
 			if (this->_content != "autoindex.html")
+			{
 				file_content = this->getContent();
+				file_content = this->changeContent(file_content);
+			}
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 		}
 	}

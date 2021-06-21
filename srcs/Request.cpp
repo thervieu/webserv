@@ -18,6 +18,7 @@ Request::Request(std::string request, server_info config) :   _config(config), _
 	int						i;
 
 	std::cout << request << std::endl;
+	this->_arguments = std::vector<std::string>(0);
 	//method
 	i = 0;
 	while (request[i] == ' ')
@@ -40,34 +41,33 @@ Request::Request(std::string request, server_info config) :   _config(config), _
 		++i;
 	ite = request.begin() + i;
 	this->_url.assign(it, ite);
-	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
-		++i;
+//	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
+//		++i;
+
 	//arguments
-	// if (request[i] == '?')
-	// {
-	// 	++i;
-	// 	while (_request[i] != ' ')
-	// 	{
-	// 		if (_request[i] == '&')
-	// 			++i;
-	// 		while (_request[i] != ' ' && _request[i] != '&')
-	// 		{
-	// 			it = _request.begin() + i;
-	// 			while (_request[i] != ' ' && _request[i] != '=')
-	// 				i++;
-	// 			ite = _request.begin() + i;
-	// 			this->_arguments.push_back(std::string(it, ite));
-	// 			++i;
-	// 			ite = _request.begin() + i;
-	// 			while (_request[i] != ' ' && _request[i] != '&')
-	// 				i++;
-	// 			it = _request.begin() + i;
-	// 			this->_arguments.push_back(std::string(ite, it));
-	// 		}
-	// 	}
-	// }
-//	for (size_t i = 0; i < this->_arguments.size(); i++)
-//		std::cout << _arguments[i] << std::endl;
+	if (request[i] == '?')
+	{
+		++i;
+		while (request[i] != ' ')
+		{
+			if (request[i] == '&')
+				++i;
+			while (request[i] != ' ' && request[i] != '&')
+			{
+				it = request.begin() + i;
+				while (request[i] != ' ' && request[i] != '=')
+					i++;
+				ite = request.begin() + i;
+				this->_arguments.push_back(std::string(it, ite));
+				++i;
+				ite = request.begin() + i;
+				while (_request[i] != ' ' && _request[i] != '&')
+					i++;
+				it = request.begin() + i;
+				this->_arguments.push_back(std::string(ite, it));
+			}
+		}
+	}
 
 	//http version
 	while (request[i] == ' ')
@@ -97,6 +97,7 @@ Request::~Request()
 Request		&Request::operator=(Request const &rhs)
 {
 	this->_method = rhs.getMethod();
+	this->_arguments = rhs.getArguments();
 	this->_url = rhs.getURI();
 	this->_http_version = rhs.getHTTPVersion();
 	this->_unknown = rhs.getUnknown();
@@ -245,4 +246,9 @@ int				Request::getUnknown(void) const
 std::string		Request::getRequest(void) const
 {
 	return (this->_request);
+}
+
+std::vector<std::string>	Request::getArguments(void) const
+{
+	return (this->_arguments);
 }
