@@ -642,7 +642,7 @@ std::string			Response::find_error_page(void)
 		i += 2;
 	if (i < this->_request.getConfig()._error_pages.size())
 		return (this->_request.getConfig()._error_pages[i + 1]);
-	return (this->_root + this->_request.getConfig()._index);
+	return ("/error_pages/error.html");
 }
 
 std::string			Response::findIndex(void)
