@@ -733,7 +733,12 @@ std::vector<char>	Response::GETResponse(void)
 			response += "Content-Length: " + ss.str() + "\r\n";
 		}
 		else
-			response += this->getContentLength() + "\r\n";
+		{
+			file_content = this->getContent();
+			file_content = this->changeContent(file_content);
+			ss << file_content.size();
+			response += "Content-Length: " + ss.str() + "\r\n";
+		}
 		response += this->getContentLanguage() + "\r\n";
 		response += this->getLastModified() + "\r\n";
 		if (this->_code == 301 || this->_code == 302)
@@ -745,14 +750,7 @@ std::vector<char>	Response::GETResponse(void)
 		f_response.push_back('\r');
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("POST") == 0)
-		{
-			if (this->_content != "autoindex.html")
-			{
-				file_content = this->getContent();
-				file_content = this->changeContent(file_content);
-			}
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
-		}
 	}
 	return (f_response);
 }
