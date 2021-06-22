@@ -1,4 +1,3 @@
-
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
@@ -20,13 +19,15 @@ class Request
 		std::string		_host;
 		std::string		_referer;
 		std::string		_user_agent;
+		std::string		_clientIP;
+		std::string		_query;
 		int				_unknown;
 
 	public:
 
 		Request();
 		Request(Request const &ref);
-		Request(std::string request, server_info config);
+		Request(std::string request, std::string client_ip, server_info config);
 		~Request();
 
 		Request			&operator=(Request const &rhs);
@@ -36,18 +37,21 @@ class Request
 		void			setHost(std::string header);
 		void			setReferer(std::string header);
 		void			setUserAgent(std::string header);
-		void			setURI(std::string str);
+		void			setURL(std::string str);
+		void			setCLientIP(std::string str);
 		std::vector<std::string>	getArguments(void) const;
-		void	ParseBody(std::string body);
+		void			ParseBody(std::string body);
 		std::string		getAcceptCharsets(void) const;
 		std::string		getAcceptLanguage(void) const;
 		std::string		getHost(void) const;
 		std::string		getReferer(void) const;
 		std::string		getUserAgent(void) const;
 		std::string		getMethod(void) const;
-		std::string		getURI(void) const;
+		std::string		getURL(void) const;
 		std::string		getHTTPVersion(void) const;
 		std::string		getRequest(void) const;
+		std::string		getClientIP(void) const;
+		std::string		getQuery(void) const;
 		server_info		getConfig(void) const;
 		int				getUnknown(void) const;
 		void			parsing(std::string str);

@@ -8,8 +8,7 @@ class CGI
 {
 	private:
 
-		std::string _full_path;
-		std::string _ressource_path;
+		Request _request;
 		location _loc;
 
 	public:

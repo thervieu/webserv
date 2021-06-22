@@ -32,7 +32,5 @@ class Socket
 		std::string		getBuffer(void);
 		server_info		getServerConfig(void);
 
-		void			MainLoop(void);
 };
-
 #endif

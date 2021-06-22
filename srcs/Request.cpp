@@ -9,7 +9,7 @@ Request::Request(Request const &ref) :  _method("GET"), _url("/"), _accept_chars
 {
 }
 
-Request::Request(std::string request, server_info config) :   _config(config), _request(request), _unknown(0)
+Request::Request(std::string request, std::string client_ip, server_info config) :   _config(config), _request(request), _clientIP(client_ip), _unknown(0)
 {
 	std::string				line;
 	std::string				tmp;
@@ -47,6 +47,7 @@ Request::Request(std::string request, server_info config) :   _config(config), _
 	//arguments
 	if (request[i] == '?')
 	{
+		it = request.begin() + i;
 		++i;
 		while (request[i] != ' ')
 		{
@@ -67,6 +68,8 @@ Request::Request(std::string request, server_info config) :   _config(config), _
 				this->_arguments.push_back(std::string(ite, it));
 			}
 		}
+		ite = request.begin() + i;
+		this->_query.assign(it, ite);
 	}
 
 	//http version
@@ -98,7 +101,7 @@ Request		&Request::operator=(Request const &rhs)
 {
 	this->_method = rhs.getMethod();
 	this->_arguments = rhs.getArguments();
-	this->_url = rhs.getURI();
+	this->_url = rhs.getURL();
 	this->_http_version = rhs.getHTTPVersion();
 	this->_unknown = rhs.getUnknown();
 	this->_accept_charsets = rhs.getAcceptCharsets();
@@ -227,12 +230,18 @@ std::string		Request::getUserAgent(void) const
 	return (this->_user_agent);
 }
 
-void			Request::setURI(std::string str)
+void			Request::setURL(std::string str)
 {
 	this->_url.assign(str);
 }
 
-std::string		Request::getURI(void) const
+void			Request::setCLientIP(std::string str)
+{
+	this->_clientIP.assign(str);
+}
+
+
+std::string		Request::getURL(void) const
 {
 	return (this->_url);
 }
@@ -255,6 +264,11 @@ int				Request::getUnknown(void) const
 std::string		Request::getRequest(void) const
 {
 	return (this->_request);
+}
+
+std::string		Request::getQuery(void) const
+{
+	return (this->_query);
 }
 
 std::vector<std::string>	Request::getArguments(void) const

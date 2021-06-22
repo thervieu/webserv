@@ -51,7 +51,6 @@ Socket::Socket(server_info server)
 		std::cout << "Error: Memory required too high" << std::endl;
 		exit(1);
 	}
-	//this->MainLoop();
 }
 
 Socket::~Socket(void)
@@ -66,31 +65,4 @@ int		Socket::getSocketDescriptor(void)
 server_info		Socket::getServerConfig(void)
 {
 	return (_server);
-}
-
-void	Socket::MainLoop()
-{
-	Response			response;
-	std::vector<char>	message;
-
-	while (1)
-	{
-		std::cout << "\nSelect loop !\n" << std::endl;
-		// Select ??
-		if ((this->_socket = accept(this->_fd, (struct sockaddr *)&this->_address, (socklen_t*)&this->_addrlen)) < 0)
-		{
-			std::cout << "Error: accept failed" << std::endl;
-			exit(1);
-		}
-		if (read(this->_socket, this->_buff, this->_server._client_max_body_size) < 0)
-		{
-			std::cout << "Error: read failed" << std::endl;
-			exit(1);
-		}
-		std::cout << this->_buff << std::endl;
-		response.setRequest(Request(this->_buff, this->_server));
-		message = response.sendResponse();
-		send(this->_socket, &message[0], message.size(), 0);
-		std::cout << "\nResponse sent !\n" << std::endl;
-	}
 }

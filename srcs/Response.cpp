@@ -865,7 +865,7 @@ bool		Response::IsCGICalled(std::string url)
 	std::cout << "extension_url = |" << extension << "|\n";
 	for (size_t i = 0; i < _location._cgi_extensions.size(); i++)
 	{
-		if (extension.compare(_location._cgi_extensions[i])  == 0)
+		if (extension.compare(_location._cgi_extensions[i]) == 0)
 		return (true);
 	}
 	return (false);
@@ -894,7 +894,7 @@ std::vector<char>		Response::sendResponse()
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
 	// std::cout << "ROOT SUBSTR = |" << _root << "\n";
 	this->_content = "." + this->_request.getConfig()._root;
-	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURI();
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL();
 	this->_code = 200;
 	this->_encoding_type = "plain";
 	i = 0;
@@ -908,21 +908,21 @@ std::vector<char>		Response::sendResponse()
 		this->_code = 404;
 	else if (S_ISDIR(filestat.st_mode))
 	{
-		if (this->_request.getURI()[this->_request.getURI().size() - 1] != '/')
+		if (this->_request.getURL()[this->_request.getURL().size() - 1] != '/')
 		{
-			this->_request.setURI(this->_request.getURI() + "/");
+			this->_request.setURL(this->_request.getURL() + "/");
 			this->_content.append("/");
 		}
-		this->_location = getLocation(_request.getURI(), _request.getConfig()._locations);
+		this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 		this->_content = this->findIndex();
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
 	}
-	this->_location = getLocation(_request.getURI(), _request.getConfig()._locations);
+	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	//CGI
-	if (IsCGICalled(_request.getURI()))
+	if (IsCGICalled(_request.getURL()))
 	{
-		std::cout << "CGI_CALL" << std::endl;
+		//return (executeCGI(CGI(_request, _location)));
 	}
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();

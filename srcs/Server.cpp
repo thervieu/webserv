@@ -210,7 +210,7 @@ void	Server::select_loop(void)
 				Response			response;
 				std::vector<char>	message;
 				
-				response.setRequest(Request(client.getRequest(), client.getServerSocket().getServerConfig()));
+				response.setRequest(Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig()));
 				message = response.sendResponse();
 				// std::cout << "sendResponse ok\n";
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux

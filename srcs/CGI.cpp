@@ -1,16 +1,40 @@
 #include "CGI.hpp"
 
 // ressource should be in _loc ?
-CGI::CGI(std::string path, std::string ressource_path, location loc)
+CGI::CGI(Request request, location loc)
 {
-	_full_path = path;
-	_ressource_path = ressource_path;
-	_loc = loc;
+	_request = request;
+	_location = loc;
 }
 
 //if need to del sthg
 CGI::~CGI(void)
 {
+}
+
+char **CGI::getEnv(void)
+{
+	std::map<std::string, std::string> env;
+	map['AUTH_TYPE'] = 
+	map['CONTENT_LENGTH'] = 
+	map['CONTENT_TYPE'] = 
+	map['GATEWAY_INTERFACE'] = "CGI/1.1";
+	map['PATH_INFO'] = _request.getURL(); // root + loc
+	map['PATH_TRANSLATED'] = _request.getURL(); // root + loc
+	map['QUERY_STRING'] = _request.getQuery();
+	map['REMOTE_ADDR'] = _request.getClientIP();
+	map['REMOTE_HOST'] = 
+	map['REMOTE_IDENT'] = 
+	map['REMOTE_USER'] = 
+	map['REQUEST_METHOD'] = _request.getMethod();
+	map['SCRIPT_NAME'] = 
+	map['SERVER_NAME'] = _request.getConfig()._host;
+	map['SERVER_PORT'] = _request.getConfig()._port;
+	map['SERVER_PROTOCOL'] = "HTTP/1.1"
+	map['SERVER_SOFTWARE'] = "Werbserv/1.1";
+	
+
+
 }
 
 // some helpful links
@@ -24,6 +48,8 @@ std::string executeCGI(void)
 	int status;
 
 	//get args into a char **
+
+	char **env = getArgsEnv();
 
 	if (pipe(_pipe) != 0)
 	{
