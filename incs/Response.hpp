@@ -4,11 +4,11 @@
 
 # include "Webserv.hpp"
 # include "Request.hpp"
+# include "CGI.hpp"
 # include <dirent.h>
 # include <string.h>
 # include <bits/stdc++.h>
 # include <algorithm>
-//# include "CGI.hpp"
 
 # define SEC_PER_MIN 60
 # define SEC_PER_HOUR 3600
@@ -24,6 +24,7 @@ class Response
 		std::string		_encoding_type;
 		std::string		_content;
 		std::string		_root;
+		bool			_cgi;
 		int				_code;
 		location		_location;
 

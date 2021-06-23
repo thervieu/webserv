@@ -734,8 +734,17 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		else
 		{
-			file_content = this->getContent();
-			file_content = this->changeContent(file_content);
+			// std::cout << "content in GETreponse = |" << _content << "|\n";
+			if (_cgi == false)
+			{
+				file_content = this->getContent();
+				file_content = this->changeContent(file_content);
+			}
+			else
+			{
+				for (size_t i = 0; i < _content.length(); i++)
+					file_content.push_back(_content[i]);
+			}
 			ss << file_content.size();
 			response += "Content-Length: " + ss.str() + "\r\n";
 		}
@@ -864,7 +873,7 @@ bool		Response::IsCGICalled(std::string url)
 	for (size_t i = 0; i < _location._cgi_extensions.size(); i++)
 	{
 		if (extension.compare(_location._cgi_extensions[i]) == 0)
-		return (true);
+			return (true);
 	}
 	return (false);
 }
@@ -879,6 +888,15 @@ bool Response::isAllowedMethod(void)
 	return (false);
 }
 
+std::string		getScriptName(std::string url)
+{
+	size_t pos = url.rfind("/");
+
+	std::string name = url.substr(pos + 1, url.length() - (pos + 1));
+	std::cout << "scipt name = |" << name << "|\n";
+	return (name);
+}
+
 std::vector<char>		Response::sendResponse()
 {
 	std::string			str;
@@ -887,6 +905,7 @@ std::vector<char>		Response::sendResponse()
 	int					i;
 	struct stat			filestat;
 
+	_cgi = false;
 	this->_root = "." + this->_request.getConfig()._root;
 	// std::cout << "ROOT = |" << _root << "\n";
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
@@ -920,7 +939,15 @@ std::vector<char>		Response::sendResponse()
 	//CGI
 	if (IsCGICalled(_request.getURL()))
 	{
-		//return (executeCGI(CGI(_request, _location)));
+		_cgi = true;
+		std::cout << "HERE\n";
+		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
+		_content = response;
+		// std::cout << "CGICALL ended _content = |" << _content << "|\n";
+		f_response = GETResponse();
+		for (size_t i = 0; i < f_response.size(); i++)
+			std::cout << f_response[i];
+		return (f_response);
 	}
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();

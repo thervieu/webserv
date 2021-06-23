@@ -168,6 +168,10 @@ int			Request::setHeader(std::string str)
 		this->setReferer(std::string(it, ite));
 	else if (line.compare("User-Agent:") == 0)
 		this->setUserAgent(std::string(it, ite));
+	else if (line.compare("Content-Length:") == 0)
+		this->setContentLength(std::string(it, ite));
+	else if (line.compare("Content-Type:") == 0)
+		this->setContentType(std::string(it, ite));
 	else if (line.compare("\r") == 0)
 		return (-2);
 	else
@@ -240,6 +244,25 @@ void			Request::setCLientIP(std::string str)
 	this->_clientIP.assign(str);
 }
 
+void			Request::setContentLength(std::string str)
+{
+	this->_contentLength.assign(str);
+}
+
+void			Request::setContentType(std::string str)
+{
+	this->_contentType.assign(str);
+}
+
+std::string		Request::getContentLength(void) const
+{
+	return (this->_contentLength);
+}
+
+std::string		Request::getContentType(void) const
+{
+	return (this->_contentType);
+}
 
 std::string		Request::getURL(void) const
 {
@@ -271,6 +294,16 @@ std::string		Request::getQuery(void) const
 	return (this->_query);
 }
 
+std::string		Request::getClientIP(void) const
+{
+	return (this->_clientIP);
+}
+
+std::string		Request::getContent(void) const
+{
+	return (this->_content);
+}
+
 std::vector<std::string>	Request::getArguments(void) const
 {
 	return (this->_arguments);
@@ -283,6 +316,7 @@ void			Request::ParseBody(std::string request)
 	std::string::iterator	ite;
 
 	i = 0;
+	_content = request;
 	std::cout << request << std::endl;
 	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
 	{
@@ -303,4 +337,5 @@ void			Request::ParseBody(std::string request)
 			this->_arguments.push_back(std::string(ite, it));
 		}
 	}
+
 }

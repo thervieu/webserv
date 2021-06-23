@@ -5,7 +5,6 @@
 
 class Request
 {
-
 	private:
 
 		std::vector<std::string>	_arguments;
@@ -21,6 +20,9 @@ class Request
 		std::string		_user_agent;
 		std::string		_clientIP;
 		std::string		_query;
+		std::string		_content;
+		std::string		_contentLength;
+		std::string		_contentType;
 		int				_unknown;
 
 	public:
@@ -39,6 +41,8 @@ class Request
 		void			setUserAgent(std::string header);
 		void			setURL(std::string str);
 		void			setCLientIP(std::string str);
+		void			setContentLength(std::string str);
+		void			setContentType(std::string str);
 		std::vector<std::string>	getArguments(void) const;
 		void			ParseBody(std::string body);
 		std::string		getAcceptCharsets(void) const;
@@ -51,7 +55,10 @@ class Request
 		std::string		getHTTPVersion(void) const;
 		std::string		getRequest(void) const;
 		std::string		getClientIP(void) const;
+		std::string		getContent(void) const;
 		std::string		getQuery(void) const;
+		std::string		getContentLength(void) const;
+		std::string		getContentType(void) const;
 		server_info		getConfig(void) const;
 		int				getUnknown(void) const;
 		void			parsing(std::string str);

@@ -1,10 +1,17 @@
-#include "CGI.hpp"
+#include "../incs/CGI.hpp"
 
 // ressource should be in _loc ?
-CGI::CGI(Request request, location loc)
+CGI::CGI(Request & request, location loc)
 {
-	_request = request;
+	setRequest(request);
+	// std::cout << "req root = |" << request.getConfig()._root << "|\n";
+	// std::cout << "root = |" << _request.getConfig()._root << "|\n";
 	_location = loc;
+}
+
+void CGI::setRequest(Request & req)
+{
+	_request = req;
 }
 
 //if need to del sthg
@@ -12,92 +19,149 @@ CGI::~CGI(void)
 {
 }
 
+std::string intToString(size_t n)
+{
+	std::ostringstream convert;
+
+	convert << n;
+	return (convert.str());
+}
+
 char **CGI::getEnv(void)
 {
-	std::map<std::string, std::string> env;
-	map['AUTH_TYPE'] = 
-	map['CONTENT_LENGTH'] = 
-	map['CONTENT_TYPE'] = 
-	map['GATEWAY_INTERFACE'] = "CGI/1.1";
-	map['PATH_INFO'] = _request.getURL(); // root + loc
-	map['PATH_TRANSLATED'] = _request.getURL(); // root + loc
-	map['QUERY_STRING'] = _request.getQuery();
-	map['REMOTE_ADDR'] = _request.getClientIP();
-	map['REMOTE_HOST'] = 
-	map['REMOTE_IDENT'] = 
-	map['REMOTE_USER'] = 
-	map['REQUEST_METHOD'] = _request.getMethod();
-	map['SCRIPT_NAME'] = 
-	map['SERVER_NAME'] = _request.getConfig()._host;
-	map['SERVER_PORT'] = _request.getConfig()._port;
-	map['SERVER_PROTOCOL'] = "HTTP/1.1"
-	map['SERVER_SOFTWARE'] = "Werbserv/1.1";
-	
+	std::map<std::string, std::string> env_map;
 
+	env_map["REDIRECT_STATUS"] = "200";
 
+	env_map["AUTH_TYPE"] = "";
+	env_map["CONTENT_LENGTH"] = _request.getContentLength();
+	env_map["CONTENT_TYPE"] = _request.getContentType();
+	env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
+	std::string root = _request.getConfig()._root;
+	env_map["PATH_INFO"] = root.substr(0, root.length() - 1) + _location._name;
+	env_map["PATH_TRANSLATED"] = root.substr(0, root.length() - 1) + _location._name;;
+	env_map["QUERY_STRING"] = _request.getQuery();
+	env_map["REMOTE_ADDR"] = _request.getClientIP();
+	env_map["REMOTE_IDENT"] = "";
+	env_map["REQUEST_METHOD"] = _request.getMethod();
+	env_map["SCRIPT_NAME"] = _request.getURL();
+	env_map["SCRIPT_FILENAME_NAME"] = _request.getURL();
+	env_map["SERVER_NAME"] = _request.getConfig()._host;
+	env_map["SERVER_PORT"] = intToString(_request.getConfig()._port);
+	env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
+	env_map["SERVER_SOFTWARE"] = "Werbserv/1.1";
+
+	char	**env = new char*[env_map.size() + 1];
+	int	j = 0;
+	for (std::map<std::string, std::string>::const_iterator i = env_map.begin(); i != env_map.end(); i++)
+	{
+		std::string	element = i->first + "=" + i->second;
+		// std::cout << "elt = |" << element << "|\n";
+		env[j] = new char[element.size() + 1];
+		env[j] = strcpy(env[j], (const char*)element.c_str());
+		j++;
+	}
+	env[j] = NULL;
+	return (env);
 }
 
 // some helpful links
 // https://cmd.inp.nsk.su/old/cmd2/manuals/unix/UNIX_Unleashed/ch20.htm
 // https://programmer.help/blogs/implement-simple-web-server-c-language.html
 // https://www.classes.cs.uchicago.edu/archive/1999/winter/CS219/projects/project2/project2.html
-std::string executeCGI(void)
+
+
+#include <cerrno>
+
+std::string		CGI::executeCGI(std::string scriptName)
 {
-	int _pipe[2];
-	pid_t pid;
-	int status;
+	int		ret = 1;
 
-	//get args into a char **
+	pid_t		pid;
+	int			saveStdin;
+	int			saveStdout;
+	char		**env;
+		
+	std::string	rtnContent;
 
-	char **env = getArgsEnv();
 
-	if (pipe(_pipe) != 0)
-	{
-		std::cout << "pipe failed" << std::endl;
-		exit(1);
-	}
-	
+	env = getEnv();
+
+	saveStdin = dup(STDIN_FILENO);
+	saveStdout = dup(STDOUT_FILENO);
+
+	FILE	*fIn = tmpfile();
+	FILE	*fOut = tmpfile();
+
+	long	fdIn = fileno(fIn);
+	long	fdOut = fileno(fOut);
+
+
+	saveStdin = dup(STDIN_FILENO);
+	saveStdout = dup(STDOUT_FILENO);
+
+	write(fdIn, _request.getContent().c_str(), _request.getContent().size());
+	lseek(fdIn, 0, SEEK_SET);
+
 	pid = fork();
 
 	if (pid == -1)
 	{
-		std::cout << "fork failed" << std::endl;
-		exit(1);
+		std::cerr << "Fork crashed." << std::endl;
+		return ("Status: 500\r\n\r\n");
 	}
-	if (pid == 0)
+	else if (pid == 0)
 	{
-		close (_pipe[1]);
-		dup2(_pipe[0], 0);
+		// std::cout << "son process" << "\n";
+		char * const * nll = NULL;
 
-		int _file_fd;
-
-		_file_fd = open("/tmp/cgi_file", O_RDWR | O_CREAT | O_TRUNC | O_IRUSR | O_IWUSR)
-		if (_file_fd == -1)
-		{
-			std::cout << "open failed" << std::endl;
-			exit(1);
-		}
-		dup2(_file_fd, 1);
-		dup2(_file_fd, 2);
-		//int res = 0
-		//res = execve(_full_path, exec_and_args, args);
-		if (res == -1)
-		{
-			std::cout << "execve failed" << std::endl;
-			exit(1);
-		}
-		close (_file_fd);
-		close (_pipe[0]);
-		// free args
-		exit(1);
+		dup2(fdIn, STDIN_FILENO);
+		dup2(fdOut, STDOUT_FILENO);
+		std::string root = _request.getConfig()._root;
+		//std::cout << "root = |" << _request.getConfig()._root << "|\n";
+		scriptName = "." + root.substr(0, root.length() - 1) + _location._name + scriptName;
+		//std::cout << "scriptName = |" << scriptName << "|\n\n";
+		//std::cout << "before execve" << "\n";
+		execve(scriptName.c_str(), nll, env);
+		//std::cout << "after execve ret = |" << ret << "|\n";
+		//std::cerr << "Execve crashed." << std::endl;
+		//write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
+		exit(0);
 	}
 	else
 	{
-		close(_pipe[0]);
-		write(_pipe[1], content, content.length());
-		close(_pipe[1]);
-		waitpid(-1, NULL, 0); // wait for any child to die but since we only have one it's ok
-		//free args
+		// std::cout << "parent process" << "\n";
+		char	buffer[CGI_BUFFER_SIZE] = {0};
+
+		waitpid(-1, NULL, 0);
+		// std::cout << "parent process: son ended" << "\n";
+		lseek(fdOut, 0, SEEK_SET);
+
+		ret = 1;
+		while (ret > 0)
+		{
+			memset(buffer, 0, CGI_BUFFER_SIZE);
+			ret = read(fdOut, buffer, CGI_BUFFER_SIZE - 1);
+			rtnContent += buffer;
+		}
 	}
-	return (readFile("tmp/cgi_file"));
+
+	dup2(saveStdin, STDIN_FILENO);
+	dup2(saveStdout, STDOUT_FILENO);
+	fclose(fIn);
+	fclose(fOut);
+	close(fdIn);
+	close(fdOut);
+	close(saveStdin);
+	close(saveStdout);
+	// std::cout << "rtnContent = |" << rtnContent << "|\n";
+
+	for (size_t i = 0; env[i]; i++)
+		delete[] env[i];
+	delete[] env;
+
+	if (!pid)
+		exit(0);
+
+	return (rtnContent);
 }

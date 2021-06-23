@@ -3,20 +3,26 @@
 
 # include "Config.hpp"
 # include "Request.hpp"
+# include <string>
+# include <string.h>
+# include <sys/wait.h>
+
+# define CGI_BUFFER_SIZE 1000
 
 class CGI
 {
 	private:
 
 		Request _request;
-		location _loc;
+		location _location;
 
 	public:
 
-		CGI(std::string, std::string, location);
+		CGI(Request & , location);
 		~CGI(void);
-		std::string executeCGI(void);
-		std::string getArgs(void);
+		void setRequest(Request &);
+		std::string executeCGI(std::string);
+		char		**getEnv(void);
 
 };
 
