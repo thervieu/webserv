@@ -382,5 +382,30 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 			exit(1);
 		}
 	}
+	else if (splittedLine[0] == location_directives[10])
+	{
+		if (splittedLine.size() != 4)
+		{
+			std::cout << "SyntaxError: " << splittedLine[0] << " directive should be in format 'rewrite ^/old_link$ http://new_link [redirection_type]" << std::endl;
+			exit(1);
+		}
+		if (splittedLine[1][0] != '^' || splittedLine[1][1] != '/' || splittedLine[1][splittedLine[1].length() - 1] != '$')
+		{
+			std::cout << splittedLine[1] << "\n";
+			std::cout << "1SyntaxError: " << splittedLine[0] << " directive should be in format 'rewrite ^/old_link$ http://new_link [redirection_type]" << std::endl;
+			exit(1);
+		}
+		if (splittedLine[3].compare("permanent") != 0 && splittedLine[3].compare("temporary") != 0)
+		{
+			std::cout << "SyntaxError: " << splittedLine[0] << " directive should in format have 'permanent' or 'temporary as redirection_type" << std::endl;
+			exit(1);
+		}
+		_loc._redirections.push_back(splittedLine[1].substr(1, splittedLine[1].length() - 2));
+		_loc._redirections.push_back(splittedLine[2]);
+		_loc._redirections.push_back(splittedLine[3]);
+		std::cout << "redir 0 = " << _loc._redirections[0] << "\n";
+		std::cout << "redir 1 = " << _loc._redirections[1] << "\n";
+		std::cout << "redir 2 = " << _loc._redirections[2] << "\n";
+	}
 	return ;
 }

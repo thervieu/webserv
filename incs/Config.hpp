@@ -10,6 +10,7 @@ class location
 	public:
 
 		std::vector<std::string>	_cgi_extensions;
+		std::vector<std::string>	_redirections;
 		std::vector<std::string>	_methods;
 		std::string					_name;
 		std::string					_index;
@@ -93,6 +94,7 @@ static const char * location_directives[] =
 	"cgi_extension",
 	"cgi_path",
 	"client_max_body_size",
+	"rewrite",
 	NULL
 };
 
