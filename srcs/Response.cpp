@@ -889,7 +889,7 @@ bool		Response::IsCGICalled(std::string url)
 	if (dot == std::string::npos)
 		return (false);
 	std::string extension = url.substr(dot, url.length() - dot);
-	std::cout << "extension_url = |" << extension << "|\n";
+	// std::cout << "extension_url = |" << extension << "|\n";
 	for (size_t i = 0; i < _location._cgi_extensions.size(); i++)
 	{
 		if (extension.compare(_location._cgi_extensions[i]) == 0)
@@ -965,6 +965,7 @@ std::vector<char>		Response::sendResponse()
 			std::cout << f_response[i];
 		return (f_response);
 	}
+	std::cout << "NOT HERE\n";
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)

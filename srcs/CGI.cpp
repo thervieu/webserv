@@ -122,7 +122,14 @@ std::string		CGI::executeCGI(std::string scriptName)
 		scriptName = "." + root.substr(0, root.length() - 1) + _location._name + scriptName;
 		//std::cout << "scriptName = |" << scriptName << "|\n\n";
 		//std::cout << "before execve" << "\n";
-		execve(scriptName.c_str(), nll, env);
+		if (_location._cgi_extensions[0].compare(".php") == 0)
+		{
+			char **argv = NULL;
+			argv[0] = &scriptName[0];
+			execve("php", argv, env);
+		}
+		else
+			execve(scriptName.c_str(), nll, env);
 		//std::cout << "after execve ret = |" << ret << "|\n";
 		//std::cerr << "Execve crashed." << std::endl;
 		//write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);

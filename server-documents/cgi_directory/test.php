@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/local/bin/php
 
 <?php
 phpinfo()
