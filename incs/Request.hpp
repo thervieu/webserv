@@ -57,6 +57,7 @@ class Request
 		std::string		getClientIP(void) const;
 		std::string		getContent(void) const;
 		std::string		getQuery(void) const;
+		void			setContent(std::string	content);
 		std::string		getContentLength(void) const;
 		std::string		getContentType(void) const;
 		server_info		getConfig(void) const;

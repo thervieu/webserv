@@ -83,7 +83,7 @@ def stress_test(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
 	threads = []
 
-	for i in range(20):
+	for i in range(10):
 		thread = threading.Thread(target=one_hundred_get_requests, args=(port, i))
 		threads.append(thread)
 		thread.start()
@@ -95,4 +95,19 @@ def wrong_method(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port))
 	if (r.status_code != 405):
 		return "Bad status code"
+	return ""
+
+def simple_post(port:int) -> str:
+	payload = "a"
+	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
+	if (r.status_code != 200):
+		return "Bad status code."
+	return ""
+
+
+def post_too_big(port:int) -> str:
+	payload = "a" * 1025
+	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
+	if (r.status_code != 413):
+		return "Bad status code."
 	return ""

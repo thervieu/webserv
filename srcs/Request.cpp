@@ -111,6 +111,9 @@ Request		&Request::operator=(Request const &rhs)
 	this->_user_agent = rhs.getUserAgent();
 	this->_config = rhs.getConfig();
 	this->_request = rhs.getRequest();
+	this->_content = rhs.getContent();
+	this->_contentLength = rhs.getContentLength();
+	this->_contentType = rhs.getContentType();
 	return (*this);
 }
 
@@ -299,6 +302,11 @@ std::string		Request::getClientIP(void) const
 	return (this->_clientIP);
 }
 
+void	Request::setContent(std::string	content)
+{
+	_content.assign(content);
+}
+
 std::string		Request::getContent(void) const
 {
 	return (this->_content);
@@ -316,8 +324,7 @@ void			Request::ParseBody(std::string request)
 	std::string::iterator	ite;
 
 	i = 0;
-	_content = request;
-	std::cout << request << std::endl;
+	this->setContent(request);
 	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
 	{
 		if (request[i] == '&')

@@ -32,7 +32,9 @@ def run(port: int) -> None:
 	check_test(port, "GET / ports 8080 and 8081", get_index_two_ports)
 	check_test(port, "GET / 1 worker 50 times", fifty_get_root)
 	check_test(port, "POST / (method not authorized) ", wrong_method)
-	check_test(port, "GET / 20 workers 100 times", stress_test)
+	check_test(port, "POST /post ", simple_post)
+	check_test(port, "POST /post request too big", post_too_big)
+	check_test(port, "GET / 10 workers 100 times", stress_test)
 
 if (__name__ == "__main__"):
 	if (len(sys.argv) != 2):

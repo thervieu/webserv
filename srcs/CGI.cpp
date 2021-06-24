@@ -120,13 +120,21 @@ std::string		CGI::executeCGI(std::string scriptName)
 		std::string root = _request.getConfig()._root;
 		//std::cout << "root = |" << _request.getConfig()._root << "|\n";
 		scriptName = "." + root.substr(0, root.length() - 1) + _location._name + scriptName;
-		//std::cout << "scriptName = |" << scriptName << "|\n\n";
+		std::cout << "scriptName = |" << scriptName << "|\n\n";
 		//std::cout << "before execve" << "\n";
 		if (_location._cgi_extensions[0].compare(".php") == 0)
 		{
-			char **argv = NULL;
-			argv[0] = &scriptName[0];
-			execve("php", argv, env);
+			std::cout << "HERE .php :)\n";
+			std::cout << std::system(std::string("php " + scriptName).c_str());
+			// char **argv = NULL;
+			// argv[0] = (char *)std::string("php").c_str();
+			// argv[1] = &scriptName[0];
+			// char **argv = NULL;
+			// argv[0] = (char *)std::string("php").c_str();
+			// argv[1] = &scriptName[0];
+			// int ret = execve("php", argv, env);
+			// std::cout << "after execve ret = |" << ret << "|\n";
+			// std::cerr << "Execve crashed." << std::endl;
 		}
 		else
 			execve(scriptName.c_str(), nll, env);

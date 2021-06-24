@@ -20,6 +20,7 @@ Response::~Response()
 void				Response::setRequest(Request request)
 {
 	this->_request = request;
+
 }
 
 std::string			Response::itos(int nb)
@@ -721,7 +722,7 @@ std::vector<char>	Response::GETResponse(void)
 			response += this->getAllow() + "\r\n";
 		if (this->_code == 429 || this->_code == 504)
 			response += this->getRetryAfter() + "\r\n";
-		if ((this->_code > 500 && this->_code < 600) || this->_code == 404 || this->_code == 405 || this->_code == 403 || this->_code == 400)
+		if ((this->_code > 500 && this->_code < 600) || this->_code == 413|| this->_code == 404 || this->_code == 405 || this->_code == 403 || this->_code == 400)
 		{
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
@@ -952,11 +953,19 @@ std::vector<char>		Response::sendResponse()
 			this->_code = 403;
 	}
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
+	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
+	{
+		_code = 413;
+		f_response = GETResponse();
+		for (size_t i = 0; i < f_response.size(); i++)
+			std::cout << f_response[i];
+		return (f_response);
+	}
+	
 	//CGI
 	if (IsCGICalled(_request.getURL()))
 	{
 		_cgi = true;
-		std::cout << "HERE\n";
 		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
 		_content = response;
 		// std::cout << "CGICALL ended _content = |" << _content << "|\n";
@@ -965,7 +974,6 @@ std::vector<char>		Response::sendResponse()
 			std::cout << f_response[i];
 		return (f_response);
 	}
-	std::cout << "NOT HERE\n";
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
