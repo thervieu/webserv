@@ -61,6 +61,7 @@ class Response
 		location			getLocation(std::string url, std::vector<location> locations);
 		bool				IsCGICalled(std::string url);
 		bool				isAllowedMethod(void);
+		bool				VerifyHost(void) const;
 
 		std::vector<char>	GETResponse(void);
 		std::vector<char>	POSTResponse(void);

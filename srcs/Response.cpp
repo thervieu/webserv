@@ -248,6 +248,8 @@ std::string			Response::getMessage(int code)
 			return ("Moved Permanently");
 		case 302:
 			return ("Found");
+		case 400:
+			return ("Bad Request");
 		case 401:
 			return ("Unauthorized");
 		case 403:
@@ -719,7 +721,7 @@ std::vector<char>	Response::GETResponse(void)
 			response += this->getAllow() + "\r\n";
 		if (this->_code == 429 || this->_code == 504)
 			response += this->getRetryAfter() + "\r\n";
-		if ((this->_code > 500 && this->_code < 600) || this->_code == 404 || this->_code == 405 || this->_code == 403)
+		if ((this->_code > 500 && this->_code < 600) || this->_code == 404 || this->_code == 405 || this->_code == 403 || this->_code == 400)
 		{
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
@@ -860,6 +862,24 @@ location	Response::getLocation(std::string url, std::vector<location> locations)
 	return (locations[max_index]);
 }
 
+bool		Response::VerifyHost(void) const
+{
+	std::ostringstream	convert;
+	std::string			tmp;
+
+	convert << this->_request.getConfig()._port;
+	for (size_t i = 0; i < this->_request.getConfig()._names.size(); i++)
+	{
+		tmp = this->_request.getConfig()._names[i] + ":" + convert.str();
+		std::cout << tmp << std::endl;
+		if (tmp.compare(this->_request.getHost()) == 0)
+			return (true);
+	}
+	tmp = this->_request.getConfig()._host + ":" + convert.str();
+	if (tmp.compare(this->_request.getHost()) == 0)
+		return (true);
+	return (false);
+}
 
 bool		Response::IsCGICalled(std::string url)
 {
@@ -899,8 +919,6 @@ std::string		getScriptName(std::string url)
 
 std::vector<char>		Response::sendResponse()
 {
-	std::string			str;
-	std::ostringstream	convert;
 	std::vector<char>	f_response;
 	int					i;
 	struct stat			filestat;
@@ -915,12 +933,10 @@ std::vector<char>		Response::sendResponse()
 	this->_code = 200;
 	this->_encoding_type = "plain";
 	i = 0;
-	convert << this->_request.getConfig()._port;
-	str = this->_request.getConfig()._host + ":" + convert.str();
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
-	else if (this->_request.getHost().compare(str) != 0)
-		this->_code = 404;
+	else if (this->VerifyHost() == false)
+		this->_code = 400;
 	if (stat(this->_content.c_str(), &filestat) == -1)
 		this->_code = 404;
 	else if (S_ISDIR(filestat.st_mode))
