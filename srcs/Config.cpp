@@ -403,9 +403,9 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		_loc._redirections.push_back(splittedLine[1].substr(1, splittedLine[1].length() - 2));
 		_loc._redirections.push_back(splittedLine[2]);
 		_loc._redirections.push_back(splittedLine[3]);
-		std::cout << "redir 0 = " << _loc._redirections[0] << "\n";
-		std::cout << "redir 1 = " << _loc._redirections[1] << "\n";
-		std::cout << "redir 2 = " << _loc._redirections[2] << "\n";
+		// std::cout << "redir 0 = " << _loc._redirections[0] << "\n";
+		// std::cout << "redir 1 = " << _loc._redirections[1] << "\n";
+		// std::cout << "redir 2 = " << _loc._redirections[2] << "\n";
 	}
 	return ;
 }
