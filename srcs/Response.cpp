@@ -261,6 +261,8 @@ std::string			Response::getMessage(int code)
 			return ("Method Not Allowed");
 		case 406:
 			return ("Not Acceptable");
+		case 413:
+			return ("Request entity too large");
 		case 429:
 			return ("Too Many Requests");
 		case 500:
@@ -641,10 +643,13 @@ std::string			Response::find_error_page(void)
 	i = 0;
 	convert << this->_code;
 	code = convert.str();
+	std::cout << "ERROR+PGES\n";
 	while (i < this->_request.getConfig()._error_pages.size() && this->_request.getConfig()._error_pages[i].compare(code) != 0)
 		i += 2;
+	std::cout << "i = " << i << "\n";
 	if (i < this->_request.getConfig()._error_pages.size())
 		return (this->_request.getConfig()._error_pages[i + 1]);
+	std::cout << "DEFAULT ERROR\n";
 	return ("/error_pages/error.html");
 }
 
@@ -722,10 +727,11 @@ std::vector<char>	Response::GETResponse(void)
 			response += this->getAllow() + "\r\n";
 		if (this->_code == 429 || this->_code == 504)
 			response += this->getRetryAfter() + "\r\n";
-		if ((this->_code > 500 && this->_code < 600) || this->_code == 413|| this->_code == 404 || this->_code == 405 || this->_code == 403 || this->_code == 400)
+		if ((this->_code > 500 && this->_code < 600) || this->_code == 413 || this->_code == 404 || this->_code == 405 || this->_code == 403 || this->_code == 400)
 		{
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
+			std::cout << "_content addr = |" << _content << "|\n";
 		}
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\r\n";
