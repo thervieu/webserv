@@ -22,7 +22,7 @@ class CGI
 		~CGI(void);
 		void setRequest(Request &);
 		std::string executeCGI(std::string);
-		char		**getEnv(void);
+		char		**getEnv(std::string);
 
 };
 

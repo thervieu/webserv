@@ -922,7 +922,6 @@ std::string		getScriptName(std::string url)
 	size_t pos = url.rfind("/");
 
 	std::string name = url.substr(pos + 1, url.length() - (pos + 1));
-	std::cout << "scipt name = |" << name << "|\n";
 	return (name);
 }
 

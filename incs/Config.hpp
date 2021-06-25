@@ -15,6 +15,7 @@ class location
 		std::string					_name;
 		std::string					_index;
 		std::string					_cgi_path;
+		std::string					_cgi_extension;
 		std::string					_root;
 		std::string					_upload_path;
 		size_t						_upload_cleanup;

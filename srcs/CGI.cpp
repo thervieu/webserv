@@ -27,7 +27,7 @@ std::string intToString(size_t n)
 	return (convert.str());
 }
 
-char **CGI::getEnv(void)
+char **CGI::getEnv(std::string str)
 {
 	std::map<std::string, std::string> env_map;
 
@@ -37,15 +37,18 @@ char **CGI::getEnv(void)
 	env_map["CONTENT_LENGTH"] = _request.getContentLength();
 	env_map["CONTENT_TYPE"] = _request.getContentType();
 	env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
-	std::string root = _request.getConfig()._root;
-	env_map["PATH_INFO"] = root.substr(0, root.length() - 1) + _location._name;
-	env_map["PATH_TRANSLATED"] = root.substr(0, root.length() - 1) + _location._name;;
+	
+	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
+	
+	std::cout << "PATH_INFO = " << root + _location._name + str << "\n";
+	env_map["PATH_INFO"] = root + _location._name + str;
+	env_map["PATH_TRANSLATED"] = root + _location._name + str;
 	env_map["QUERY_STRING"] = _request.getQuery();
 	env_map["REMOTE_ADDR"] = _request.getClientIP();
 	env_map["REMOTE_IDENT"] = "";
 	env_map["REQUEST_METHOD"] = _request.getMethod();
-	env_map["SCRIPT_NAME"] = _request.getURL();
-	env_map["SCRIPT_FILENAME_NAME"] = _request.getURL();
+	env_map["SCRIPT_NAME"] = _location._cgi_path;
+	env_map["SCRIPT_FILENAME"] = "." + root + _location._name + _location._cgi_path;
 	env_map["SERVER_NAME"] = _request.getConfig()._host;
 	env_map["SERVER_PORT"] = intToString(_request.getConfig()._port);
 	env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -73,7 +76,19 @@ char **CGI::getEnv(void)
 
 #include <cerrno>
 
-std::string		CGI::executeCGI(std::string scriptName)
+char *newStr(std::string src)
+{
+	char *rtn;
+
+	if (!(rtn = (char *)malloc(sizeof(char) * (src.size() + 1))))
+		return (0);
+	for (size_t i = 0; i < src.size(); ++i)
+		rtn[i] = src[i];
+	rtn[src.size()] = 0;
+	return (rtn);
+}
+
+std::string		CGI::executeCGI(std::string urlFile)
 {
 	int		ret = 1;
 
@@ -84,8 +99,7 @@ std::string		CGI::executeCGI(std::string scriptName)
 		
 	std::string	rtnContent;
 
-
-	env = getEnv();
+	env = getEnv(urlFile);
 
 	saveStdin = dup(STDIN_FILENO);
 	saveStdout = dup(STDOUT_FILENO);
@@ -104,6 +118,13 @@ std::string		CGI::executeCGI(std::string scriptName)
 	lseek(fdIn, 0, SEEK_SET);
 
 	pid = fork();
+	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
+	char **argv = (char**)malloc(sizeof(char *) * 3);
+	argv[0] = newStr("/etc/alternatives/php-cgi");
+	argv[1] = newStr("." + root + _location._name + _location._cgi_path);
+	argv[2] = NULL;
+	std::cout << "argv = |" << std::string(argv[0]) << "| |" << std::string(argv[1]) << "|\n";
+		
 
 	if (pid == -1)
 	{
@@ -117,41 +138,19 @@ std::string		CGI::executeCGI(std::string scriptName)
 
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
+		
 		std::string root = _request.getConfig()._root;
-		// std::cout << "root = |" << _request.getConfig()._root << "|\n";
-		scriptName = "." + root.substr(0, root.length() - 1) + _location._name + scriptName;
-		// std::cout << "scriptName = |" << scriptName << "|\n\n";
-		// std::cout << "before execve" << "\n";
-		if (_location._cgi_extensions[0].compare(".php") == 0)
-		{
-			// std::cout << "HERE .php :)\n";
-			// std::cout << std::system(std::string("php " + scriptName).c_str());
-			char **argv = NULL;
-			argv[0] = (char *)std::string("php").c_str();
-			argv[1] = &scriptName[0];
-			
-			execve("php", argv, env);
-			std::cout << "after execve errno = |" << strerror(errno) <<"|\n";
-			std::cout << "after execve errno = |" << strerror(errno) <<"|\n";
-			exit(0);
-		}
+		if (_location._cgi_path.substr(_location._cgi_path.rfind("."), 4).compare(".php") == 0)
+			execve(argv[0], argv, env);
 		else
-		{
-			execve(scriptName.c_str(), nll, env);
-			std::cout << "after execve errno = |" << strerror(errno) <<"|\n";
-		}
-		// std::cout << "after execve ret = |" << ret << "|\n";
-		// std::cerr << "Execve crashed." << std::endl;
-		// write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
-		exit(0);
+			execve(("." + _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1) + _location._name + _location._cgi_path).c_str(), nll, env);
+		// exit(0);
 	}
 	else
 	{
-		// std::cout << "parent process" << "\n";
 		char	buffer[CGI_BUFFER_SIZE] = {0};
 
 		waitpid(-1, NULL, 0);
-		// std::cout << "parent process: son ended" << "\n";
 		lseek(fdOut, 0, SEEK_SET);
 
 		ret = 1;
@@ -171,7 +170,6 @@ std::string		CGI::executeCGI(std::string scriptName)
 	close(fdOut);
 	close(saveStdin);
 	close(saveStdout);
-	// std::cout << "rtnContent = |" << rtnContent << "|\n";
 
 	for (size_t i = 0; env[i]; i++)
 		delete[] env[i];
