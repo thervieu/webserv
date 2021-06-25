@@ -249,6 +249,8 @@ std::string			Response::getMessage(int code)
 			return ("Moved Permanently");
 		case 302:
 			return ("Found");
+		case 307:
+			return ("Temporary Redirect");
 		case 400:
 			return ("Bad Request");
 		case 401:
@@ -721,6 +723,11 @@ std::vector<char>	Response::GETResponse(void)
 		response = this->getCode() + "\r\n";
 		response += this->getDate(0) + "\r\n";
 		response += this->getServer() + "\r\n";
+		if (this->_code == 301 || this->_code == 302 || this->_code == 307)
+		{
+			response += this->getLocation() + "\r\n";
+			response += this->getRetryAfter() + "\r\n";
+		}
 		if (this->_code == 401)
 			response += this->getWWWAuthentificate() + "\r\n";
 		if (this->_code == 405)
@@ -759,11 +766,6 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		response += this->getContentLanguage() + "\r\n";
 		response += this->getLastModified() + "\r\n";
-		if (this->_code == 301 || this->_code == 302)
-		{
-			response += this->getLocation();
-			response += this->getRetryAfter();
-		}
 		f_response.assign(response.begin(), response.end());
 		f_response.push_back('\r');
 		f_response.push_back('\n');
@@ -878,7 +880,7 @@ bool		Response::VerifyHost(void) const
 	for (size_t i = 0; i < this->_request.getConfig()._names.size(); i++)
 	{
 		tmp = this->_request.getConfig()._names[i] + ":" + convert.str();
-		std::cout << tmp << std::endl;
+		//std::cout << tmp << std::endl;
 		if (tmp.compare(this->_request.getHost()) == 0)
 			return (true);
 	}
@@ -924,10 +926,31 @@ std::string		getScriptName(std::string url)
 	return (name);
 }
 
+void					Response::VerifyRedirection()
+{
+	size_t		i;
+
+	i = 0;
+	while (i < this->_location._redirections.size())
+	{
+		std::cout << " ||| " << this->_root + this->_location._name + this->_location._redirections[i] << std::endl << this->_content << " |||  " << std::endl;
+		if (this->_content.compare(this->_root + this->_location._name + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
+		{
+			this->_content = this->_location._redirections[i + 1];
+			if (this->_location._redirections[i + 2].compare("permanent") == 0)
+				this->_code = 301;
+			else if (this->_location._redirections[i + 2].compare("temporary") == 0)
+				this->_code = 307;
+			return ;
+		}
+		i += 3;
+	}
+	this->_code = 200;
+}
+
 std::vector<char>		Response::sendResponse()
 {
 	std::vector<char>	f_response;
-	int					i;
 	struct stat			filestat;
 
 	_cgi = false;
@@ -937,9 +960,7 @@ std::vector<char>		Response::sendResponse()
 	// std::cout << "ROOT SUBSTR = |" << _root << "\n";
 	this->_content = "." + this->_request.getConfig()._root;
 	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL();
-	this->_code = 200;
 	this->_encoding_type = "plain";
-	i = 0;
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
 	else if (this->VerifyHost() == false)
@@ -959,6 +980,7 @@ std::vector<char>		Response::sendResponse()
 			this->_code = 403;
 	}
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
+	this->VerifyRedirection();
 	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
 	{
 		_code = 413;
