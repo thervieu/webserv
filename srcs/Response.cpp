@@ -727,7 +727,6 @@ std::string	Response::upload(void)
 	
 	if (ret == 0 && S_ISREG(filestat.st_mode))
 	{
-		std::cout << "ISREG\n";
 		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
 		{
 			std::cout << "NON\n";
@@ -801,7 +800,6 @@ std::vector<char>	Response::GETResponse(void)
 			std::cout << "content in GETreponse = |" << _content << "|\n";
 			if (_cgi == false)
 			{
-				std::cout << "HERE\n";
 				file_content = this->getContent();
 				file_content = this->changeContent(file_content);
 			}
@@ -815,14 +813,12 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		response += this->getContentLanguage() + "\r\n";
 		response += this->getLastModified() + "\r\n";
-		std::cout << "ASSIGN reponse\n\n";
 		f_response.assign(response.begin(), response.end());
 		f_response.push_back('\r');
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("POST") == 0)
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 	}
-	std::cout << "\nOUT GETResponse\n\n";
 	return (f_response);
 }
 
@@ -1044,13 +1040,11 @@ std::vector<char>		Response::sendResponse()
 		_cgi = true;
 		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
 		_content = response;
-		// std::cout << "CGICALL ended _content = |" << _content << "|\n";
 		f_response = GETResponse();
 		for (size_t i = 0; i < f_response.size(); i++)
 			std::cout << f_response[i];
 		return (f_response);
 	}
-	std::cout << "NO CGI\n\n";
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
@@ -1065,6 +1059,5 @@ std::vector<char>		Response::sendResponse()
 		f_response = OPTIONSResponse();
 	for (size_t i = 0; i < f_response.size(); i++)
 		std::cout << f_response[i];
-	std::cout << "sendResponse OUT\n\n";
 	return (f_response);
 }

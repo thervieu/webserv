@@ -212,20 +212,19 @@ void	Server::select_loop(void)
 				
 				response.setRequest(Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig()));
 				message = response.sendResponse();
-				std::cout << "sendResponse ok\n";
+				// std::cout << "sendResponse ok\n";
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
 				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
-				std::cout << "\nResponse sent !\n" << std::endl;
+				// std::cout << "\nResponse sent !\n" << std::endl;
 				
 				client.setReceived(false);
 				client.getRequest().clear();
 				bool_treat = true;
-				std::cout << "\n end Response sent !\n" << std::endl;
 			}
 			if (FD_ISSET(client_sd, &read_set) && bool_treat == false)
 			{
 				int rtn = receiveConnection(client_sd, client.getRequest());
-				std::cout << "rtn receive = |" << rtn << "|\n";
+				// std::cout << "rtn receive = |" << rtn << "|\n";
 				if (rtn < 0)
 				{
 					// std::cout << "bad rtn\n";
@@ -249,7 +248,7 @@ void	Server::select_loop(void)
 				else if (rtn == 0)
 				{
 					client.setReceived(true);
-					std::cout << "rtn = 0  client nb = |" << client_nb << "| clients len = |" << _clients.size() << "| client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
+					// std::cout << "rtn = 0  client nb = |" << client_nb << "| clients len = |" << _clients.size() << "| client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
 				}
 			}
 		}
