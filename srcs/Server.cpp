@@ -209,6 +209,7 @@ void	Server::select_loop(void)
 			{
 				Response			response;
 				std::vector<char>	message;
+				// std::cout << "bef setRequest\n\n";
 				
 				response.setRequest(Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig()));
 				message = response.sendResponse();

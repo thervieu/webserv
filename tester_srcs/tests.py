@@ -1,5 +1,6 @@
 import requests
 import threading
+import os.path
 
 def simple_get_index(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port))
@@ -69,7 +70,6 @@ def one_hundred_get_requests(port: int, nb: int) -> None:
 	if nb % 2 == 0:
 		port += 1
 	for i in range(100):
-		# print("worker {} | test {}".format(str(nb), str(i)))
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
 			print("worker" + i + ": Bad status code")
@@ -110,4 +110,27 @@ def post_too_big(port:int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
 	if (r.status_code != 413):
 		return "Bad status code."
+	return ""
+
+def post_with_upload(port:int) -> str:
+	payload = "fname=test_fname&lname=test_lname"
+	r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
+	if (r.status_code != 201):
+		return "Bad status code."
+	filename = "./upload/index.html"
+	with open(filename) as f:
+		content = f.readlines()
+	if (content[0] != "fname=test_fname&lname=test_lname"):
+		return "upload_file has wrong text"
+	return ""
+
+def delete(port: int) -> str:
+	filename = "/delete_folder/index.html"
+	if (os.path.isfile("." + filename)):
+		print("File exists")
+	r = requests.delete("http://localhost:" + str(port) + filename)
+	if (r.status_code != 204):
+		return "Bad status code for DELETE."
+	if (os.path.isfile("." + filename)):
+		return "File still exists"
 	return ""

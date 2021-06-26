@@ -71,6 +71,7 @@ Request::Request(std::string request, std::string client_ip, server_info config)
 		ite = request.begin() + i;
 		this->_query.assign(it, ite);
 	}
+	// std::cout << "hehehe\n\n";
 
 	//http version
 	while (request[i] == ' ')
@@ -90,7 +91,9 @@ Request::Request(std::string request, std::string client_ip, server_info config)
 
 	//headers
 	line.assign(++ite, request.end());
+	// std::cout << "assign ok\n\n";
 	this->parsing(line);
+	// std::cout << "parsing ok\n\n";
 }
 
 Request::~Request()
@@ -143,6 +146,7 @@ void		Request::parsing(std::string str)
 		else if (setHeader(line) == -2)
 			this->_unknown = 2;
 	}
+	// std::cout << "end pasring ok\n\n";
 }
 
 int			Request::setHeader(std::string str)
@@ -319,30 +323,32 @@ std::vector<std::string>	Request::getArguments(void) const
 
 void			Request::ParseBody(std::string request)
 {
-	int		i;
+	size_t		i;
 	std::string::iterator	it;
 	std::string::iterator	ite;
 
 	i = 0;
+	// std::cout << "parse body beg\n\n";
 	this->setContent(request);
-	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
+	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0' && i < request.length())
 	{
 		if (request[i] == '&')
 			++i;
-		while (request[i] != '\r' && request[i] != '\n' && request[i] != 0 && request[i] != '&')
+		while (request[i] != '\r' && request[i] != '\n' && request[i] != 0 && request[i] != '&' && i < request.length())
 		{
 			it = request.begin() + i;
-			while (request[i] != '\r' && request[i] != '\n' && request[i] != '=')
+			while (request[i] != '\r' && request[i] != '\n' && request[i] != '=' && i < request.length())
 				i++;
 			ite = request.begin() + i;
 			this->_arguments.push_back(std::string(it, ite));
 			++i;
 			ite = request.begin() + i;
-			while (request[i] != '\r' && request[i] != '\n' && request[i] != '&' && request[i] != '\0')
+			while (request[i] != '\r' && request[i] != '\n' && request[i] != '&' && request[i] != '\0' && i < request.length())
 				i++;
 			it = request.begin() + i;
 			this->_arguments.push_back(std::string(ite, it));
+			// std::cout << "parse body mid i = |" << i << "|\n\n";
 		}
 	}
-
+	// std::cout << "parse body ok\n\n";
 }

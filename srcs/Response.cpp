@@ -645,13 +645,13 @@ std::string			Response::find_error_page(void)
 	i = 0;
 	convert << this->_code;
 	code = convert.str();
-	std::cout << "ERROR+PGES\n";
+	// std::cout << "ERROR+PGES\n";
 	while (i < this->_request.getConfig()._error_pages.size() && this->_request.getConfig()._error_pages[i].compare(code) != 0)
 		i += 2;
-	std::cout << "i = " << i << "\n";
+	// std::cout << "i = " << i << "\n";
 	if (i < this->_request.getConfig()._error_pages.size())
 		return (this->_request.getConfig()._error_pages[i + 1]);
-	std::cout << "DEFAULT ERROR\n";
+	// std::cout << "DEFAULT ERROR\n";
 	return ("/error_pages/error.html");
 }
 
@@ -740,6 +740,7 @@ std::string	Response::upload(void)
 	else
 	{
 		std::cout << "CREATE\n";
+		std::cout << "PATH = " << path << "\n\n";
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
 			std::cout << strerror(errno) << "\n";
@@ -797,7 +798,7 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		else
 		{
-			std::cout << "content in GETreponse = |" << _content << "|\n";
+			// std::cout << "content in GETreponse = |" << _content << "|\n";
 			if (_cgi == false)
 			{
 				file_content = this->getContent();
@@ -837,7 +838,7 @@ std::vector<char>		Response::DELETEResponse(void)
 	else
 		this->_code = 204;
 	response = this->getCode() + "\r\n";
-	response += this->getDate(0) + "\r\n";
+	response += this->getDate(0) + "\r\n\r\n";
 	f_response.assign(response.begin(), response.end());
 	return (f_response);
 }
@@ -859,7 +860,6 @@ std::vector<char>		Response::wrongMethodReponse(void)
 	response += this->getContentLanguage() + "\r\n";
 	response += this->getLastModified() + "\r\n\r\n";
 	f_response.assign(response.begin(), response.end());
-	//std::cout << "CONTENT_PATH 2 = |" << this->_content << "|\n";
 	file_content = this->getContent();
 	std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 	return (f_response);
@@ -998,8 +998,10 @@ std::vector<char>		Response::sendResponse()
 {
 	std::vector<char>	f_response;
 	struct stat			filestat;
+	// std::cout << "SENDRESPONSE\n\n";
 
 	_cgi = false;
+	this->_code = 200;
 	this->_root = "." + this->_request.getConfig()._root;
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
 	this->_content = "." + this->_request.getConfig()._root;
@@ -1020,11 +1022,15 @@ std::vector<char>		Response::sendResponse()
 		}
 		this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 		this->_content = this->findIndex();
+		// std::cout << "contetn after index = " << _content << "\n\n";
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
+		// std::cout << "code after index and compare = " << _code << "\n\n";
 	}
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
-	this->VerifyRedirection();
+	if (this->_location._redirections.size())
+		this->VerifyRedirection();
+	// std::cout << "code after ver redir = " << _code << "\n\n";
 	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
 	{
 		_code = 413;
@@ -1035,6 +1041,7 @@ std::vector<char>		Response::sendResponse()
 	}
 	
 	//CGI
+		// std::cout << "code bef CGI = " << _code << "\n\n";
 	if (IsCGICalled(_request.getURL()))
 	{
 		_cgi = true;
@@ -1045,8 +1052,12 @@ std::vector<char>		Response::sendResponse()
 			std::cout << f_response[i];
 		return (f_response);
 	}
+	// std::cout << "NOCGI\n\n";
 	if (isAllowedMethod() == false)
+	{
+		// std::cout << "NOTALLOWEDMETHOD\n\n";
 		f_response = wrongMethodReponse();
+	}
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
 		f_response = GETResponse();
 	else if (this->_request.getMethod().compare("POST") == 0)
