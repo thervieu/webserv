@@ -63,6 +63,7 @@ class Response
 		bool				IsCGICalled(std::string url);
 		bool				isAllowedMethod(void);
 		bool				VerifyHost(void) const;
+		std::string			upload(void);
 
 		std::vector<char>	GETResponse(void);
 		std::vector<char>	POSTResponse(void);

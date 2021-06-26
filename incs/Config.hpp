@@ -90,7 +90,7 @@ static const char * location_directives[] =
 	"autoindex",
 	"index",
 	"upload_enable",
-	"upload_store",
+	"upload_path",
 	"upload_cleanup",
 	"cgi_extension",
 	"cgi_path",

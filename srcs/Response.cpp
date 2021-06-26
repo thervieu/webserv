@@ -711,16 +711,65 @@ std::vector<char>	Response::changeContent(std::vector<char> content)
 	return (content);
 }
 
+#include <cerrno>
+
+std::string	Response::upload(void)
+{
+	int fd;
+	struct stat			filestat;
+	
+	size_t pos = _request.getURL().rfind("/");
+	
+	std::string urlFile = _request.getURL().substr(pos + 1 , _request.getURL().length() - pos - 1);
+	std::string path = this->_root + _location._upload_path + "/" + urlFile;
+
+	int ret = stat(path.c_str(), &filestat);
+	
+	if (ret == 0 && S_ISREG(filestat.st_mode))
+	{
+		std::cout << "ISREG\n";
+		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
+		{
+			std::cout << "NON\n";
+			exit(1);
+		}
+		write(fd, _request.getContent().c_str(), _request.getContent().length());
+		close(fd);
+		this->_code = 200;
+		path = "Content-Location: " + path;
+	}
+	else
+	{
+		std::cout << "CREATE\n";
+		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
+		{
+			std::cout << strerror(errno) << "\n";
+			std::cout << "NON2\n";
+			exit(1);
+		}
+		write(fd, _request.getContent().c_str(), _request.getContent().length());
+		close(fd);
+		this->_code = 201;
+		path = "Location: " + path;
+	}
+	return (path);
+}
+
 std::vector<char>	Response::GETResponse(void)
 {
 	std::string			response;
 	std::vector<char>	file_content;
 	std::vector<char>	f_response;
 	std::stringstream	ss;
+	std::string upload_rtn;
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
+		if (_request.getMethod().compare("POST") == 0 && _location._upload_path.length() != 0)
+			upload_rtn = upload();
 		response = this->getCode() + "\r\n";
+		if (_request.getMethod().compare("POST") == 0 && _location._upload_path.length() != 0)
+			response += upload_rtn;
 		response += this->getDate(0) + "\r\n";
 		response += this->getServer() + "\r\n";
 		if (this->_code == 301 || this->_code == 302 || this->_code == 307)
@@ -738,7 +787,6 @@ std::vector<char>	Response::GETResponse(void)
 		{
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
-			std::cout << "_content addr = |" << _content << "|\n";
 		}
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\r\n";
@@ -750,9 +798,10 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		else
 		{
-			// std::cout << "content in GETreponse = |" << _content << "|\n";
+			std::cout << "content in GETreponse = |" << _content << "|\n";
 			if (_cgi == false)
 			{
+				std::cout << "HERE\n";
 				file_content = this->getContent();
 				file_content = this->changeContent(file_content);
 			}
@@ -766,12 +815,14 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		response += this->getContentLanguage() + "\r\n";
 		response += this->getLastModified() + "\r\n";
+		std::cout << "ASSIGN reponse\n\n";
 		f_response.assign(response.begin(), response.end());
 		f_response.push_back('\r');
 		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("POST") == 0)
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 	}
+	std::cout << "\nOUT GETResponse\n\n";
 	return (f_response);
 }
 
@@ -954,9 +1005,7 @@ std::vector<char>		Response::sendResponse()
 
 	_cgi = false;
 	this->_root = "." + this->_request.getConfig()._root;
-	// std::cout << "ROOT = |" << _root << "\n";
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
-	// std::cout << "ROOT SUBSTR = |" << _root << "\n";
 	this->_content = "." + this->_request.getConfig()._root;
 	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL();
 	this->_encoding_type = "plain";
@@ -1001,6 +1050,7 @@ std::vector<char>		Response::sendResponse()
 			std::cout << f_response[i];
 		return (f_response);
 	}
+	std::cout << "NO CGI\n\n";
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
@@ -1015,5 +1065,6 @@ std::vector<char>		Response::sendResponse()
 		f_response = OPTIONSResponse();
 	for (size_t i = 0; i < f_response.size(); i++)
 		std::cout << f_response[i];
+	std::cout << "sendResponse OUT\n\n";
 	return (f_response);
 }
