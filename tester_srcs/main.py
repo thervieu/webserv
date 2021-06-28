@@ -25,6 +25,7 @@ def check_test(port: int, name_test: str, test: Callable) -> None:
 
 def run(port: int) -> None:
 	"""run tests"""
+	print("All tests  are done requesting on http://localhost:port (except the one shozcasing server_name)\n")
 	check_test(port, "GET / ", simple_get_index)
 	check_test(port, "GET /auto autoindex", get_autoindex_subdir)
 	check_test(port, "GET /forbidden (403) ", get_forbidden_dir)
@@ -36,8 +37,10 @@ def run(port: int) -> None:
 	check_test(port, "POST /post request too big (413)", post_too_big)
 	check_test(port, "POST /post_upload -> upload in /upload", post_with_upload)
 	check_test(port, "DELETE /delete_folder/index.html", delete)
+	check_test(port, "DELETE /delete_folder/index.html (404)", delete_already_deleted)
+	check_test(port, "GET http://webserv:port use of server_name ", server_name)
 
-	#check_test(port, "GET / 10 workers 100 times", stress_test)
+	# check_test(port, "GET / 10 workers 100 times", stress_test)
 
 if (__name__ == "__main__"):
 	if (len(sys.argv) != 2):

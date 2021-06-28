@@ -780,7 +780,7 @@ std::vector<char>	Response::GETResponse(void)
 			upload_rtn = upload();
 		response = this->getCode() + "\r\n";
 		if (_request.getMethod().compare("POST") == 0 && _location._upload_path.length() != 0)
-			response += upload_rtn;
+			response += upload_rtn + "\r\n";
 		response += this->getDate(0) + "\r\n";
 		response += this->getServer() + "\r\n";
 		if (this->_code == 301 || this->_code == 302 || this->_code == 307)
@@ -848,8 +848,27 @@ std::vector<char>		Response::DELETEResponse(void)
 		this->_code = 404;
 	else
 		this->_code = 204;
+	std::cout << "CODE = |" << _code << "|\n";
 	response = this->getCode() + "\r\n";
-	response += this->getDate(0) + "\r\n\r\n";
+	response += this->getDate(0) + "\r\n";
+	if (this->_code == 404)
+	{
+
+		this->_content = "." + this->_request.getConfig()._root;
+		this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
+
+		response += this->getServer() + "\r\n";
+		response += this->getContentType() + "\r\n";
+		response += this->getContentLength() + "\r\n";
+		response += this->getContentLanguage() + "\r\n";
+		response += this->getLastModified() + "\r\n\r\n";
+		f_response.assign(response.begin(), response.end());
+		
+		std::vector<char> file_content = this->getContent();
+		std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
+		return (f_response);
+	}
+	response += "\r\n";
 	f_response.assign(response.begin(), response.end());
 	return (f_response);
 }

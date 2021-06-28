@@ -13,20 +13,21 @@ def simple_get_index(port: int) -> str:
 	return ""
 
 def get_index_two_ports(port: int) -> str:
-	r = requests.get("http://localhost:" + str(port))
-	if (r.status_code != 200):
-		return "Bad status code"
-	if (r.text != "Hello World !\n"):
-		return "Bad Content"
-	if (r.headers['Content-Length'] != "14"):
-		return "Bad Content-Length"
-	r = requests.get("http://localhost:" + str(port + 1))
-	if (r.status_code != 200):
-		return "Bad status code"
-	if (r.text != "Hello World !\n"):
-		return "Bad Content"
-	if (r.headers['Content-Length'] != "14"):
-		return "Bad Content-Length"
+	for i in range(10):
+		r = requests.get("http://localhost:" + str(port))
+		if (r.status_code != 200):
+			return "Bad status code"
+		if (r.text != "Hello World !\n"):
+			return "Bad Content"
+		if (r.headers['Content-Length'] != "14"):
+			return "Bad Content-Length"
+		r = requests.get("http://localhost:" + str(port + 1))
+		if (r.status_code != 200):
+			return "Bad status code"
+		if (r.text != "Hello World !\n"):
+			return "Bad Content"
+		if (r.headers['Content-Length'] != "14"):
+			return "Bad Content-Length"
 	return ""
 
 
@@ -133,4 +134,23 @@ def delete(port: int) -> str:
 		return "Bad status code for DELETE."
 	if (os.path.isfile("." + filename)):
 		return "File still exists"
+	return ""
+
+def delete_already_deleted(port: int) -> str:
+	filename = "/delete_folder/index.html"
+	if (os.path.isfile("." + filename) == False):
+		print("File doesn't exist")
+	r = requests.delete("http://localhost:" + str(port) + filename)
+	if (r.status_code != 404):
+		return "Bad status code for DELETE."
+	return ""
+
+def server_name(port: int) -> str:
+	r = requests.get("http://webserv:" + str(port))
+	if (r.status_code != 200):
+		return "Bad status code"
+	if (r.text != "Hello World !\n"):
+		return "Bad Content"
+	if (r.headers['Content-Length'] != "14"):
+		return "Bad Content-Length"
 	return ""
