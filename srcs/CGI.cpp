@@ -40,7 +40,7 @@ char **CGI::getEnv(std::string str)
 	
 	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 	
-	std::cout << "PATH_INFO = " << root + _location._name + str << "\n";
+	// std::cout << "PATH_INFO = " << root + _location._name + str << "\n";
 	env_map["PATH_INFO"] = root + _location._name + str;
 	env_map["PATH_TRANSLATED"] = root + _location._name + str;
 	env_map["QUERY_STRING"] = _request.getQuery();

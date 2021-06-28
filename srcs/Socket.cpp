@@ -41,7 +41,7 @@ Socket::Socket(server_info server)
 		std::cout << "Error: bind failed" << std::endl;
 		exit(1);
 	}
-	if (listen(this->_fd, 3) < 0)
+	if (listen(this->_fd, 1000) < 0)
 	{
 		std::cout << "Error: Unable to listen socket" << std::endl;
 		exit(1);
