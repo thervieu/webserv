@@ -824,10 +824,8 @@ std::vector<char>	Response::GETResponse(void)
 			response += "Content-Length: " + ss.str() + "\r\n";
 		}
 		response += this->getContentLanguage() + "\r\n";
-		response += this->getLastModified() + "\r\n";
+		response += this->getLastModified() + "\r\n\r\n";
 		f_response.assign(response.begin(), response.end());
-		f_response.push_back('\r');
-		f_response.push_back('\n');
 		if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("POST") == 0)
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 	}
