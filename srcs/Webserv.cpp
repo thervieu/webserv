@@ -99,8 +99,10 @@ int			main(int ac, char **av)
 	signal(SIGQUIT, signal_handler);
 	try
 	{
+		std::cout << "HERE1\n";
 		for (size_t i = 0; i < config.getServers().size(); i++)
 			server.addSocket(new Socket(config.getServers()[i]));
+		std::cout << "HERE2\n";
 		server.select_loop();
 	}
 	catch(const std::exception& e)

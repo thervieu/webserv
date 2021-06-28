@@ -9,7 +9,6 @@ class location
 {
 	public:
 
-		std::vector<std::string>	_cgi_extensions;
 		std::vector<std::string>	_redirections;
 		std::vector<std::string>	_methods;
 		std::string					_name;
