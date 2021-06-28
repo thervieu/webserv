@@ -123,7 +123,7 @@ std::string		CGI::executeCGI(std::string urlFile)
 	argv[0] = newStr("/etc/alternatives/php-cgi");
 	argv[1] = newStr("." + root + _location._name + _location._cgi_path);
 	argv[2] = NULL;
-	std::cout << "argv = |" << std::string(argv[0]) << "| |" << std::string(argv[1]) << "|\n";
+	// std::cout << "argv = |" << std::string(argv[0]) << "| |" << std::string(argv[1]) << "|\n";
 		
 
 	if (pid == -1)
@@ -139,7 +139,6 @@ std::string		CGI::executeCGI(std::string urlFile)
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		
-		std::string root = _request.getConfig()._root;
 		if (_location._cgi_path.substr(_location._cgi_path.rfind("."), 4).compare(".php") == 0)
 			execve(argv[0], argv, env);
 		else

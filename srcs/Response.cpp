@@ -663,7 +663,18 @@ std::string			Response::findIndex(void)
 	ret = "";
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
 	if (this->_location._index.compare("") != 0)
+	{
 		ret = this->_root + this->_location._name + this->_location._index;
+		std::cout << "ret = |" << ret << "|\n";
+		int rtn;
+		rtn = -5;
+		struct stat sb;
+		if ((rtn = stat(ret.c_str(), &sb)) == 0 && (rtn = S_ISREG(sb.st_mode)) == 1)
+			return (ret);
+		else
+			this->_code = 404;
+		std::cout << "rtn = |" << rtn << "|\n";
+	}
 	else if (this->_location._autoindex == true)
 		ret = "autoindex.html";
 	else
