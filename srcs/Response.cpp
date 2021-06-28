@@ -664,7 +664,7 @@ std::string			Response::findIndex(void)
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
 	if (this->_location._index.compare("") != 0)
 	{
-		ret = this->_root + this->_location._name + this->_location._index;
+		ret = this->_root + this->_location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + this->_location._index;
 		std::cout << "ret = |" << ret << "|\n";
 		int rtn;
 		rtn = -5;
