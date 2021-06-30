@@ -1035,6 +1035,7 @@ std::vector<char>		Response::sendResponse()
 	this->_content = "." + this->_request.getConfig()._root;
 	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL();
 	this->_encoding_type = "plain";
+	std::cout << "content= " << _content << "\n";
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
 	else if (this->VerifyHost() == false)
