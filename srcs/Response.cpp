@@ -1003,12 +1003,15 @@ std::string		getScriptName(std::string url)
 void					Response::VerifyRedirection()
 {
 	size_t		i;
+	std::string	str;
 
+	str = this->_location._name;
+	if (str.size() > 0 && str[str.size() - 1] == '/')
+		str.erase(str.end() - 1);
 	i = 0;
 	while (i < this->_location._redirections.size())
 	{
-		std::cout << " ||| " << this->_root + this->_location._name + this->_location._redirections[i] << std::endl << this->_content << " |||  " << std::endl;
-		if (this->_content.compare(this->_root + this->_location._name + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
+		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
 		{
 			this->_content = this->_location._redirections[i + 1];
 			if (this->_location._redirections[i + 2].compare("permanent") == 0)
@@ -1019,7 +1022,6 @@ void					Response::VerifyRedirection()
 		}
 		i += 3;
 	}
-	this->_code = 200;
 }
 
 std::vector<char>		Response::sendResponse()
