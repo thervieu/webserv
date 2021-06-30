@@ -38,7 +38,7 @@ char **CGI::getEnv(std::string str)
 	env_map["CONTENT_TYPE"] = _request.getContentType();
 	env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
 	
-	std::string root = this->_location._root;
+	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 	
 	// std::cout << "PATH_INFO = " << root + _location._name + str << "\n";
 	env_map["PATH_INFO"] = root + _location._name + str;
@@ -118,10 +118,10 @@ std::string		CGI::executeCGI(std::string urlFile)
 	lseek(fdIn, 0, SEEK_SET);
 
 	pid = fork();
-	std::string root = this->_location._upload_path;
+	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 	char **argv = (char**)malloc(sizeof(char *) * 3);
 	argv[0] = newStr("/etc/alternatives/php-cgi");
-	argv[1] = newStr("." + root);
+	argv[1] = newStr("." + root + _location._name + _location._cgi_path);
 	argv[2] = NULL;
 	// std::cout << "argv = |" << std::string(argv[0]) << "| |" << std::string(argv[1]) << "|\n";
 		
@@ -142,7 +142,7 @@ std::string		CGI::executeCGI(std::string urlFile)
 		if (_location._cgi_path.substr(_location._cgi_path.rfind("."), 4).compare(".php") == 0)
 			execve(argv[0], argv, env);
 		else
-			execve(("." + this-> _location._cgi_path).c_str(), nll, env);
+			execve(("." + _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1) + _location._name + _location._cgi_path).c_str(), nll, env);
 		// exit(0);
 	}
 	else

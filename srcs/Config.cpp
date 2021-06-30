@@ -276,8 +276,7 @@ location	Config::parseLocation(std::vector<std::string> lines, size_t start, siz
 	if (splittedLine.size() != 3)
 		exit(1);
 	_location._name = splittedLine[1];
-	_location._client_max_body_size = 1024 * 1024;
-	start++;
+	start++;	
 	while (start < end - 1)
 	{
 		splittedLine = splitSpaces(lines[start]);
@@ -322,7 +321,7 @@ bool	isMethod(std::string str)
 *	exits if a parse_error is occured
 */
 
-void	Config::parseLocationDirectives(location &location, std::vector<std::string> splittedLine)
+void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> splittedLine)
 {
 	char last_char;
 
@@ -330,7 +329,7 @@ void	Config::parseLocationDirectives(location &location, std::vector<std::string
 	splittedLine[splittedLine.size() - 1] = std::string(splittedLine[splittedLine.size() - 1], 0, splittedLine[splittedLine.size() - 1].length() - 1);
 
 	if (splittedLine[0] == location_directives[0])
-		location._root = splittedLine[1];
+		_loc._root = splittedLine[1];
 	else if (splittedLine[0] == location_directives[1])
 	{
 		for (size_t i = 1; i < splittedLine.size(); ++i)
@@ -341,38 +340,42 @@ void	Config::parseLocationDirectives(location &location, std::vector<std::string
 				exit(1);
 			}
 			else
-				location._methods.push_back(splittedLine[i]);
+				_loc._methods.push_back(splittedLine[i]);
 		}
 	}
 	else if (splittedLine[0] == location_directives[2])
-		location._autoindex = onOffBool(splittedLine[1]);
+		_loc._autoindex = onOffBool(splittedLine[1]);
 	else if (splittedLine[0] == location_directives[3])
-		location._index = splittedLine[1];
+		_loc._index = splittedLine[1];
 	else if (splittedLine[0] == location_directives[4])
-		location._upload = onOffBool(splittedLine[1]);
+		_loc._upload = onOffBool(splittedLine[1]);
 	else if (splittedLine[0] == location_directives[5])
-		location._upload_path = splittedLine[1];
+		_loc._upload_path = splittedLine[1];
 	else if (splittedLine[0] == location_directives[6])
-		location._upload_cleanup = ft_atoi(splittedLine[1]);
+		_loc._upload_cleanup = ft_atoi(splittedLine[1]);
 	else if (splittedLine[0] == location_directives[7])
-		location._cgi_extension.assign(splittedLine[1]);
+	{
+		for (size_t i = 1; i < splittedLine.size(); ++i)
+			_loc._cgi_extensions.push_back(splittedLine[i]);
+	}
 	else if (splittedLine[0] == location_directives[8])
-		location._cgi_path = splittedLine[1];
+		_loc._cgi_path = splittedLine[1];
 	else if (splittedLine[0] == location_directives[9])
 	{
+		_loc._client_max_body_size = 0;
 		if (splittedLine.size() != 2)
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
 			exit(1);
 		}
-		location._client_max_body_size = ft_atoi(splittedLine[1]);
+		_loc._client_max_body_size = ft_atoi(splittedLine[1]);
 		last_char = splittedLine[1][splittedLine[1].size() - 1];
 		if (last_char == 'K' || last_char == 'k')
-			location._client_max_body_size *= 1024;
+			_loc._client_max_body_size *= 1024;
 		else if (last_char == 'M' || last_char == 'm')
-			location._client_max_body_size *= 1024 * 1024;
+			_loc._client_max_body_size *= 1024 * 1024;
 		else if (last_char == 'G' || last_char == 'g')
-			location._client_max_body_size *= 1024 * 1024 * 1024;
+			_loc._client_max_body_size *= 1024 * 1024 * 1024;
 		else if (!std::isdigit(last_char))
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
@@ -397,9 +400,9 @@ void	Config::parseLocationDirectives(location &location, std::vector<std::string
 			std::cout << "SyntaxError: " << splittedLine[0] << " directive should in format have 'permanent' or 'temporary as redirection_type" << std::endl;
 			exit(1);
 		}
-		location._redirections.push_back(splittedLine[1].substr(1, splittedLine[1].length() - 2));
-		location._redirections.push_back(splittedLine[2]);
-		location._redirections.push_back(splittedLine[3]);
+		_loc._redirections.push_back(splittedLine[1].substr(1, splittedLine[1].length() - 2));
+		_loc._redirections.push_back(splittedLine[2]);
+		_loc._redirections.push_back(splittedLine[3]);
 		// std::cout << "redir 0 = " << _loc._redirections[0] << "\n";
 		// std::cout << "redir 1 = " << _loc._redirections[1] << "\n";
 		// std::cout << "redir 2 = " << _loc._redirections[2] << "\n";
