@@ -606,10 +606,10 @@ std::vector<char>	Response::getAutoindex(void)
 		rep = "ERROR: directory could not be opened.";
 		return (std::vector<char>(rep.begin(), rep.end()));
 	}
-
+	std::cout << "autoindex root " << _root << "\n";
 	//replace html variables
 	while ((pos = rep.find("$d_name", 0)) != std::string::npos)
-		rep.replace(pos, strlen("$d_name"), this->_location._name);
+		rep.replace(pos, strlen("$d_name"), this->_location._root.substr(_request.getConfig()._root.length() - 1, _location._root.length() - _request.getConfig()._root.length() + 1));
 	pos = rep.find("$repeat");
 	pos2 = rep.find("\n", pos);
 	repeated_line = rep.substr(pos, pos2 - pos + 1);
@@ -621,7 +621,7 @@ std::vector<char>	Response::getAutoindex(void)
 		ss.clear();
 		ss << file->d_reclen;
 		tmp.replace(tmp.find("$size"), strlen("$size"), ss.str());
-		str = this->_location._name + file->d_name;
+		str = this->_location._root.substr(_request.getConfig()._root.length() - 1, _location._root.length() - _request.getConfig()._root.length() + 1) + file->d_name;
 		tmp.replace(tmp.find("$name"), strlen("$name"), str);
 		tmp.replace(tmp.find("$name"), strlen("$name"), file->d_name);
 		repeated_lines.push_back(tmp);
@@ -1069,7 +1069,7 @@ std::vector<char>		Response::sendResponse()
 	}
 	if (this->_location._redirections.size())
 		this->VerifyRedirection();
-	// std::cout << "code after ver redir = " << _code << "\n\n";
+	std::cout << "root = " << _root << "\n\n";
 	if ((size_t)atoi(_request.getContentLength().c_str()) > _location._client_max_body_size)
 	{
 		_code = 413;
