@@ -599,7 +599,7 @@ std::vector<char>	Response::getAutoindex(void)
 		this->_content = "ERROR";
 
 	//open directory
-	file_to_open = this->_root;
+	file_to_open = this->_root + this->_location._name;
 	directory = opendir(file_to_open.c_str());
 	if (directory == NULL || this->_content.compare("ERROR") == 0)
 	{
@@ -664,8 +664,8 @@ std::string			Response::findIndex(void)
 	cpy.assign(this->_content.begin() + 18, this->_content.end());
 	if (this->_location._index.compare("") != 0)
 	{
-		ret = this->_root + this->_location._index;
-		// std::cout << "ret = |" << ret << "|\n";
+		ret = this->_root + this->_location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + this->_location._index;
+		std::cout << "ret = |" << ret << "|\n";
 		int rtn;
 		rtn = -5;
 		struct stat sb;
@@ -673,7 +673,7 @@ std::string			Response::findIndex(void)
 			return (ret);
 		else
 			this->_code = 404;
-		// std::cout << "rtn = |" << rtn << "|\n";
+		std::cout << "rtn = |" << rtn << "|\n";
 	}
 	else if (this->_location._autoindex == true)
 		ret = "autoindex.html";
@@ -723,7 +723,7 @@ std::vector<char>	Response::changeContent(std::vector<char> content)
 }
 
 #include <cerrno>
- 
+
 std::string	Response::upload(void)
 {
 	int fd;
@@ -732,8 +732,7 @@ std::string	Response::upload(void)
 	size_t pos = _request.getURL().rfind("/");
 	
 	std::string urlFile = _request.getURL().substr(pos + 1 , _request.getURL().length() - pos - 1);
-	// std::cout << "urlfile = |" << urlFile << "|\n";
-	std::string path = "." + _location._upload_path + "/" + urlFile;
+	std::string path = this->_root + _location._upload_path + "/" + urlFile;
 
 	int ret = stat(path.c_str(), &filestat);
 	
@@ -751,7 +750,7 @@ std::string	Response::upload(void)
 	}
 	else
 	{
-		// std::cout << "CREATE\n";
+		std::cout << "CREATE\n";
 		std::cout << "PATH = " << path << "\n\n";
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
@@ -777,10 +776,10 @@ std::vector<char>	Response::GETResponse(void)
 
 	if (this->_encoding_type.compare("plain") == 0)
 	{
-		if ((_request.getMethod().compare("POST") == 0 || _request.getMethod().compare("PUT") == 0) && _location._upload_path.length() != 0)
+		if (_request.getMethod().compare("POST") == 0 && _location._upload_path.length() != 0)
 			upload_rtn = upload();
 		response = this->getCode() + "\r\n";
-		if ((_request.getMethod().compare("POST") == 0 || _request.getMethod().compare("POST") == 0) && _location._upload_path.length() != 0)
+		if (_request.getMethod().compare("POST") == 0 && _location._upload_path.length() != 0)
 			response += upload_rtn + "\r\n";
 		response += this->getDate(0) + "\r\n";
 		response += this->getServer() + "\r\n";
@@ -797,8 +796,8 @@ std::vector<char>	Response::GETResponse(void)
 			response += this->getRetryAfter() + "\r\n";
 		if ((this->_code > 500 && this->_code < 600) || this->_code == 413 || this->_code == 404 || this->_code == 405 || this->_code == 403 || this->_code == 400)
 		{
-			this->_content = "." + this->_request.getConfig()._root + find_error_page();
-			std::cout << "CONTENT = |" << _content << "|\n";
+			this->_content = "." + this->_request.getConfig()._root;
+			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
 		}
 		response += this->getTransferEncoding();
 		response += this->getContentType() + "\r\n";
@@ -847,14 +846,14 @@ std::vector<char>		Response::DELETEResponse(void)
 		this->_code = 404;
 	else
 		this->_code = 204;
-	// std::cout << "CODE = |" << _code << "|\n";
+	std::cout << "CODE = |" << _code << "|\n";
 	response = this->getCode() + "\r\n";
 	response += this->getDate(0) + "\r\n";
 	if (this->_code == 404)
 	{
 
-		this->_content = "." + this->_request.getConfig()._root + find_error_page();
-		std::cout << "CONTENT = |" << _content << "|\n";
+		this->_content = "." + this->_request.getConfig()._root;
+		this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
 
 		response += this->getServer() + "\r\n";
 		response += this->getContentType() + "\r\n";
@@ -879,8 +878,8 @@ std::vector<char>		Response::wrongMethodReponse(void)
 	std::vector<char>	file_content;
 
 	this->_code = 405;
-	this->_content = "." + this->_request.getConfig()._root + find_error_page();
-	std::cout << "CONTENT = |" << _content << "|\n";
+	this->_content = "." + this->_request.getConfig()._root;
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
 	response = this->getCode() + "\r\n";
 	response += this->getDate(0) + "\r\n";
 	response += this->getServer() + "\r\n";
@@ -975,8 +974,11 @@ bool		Response::IsCGICalled(std::string url)
 		return (false);
 	std::string extension = url.substr(dot, url.length() - dot);
 	// std::cout << "extension_url = |" << extension << "|\n";
-	if (extension.compare(_location._cgi_extension) == 0)
-		return (true);
+	for (size_t i = 0; i < _location._cgi_extensions.size(); i++)
+	{
+		if (extension.compare(_location._cgi_extensions[i]) == 0)
+			return (true);
+	}
 	return (false);
 }
 
@@ -1005,8 +1007,8 @@ void					Response::VerifyRedirection()
 	i = 0;
 	while (i < this->_location._redirections.size())
 	{
-		std::cout << " ||| " << this->_root + this->_location._redirections[i] << std::endl << this->_content << " |||  " << std::endl;
-		if (this->_content.compare(this->_root + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
+		std::cout << " ||| " << this->_root + this->_location._name + this->_location._redirections[i] << std::endl << this->_content << " |||  " << std::endl;
+		if (this->_content.compare(this->_root + this->_location._name + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
 		{
 			this->_content = this->_location._redirections[i + 1];
 			if (this->_location._redirections[i + 2].compare("permanent") == 0)
@@ -1028,49 +1030,36 @@ std::vector<char>		Response::sendResponse()
 
 	_cgi = false;
 	this->_code = 200;
-	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
-	// std::cout << "LOCATION = |" << _location._name << "|\n";
-	// std::cout << "LOCATION ROOT = |" << _location._root << "|\n";
-	this->_root = "." + this->_location._root;
-	std::string url = this->_request.getURL();
-	// std::cout << "URL = |" << url << "|\n";
-	size_t pos = 0;
-	if ((pos = url.rfind(_location._name)) != std::string::npos)
-	{
-		// std::cout << pos << "\n";
-		url = url.substr(0, url.rfind(_location._name)) + url.substr(url.rfind(_location._name) + _location._name.length(), url.length() - (url.rfind(_location._name) + _location._name.length()));
-	}
-	// std::cout << "URL = |" << url << "|\n";
-	this->_content = this->_root + url;
+	this->_root = "." + this->_request.getConfig()._root;
+	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
+	this->_content = "." + this->_request.getConfig()._root;
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL();
 	this->_encoding_type = "plain";
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
 	else if (this->VerifyHost() == false)
 		this->_code = 400;
-	// std::cout << "CONTENT = |" << _content << "|\n" << "CODE = |" << _code << "|\n";
-	int rtnn = 0;
-	if ((rtnn = stat(this->_content.c_str(), &filestat)) == -1)
+	if (stat(this->_content.c_str(), &filestat) == -1)
 		this->_code = 404;
-	// std::cout << "rtn = |" << rtnn << "|\n";
-	if (rtnn == 0 && S_ISDIR(filestat.st_mode))
+	else if (S_ISDIR(filestat.st_mode))
 	{
 		if (this->_request.getURL()[this->_request.getURL().size() - 1] != '/')
 		{
 			this->_request.setURL(this->_request.getURL() + "/");
 			this->_content.append("/");
 		}
-		
-		// std::cout << "content before index = " << _content << "\n\n";
+		this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 		this->_content = this->findIndex();
-		// std::cout << "content after index = " << _content << "\n\n";
+		// std::cout << "contetn after index = " << _content << "\n\n";
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
 		// std::cout << "code after index and compare = " << _code << "\n\n";
 	}
+	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	if (this->_location._redirections.size())
 		this->VerifyRedirection();
 	// std::cout << "code after ver redir = " << _code << "\n\n";
-	if ((size_t)atoi(_request.getContentLength().c_str()) > _location._client_max_body_size)
+	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
 	{
 		_code = 413;
 		f_response = GETResponse();
@@ -1099,7 +1088,7 @@ std::vector<char>		Response::sendResponse()
 	}
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
 		f_response = GETResponse();
-	else if (this->_request.getMethod().compare("POST") == 0 || this->_request.getMethod().compare("PUT") == 0)
+	else if (this->_request.getMethod().compare("POST") == 0)
 		f_response = POSTResponse();
 	else if (this->_request.getMethod().compare("DELETE") == 0)
 		f_response = DELETEResponse();

@@ -96,8 +96,6 @@ def wrong_method(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port))
 	if (r.status_code != 405):
 		return "Bad status code"
-	if (r.text.find("This is a 405 error page") == -1):
-		return "Bad Content"
 	return ""
 
 def simple_post(port:int) -> str:
@@ -113,8 +111,6 @@ def post_too_big(port:int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
 	if (r.status_code != 413):
 		return "Bad status code."
-	if (r.text.find("This is a 413 error page") == -1):
-		return "Bad Content"
 	return ""
 
 def post_with_upload(port:int) -> str:
@@ -147,8 +143,6 @@ def delete_already_deleted(port: int) -> str:
 	r = requests.delete("http://localhost:" + str(port) + filename)
 	if (r.status_code != 404):
 		return "Bad status code for DELETE."
-	if (r.text.find("This is a 404 error page") == -1):
-		return "Bad Content"
 	return ""
 
 def server_name(port: int) -> str:

@@ -67,7 +67,6 @@ class Response
 
 		std::vector<char>	GETResponse(void);
 		std::vector<char>	POSTResponse(void);
-		std::vector<char>	PUTResponse(void);
 		std::vector<char>	DELETEResponse(void);
 		std::vector<char>	TRACEResponse(void);
 		std::vector<char>	OPTIONSResponse(void);
