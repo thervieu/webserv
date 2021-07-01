@@ -1,6 +1,6 @@
 #include "../incs/Socket.hpp"
 
-Socket::Socket(void) : _fd(0), _socket(0), _server(server_info()), _buff(NULL)
+Socket::Socket(void) : _fd(0), _server(server_info()), _buff(NULL)
 {
 }
 
@@ -8,7 +8,7 @@ Socket::Socket(int fd) : _fd(fd), _server(server_info()), _buff(NULL)
 {
 }
 
-Socket::Socket(const Socket &other): _fd(other._fd), _socket(0), _address(other._address), _addrlen(other._addrlen), _server(other._server), _buff(other._buff)
+Socket::Socket(const Socket &other): _fd(other._fd), _address(other._address), _addrlen(other._addrlen), _server(other._server), _buff(other._buff)
 {
 }
 
@@ -27,11 +27,11 @@ Socket::Socket(server_info server)
 		exit(1);
 	}
 
-	// if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
-	// {
-	// 	std::cout << "Error: Unable to set socket to non blocking" << std::endl;
-	// 	exit(1);
-	// }
+	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cout << "Error: Unable to set socket to non blocking" << std::endl;
+		exit(1);
+	}
 
 	this->_address.sin_family = AF_INET;
 	this->_address.sin_addr.s_addr = INADDR_ANY;
@@ -65,4 +65,9 @@ int		Socket::getSocketDescriptor(void)
 server_info		Socket::getServerConfig(void)
 {
 	return (_server);
+}
+
+char			*Socket::getBuffer()
+{
+	return (this->_buff);
 }

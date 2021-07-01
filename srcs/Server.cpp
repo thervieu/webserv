@@ -264,9 +264,9 @@ void Server::endServer(void)
 		close(_clients[client_nb]->getServerSocket().getSocketDescriptor());
 		delete _clients[client_nb];
 	}
-
 	for (size_t socket_nb = 0; socket_nb < _sockets.size(); socket_nb++)
 	{
+		free(this->_sockets[socket_nb]->getBuffer());
 		close(_sockets[socket_nb]->getSocketDescriptor());
 		delete _sockets[socket_nb];
 	}

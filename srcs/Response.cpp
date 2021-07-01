@@ -623,6 +623,7 @@ std::vector<char>	Response::getAutoindex(void)
 		ss.clear();
 		ss << file->d_reclen;
 		tmp.replace(tmp.find("$size"), strlen("$size"), ss.str());
+		//std::cout << "||| " << this->_location._name << std::endl << file->d_name << " |||" << std::endl;
 		str = this->_location._name + file->d_name;
 		tmp.replace(tmp.find("$name"), strlen("$name"), str);
 		tmp.replace(tmp.find("$name"), strlen("$name"), file->d_name);
@@ -1012,7 +1013,8 @@ void					Response::VerifyRedirection()
 	i = 0;
 	while (i < this->_location._redirections.size())
 	{
-		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
+		//std::cout << this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end()) << std::endl;
+		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end())) == 0)
 		{
 			this->_content = this->_location._redirections[i + 1];
 			if (this->_location._redirections[i + 2].compare("permanent") == 0)

@@ -13,7 +13,6 @@ class Socket
 		
 		int					_fd;
 		int					_opt;
-		int					_socket;
 		struct sockaddr_in	_address;
 		int					_addrlen;
 		server_info			_server;
@@ -29,7 +28,7 @@ class Socket
 		~Socket(void);
 
 		int				getSocketDescriptor(void);
-		std::string		getBuffer(void);
+		char			*getBuffer(void);
 		server_info		getServerConfig(void);
 
 };
