@@ -621,6 +621,7 @@ std::vector<char>	Response::getAutoindex(void)
 		ss.clear();
 		ss << file->d_reclen;
 		tmp.replace(tmp.find("$size"), strlen("$size"), ss.str());
+		//std::cout << "||| " << this->_location._name << std::endl << file->d_name << " |||" << std::endl;
 		str = this->_location._name + file->d_name;
 		tmp.replace(tmp.find("$name"), strlen("$name"), str);
 		tmp.replace(tmp.find("$name"), strlen("$name"), file->d_name);
