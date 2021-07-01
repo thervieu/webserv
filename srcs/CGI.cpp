@@ -34,25 +34,25 @@ char **CGI::getEnv(std::string str)
 	env_map["REDIRECT_STATUS"] = "200";
 
 	env_map["AUTH_TYPE"] = "";
-	env_map["CONTENT_LENGTH"] = _request.getContentLength();
+	env_map["CONTENT_LENGTH"] = _request.getContentLength().length() > 0 ? _request.getContentLength() : "0";
 	env_map["CONTENT_TYPE"] = _request.getContentType();
 	env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
 	
 	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 	
-	// std::cout << "PATH_INFO = " << root + _location._name + str << "\n";
-	env_map["PATH_INFO"] = root + _location._name + str;
+	env_map["PATH_INFO"] = _location._name + str;
 	env_map["PATH_TRANSLATED"] = root + _location._name + str;
 	env_map["QUERY_STRING"] = _request.getQuery();
 	env_map["REMOTE_ADDR"] = _request.getClientIP();
 	env_map["REMOTE_IDENT"] = "";
 	env_map["REQUEST_METHOD"] = _request.getMethod();
-	env_map["SCRIPT_NAME"] = _location._cgi_path;
-	env_map["SCRIPT_FILENAME"] = "." + root + _location._name + _location._cgi_path;
+	env_map["REQUEST_URI"] = _request.getURL();
+	env_map["SCRIPT_NAME"] = root + _location._name + str;
+	env_map["SCRIPT_FILENAME"] = root + _location._name + str;
 	env_map["SERVER_NAME"] = _request.getConfig()._host;
 	env_map["SERVER_PORT"] = intToString(_request.getConfig()._port);
 	env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
-	env_map["SERVER_SOFTWARE"] = "Werbserv/1.1";
+	env_map["SERVER_SOFTWARE"] = "Webserv/1.0";
 
 	char	**env = new char*[env_map.size() + 1];
 	int	j = 0;
@@ -90,8 +90,6 @@ char *newStr(std::string src)
 
 std::string		CGI::executeCGI(std::string urlFile)
 {
-	int		ret = 1;
-
 	pid_t		pid;
 	int			saveStdin;
 	int			saveStdout;
@@ -99,7 +97,7 @@ std::string		CGI::executeCGI(std::string urlFile)
 		
 	std::string	rtnContent;
 
-	env = getEnv(urlFile);
+	env = this->getEnv(urlFile);
 
 	saveStdin = dup(STDIN_FILENO);
 	saveStdout = dup(STDOUT_FILENO);
@@ -109,22 +107,13 @@ std::string		CGI::executeCGI(std::string urlFile)
 
 	long	fdIn = fileno(fIn);
 	long	fdOut = fileno(fOut);
+	int		ret = 1;
 
-
-	saveStdin = dup(STDIN_FILENO);
-	saveStdout = dup(STDOUT_FILENO);
-
+	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 	write(fdIn, _request.getContent().c_str(), _request.getContent().size());
 	lseek(fdIn, 0, SEEK_SET);
 
 	pid = fork();
-	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
-	char **argv = (char**)malloc(sizeof(char *) * 3);
-	argv[0] = newStr("/etc/alternatives/php-cgi");
-	argv[1] = newStr("." + root + _location._name + _location._cgi_path);
-	argv[2] = NULL;
-	// std::cout << "argv = |" << std::string(argv[0]) << "| |" << std::string(argv[1]) << "|\n";
-		
 
 	if (pid == -1)
 	{
@@ -133,17 +122,18 @@ std::string		CGI::executeCGI(std::string urlFile)
 	}
 	else if (pid == 0)
 	{
-		// std::cout << "son process" << "\n";
-		char * const * nll = NULL;
-
+		char **argv = (char **)malloc(sizeof(char *) * 3);
+		
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		
-		if (_location._cgi_path.substr(_location._cgi_path.rfind("."), 4).compare(".php") == 0)
-			execve(argv[0], argv, env);
-		else
-			execve(("." + _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1) + _location._name + _location._cgi_path).c_str(), nll, env);
-		// exit(0);
+		argv[0] = newStr(root + _location._name + _location._cgi_path);
+		argv[1] = newStr(root + _location._name + urlFile);
+		argv[2] = 0;
+		execve(( "." + root + _location._name + _location._cgi_path).c_str(), argv, env);
+		free(argv[0]);
+		free(argv[1]);
+		free(argv);
 	}
 	else
 	{
@@ -177,5 +167,6 @@ std::string		CGI::executeCGI(std::string urlFile)
 	if (!pid)
 		exit(0);
 
+	// std::cout << "rtnContent = |" << rtnContent << "|\n";
 	return (rtnContent);
 }

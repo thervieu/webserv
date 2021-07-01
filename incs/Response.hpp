@@ -36,7 +36,7 @@ class Response
 		~Response();
 
 		Response			&operator=(Response const &rhs);
-		void				setRequest(Request request);
+		void				setRequest(Request &);
 		void				VerifyRedirection(void);
 		int					findLocation(std::string cpy);
 		std::string			itos(int nb);

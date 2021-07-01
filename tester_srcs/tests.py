@@ -154,3 +154,20 @@ def server_name(port: int) -> str:
 	if (r.headers['Content-Length'] != "14"):
 		return "Bad Content-Length"
 	return ""
+
+def cgi_tester_get(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/cgi/file.tester")
+	if (r.status_code != 200):
+		return "Bad status code"
+	return ""
+
+
+
+def cgi_tester_post(port: int) -> str:
+	payload = "args=oui&args2=non"
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
+	if (r.status_code != 200):
+		return "Bad status code"
+	if (r.text != "ARGS=OUI&ARGS2=NON"):
+		return "Bad content"
+	return ""

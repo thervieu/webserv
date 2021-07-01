@@ -39,6 +39,9 @@ def run(port: int) -> None:
 	check_test(port, "DELETE /delete_folder/index.html", delete)
 	check_test(port, "DELETE /delete_folder/index.html (404)", delete_already_deleted)
 	check_test(port, "GET http://webserv:port use of server_name ", server_name)
+	check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
+	check_test(port, "POST /cgi/file.tester sizeof 1000 ", cgi_tester_post)
+	# check_test(port, "GET / ", simple_get_index)
 
 	# check_test(port, "GET / 10 workers 100 times", stress_test)
 

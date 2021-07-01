@@ -9,14 +9,15 @@ Request::Request(Request const &ref) :  _method("GET"), _url("/"), _accept_chars
 {
 }
 
-Request::Request(std::string request, std::string client_ip, server_info config) :   _config(config), _request(request), _clientIP(client_ip), _unknown(0)
+Request::Request(std::string request, std::string client_ip, server_info config) :   _config(config), _request(request), _unknown(0)
 {
 	std::string				line;
 	std::string				tmp;
 	std::string::iterator	it;
 	std::string::iterator	ite;
 	int						i;
-
+	this->setCLientIP(client_ip);
+	// std::cout << "client ip = " << getClientIP() << "\n";
 	std::cout << request << std::endl;
 	this->_arguments = std::vector<std::string>(0);
 	//method
@@ -41,12 +42,12 @@ Request::Request(std::string request, std::string client_ip, server_info config)
 		++i;
 	ite = request.begin() + i;
 	this->_url.assign(it, ite);
-//	while (request[i] != ' ' && request[i] != '\r' && request[i] != '\n' && request[i] != '\0')
-//		++i;
 
 	//arguments
 	if (request[i] == '?')
 	{
+		
+		std::string::iterator	pos = request.begin() + i + 1;
 		it = request.begin() + i;
 		++i;
 		while (request[i] != ' ')
@@ -69,8 +70,9 @@ Request::Request(std::string request, std::string client_ip, server_info config)
 			}
 		}
 		ite = request.begin() + i;
-		this->_query.assign(it, ite);
+		this->_query.assign(pos, ite);
 	}
+	// std::cout << "query.assign = |" << this->getQuery() << "|\n";
 	// std::cout << "hehehe\n\n";
 
 	//http version
@@ -105,6 +107,7 @@ Request		&Request::operator=(Request const &rhs)
 	this->_method = rhs.getMethod();
 	this->_arguments = rhs.getArguments();
 	this->_url = rhs.getURL();
+	this->_query = rhs.getQuery();
 	this->_http_version = rhs.getHTTPVersion();
 	this->_unknown = rhs.getUnknown();
 	this->_accept_charsets = rhs.getAcceptCharsets();
@@ -117,6 +120,7 @@ Request		&Request::operator=(Request const &rhs)
 	this->_content = rhs.getContent();
 	this->_contentLength = rhs.getContentLength();
 	this->_contentType = rhs.getContentType();
+	this->_clientIP = rhs.getClientIP();
 	return (*this);
 }
 

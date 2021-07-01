@@ -1,7 +1,7 @@
 
 # include "../incs/Response.hpp"
 
-Response::Response() : _request(Request()), _encoding_type("plain"), _content(""), _code(0)
+Response::Response() : _encoding_type("plain"), _content(""), _code(0)
 {
 }
 
@@ -17,9 +17,11 @@ Response::~Response()
 {
 }
 
-void				Response::setRequest(Request request)
+void				Response::setRequest(Request & request)
 {
-	this->_request = request;
+	// std::cout << "Response ClientIP 0 = " << request.getClientIP() << "\n";
+	_request = request;
+	// std::cout << "Response ClientIP 2 = " << _request.getClientIP() << "\n";
 
 }
 
@@ -665,7 +667,7 @@ std::string			Response::findIndex(void)
 	if (this->_location._index.compare("") != 0)
 	{
 		ret = this->_root + this->_location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + this->_location._index;
-		std::cout << "ret = |" << ret << "|\n";
+		// std::cout << "ret = |" << ret << "|\n";
 		int rtn;
 		rtn = -5;
 		struct stat sb;
@@ -673,7 +675,7 @@ std::string			Response::findIndex(void)
 			return (ret);
 		else
 			this->_code = 404;
-		std::cout << "rtn = |" << rtn << "|\n";
+		// std::cout << "rtn = |" << rtn << "|\n";
 	}
 	else if (this->_location._autoindex == true)
 		ret = "autoindex.html";
@@ -809,7 +811,6 @@ std::vector<char>	Response::GETResponse(void)
 		}
 		else
 		{
-			// std::cout << "content in GETreponse = |" << _content << "|\n";
 			if (_cgi == false)
 			{
 				file_content = this->getContent();
@@ -1028,7 +1029,6 @@ std::vector<char>		Response::sendResponse()
 {
 	std::vector<char>	f_response;
 	struct stat			filestat;
-	// std::cout << "SENDRESPONSE\n\n";
 
 	_cgi = false;
 	this->_code = 200;
@@ -1052,15 +1052,12 @@ std::vector<char>		Response::sendResponse()
 		}
 		this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 		this->_content = this->findIndex();
-		// std::cout << "contetn after index = " << _content << "\n\n";
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
-		// std::cout << "code after index and compare = " << _code << "\n\n";
 	}
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	if (this->_location._redirections.size())
 		this->VerifyRedirection();
-	// std::cout << "code after ver redir = " << _code << "\n\n";
 	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
 	{
 		_code = 413;
@@ -1071,23 +1068,22 @@ std::vector<char>		Response::sendResponse()
 	}
 	
 	//CGI
-		// std::cout << "code bef CGI = " << _code << "\n\n";
 	if (IsCGICalled(_request.getURL()))
 	{
+	
 		_cgi = true;
 		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
 		_content = response;
+		size_t pos = _content.rfind("Status: 200");
+		if (pos != std::string::npos)
+			_content = _content.substr(_content.rfind("utf-8") + 9, _content.length());
 		f_response = GETResponse();
 		for (size_t i = 0; i < f_response.size(); i++)
 			std::cout << f_response[i];
 		return (f_response);
 	}
-	// std::cout << "NOCGI\n\n";
 	if (isAllowedMethod() == false)
-	{
-		// std::cout << "NOTALLOWEDMETHOD\n\n";
 		f_response = wrongMethodReponse();
-	}
 	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
 		f_response = GETResponse();
 	else if (this->_request.getMethod().compare("POST") == 0)
