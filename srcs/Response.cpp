@@ -1012,7 +1012,8 @@ void					Response::VerifyRedirection()
 	i = 0;
 	while (i < this->_location._redirections.size())
 	{
-		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin() + 1, this->_location._redirections[i].end())) == 0)
+		//std::cout << this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end()) << std::endl;
+		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end())) == 0)
 		{
 			this->_content = this->_location._redirections[i + 1];
 			if (this->_location._redirections[i + 2].compare("permanent") == 0)
