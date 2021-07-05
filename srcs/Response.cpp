@@ -19,10 +19,7 @@ Response::~Response()
 
 void				Response::setRequest(Request & request)
 {
-	// std::cout << "Response ClientIP 0 = " << request.getClientIP() << "\n";
 	_request = request;
-	// std::cout << "Response ClientIP 2 = " << _request.getClientIP() << "\n";
-
 }
 
 std::string			Response::itos(int nb)
@@ -759,8 +756,8 @@ std::string	Response::upload(void)
 	}
 	else
 	{
-		std::cout << "CREATE\n";
-		std::cout << "PATH = " << path << "\n\n";
+		// std::cout << "CREATE\n";
+		// std::cout << "PATH = " << path << "\n\n";
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
 			std::cout << strerror(errno) << "\n";
@@ -854,7 +851,7 @@ std::vector<char>		Response::DELETEResponse(void)
 		this->_code = 404;
 	else
 		this->_code = 204;
-	std::cout << "CODE = |" << _code << "|\n";
+	// std::cout << "CODE = |" << _code << "|\n";
 	response = this->getCode() + "\r\n";
 	response += this->getDate(0) + "\r\n";
 	if (this->_code == 404)
@@ -1049,12 +1046,12 @@ std::vector<char>		Response::sendResponse()
 	{
 		this->_root = "." + this->_location._root;
 		this->_content = this->_root;
-		this->_content = this->_content.substr(0, this->_content.size() - ((this->_content[this->_content.size()] == '/') ? 1 : 0)) + this->_request.getURL().substr(this->_location._name.size() - 1, this->_request.getURL().size());
+		this->_content = this->_content.substr(0, this->_content.size() - ((this->_content[this->_content.size() - 1] == '/') ? 1 : 0)) + this->_request.getURL().substr(this->_location._name.size() - 1, this->_request.getURL().size());
 	}
 	else
 	{
 		this->_content = this->_root;
-		this->_content = this->_content.substr(0, this->_content.size() - ((this->_content[this->_content.size()] == '/') ? 1 : 0)) + this->_request.getURL();
+		this->_content = this->_content.substr(0, this->_content.size() - ((this->_content[this->_content.size() - 1] == '/') ? 1 : 0)) + this->_request.getURL();
 	}
 	this->_encoding_type = "plain";
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
@@ -1076,12 +1073,12 @@ std::vector<char>		Response::sendResponse()
 	}
 	if (this->_location._redirections.size())
 		this->VerifyRedirection();
-	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
+	if ((size_t)atoi(_request.getContentLength().c_str()) > _location._client_max_body_size)
 	{
 		_code = 413;
 		f_response = GETResponse();
-		for (size_t i = 0; i < f_response.size(); i++)
-			std::cout << f_response[i];
+		// for (size_t i = 0; i < f_response.size(); i++)
+		// 	std::cout << f_response[i];
 		return (f_response);
 	}
 	//CGI
@@ -1094,8 +1091,8 @@ std::vector<char>		Response::sendResponse()
 		if (pos != std::string::npos)
 			_content = _content.substr(_content.rfind("utf-8") + 9, _content.length());
 		f_response = GETResponse();
-		for (size_t i = 0; i < f_response.size(); i++)
-			std::cout << f_response[i];
+		// for (size_t i = 0; i < f_response.size(); i++)
+		// 	std::cout << f_response[i];
 		return (f_response);
 	}
 	if (isAllowedMethod() == false)
@@ -1110,7 +1107,7 @@ std::vector<char>		Response::sendResponse()
 		f_response = TRACEResponse();
 	else if (this->_request.getMethod().compare("OPTIONS") == 0)
 		f_response = OPTIONSResponse();
-	for (size_t i = 0; i < f_response.size(); i++)
-		std::cout << f_response[i];
+	// for (size_t i = 0; i < f_response.size(); i++)
+	// 	std::cout << f_response[i];
 	return (f_response);
 }

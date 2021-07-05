@@ -64,34 +64,6 @@ def fifty_get_root(port: int) -> str:
 			return "Bad Content-Length"
 	return ""
 
-
-""" 20 workers doing 100 GET requests on /"""
-
-def one_hundred_get_requests(port: int, nb: int) -> None:
-	if nb % 2 == 0:
-		port += 1
-	for i in range(100):
-		r = requests.get("http://localhost:" + str(port))
-		if (r.status_code != 200):
-			print("worker" + i + ": Bad status code")
-		if (r.text != "Hello World !\n"):
-			print("worker" + i + ": Bad Content")
-		if (r.headers['Content-Length'] != "14"):
-			print("worker" + i + ": Bad Content-Length")
-	print("worker {} has finished all his tasks".format(str(nb)))
-
-def stress_test(port: int) -> str:
-	print("Please wait a few seconds for the stress test to finish ...")
-	threads = []
-
-	for i in range(10):
-		thread = threading.Thread(target=one_hundred_get_requests, args=(port, i))
-		threads.append(thread)
-		thread.start()
-	for thread in threads:
-		thread.join()
-	return ""
-
 def wrong_method(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port))
 	if (r.status_code != 405):
@@ -170,4 +142,80 @@ def cgi_tester_post(port: int) -> str:
 		return "Bad status code"
 	if (r.text != "ARGS=OUI&ARGS2=NON"):
 		return "Bad content"
+	return ""
+
+""" 20 workers doing 100 GET requests on /"""
+
+def one_hundred_get_requests(port: int, nb: int) -> None:
+	if nb % 2 == 0:
+		port += 1
+	for i in range(100):
+		r = requests.get("http://localhost:" + str(port))
+		if (r.status_code != 200):
+			print("worker" + i + ": Bad status code")
+		if (r.text != "Hello World !\n"):
+			print("worker" + i + ": Bad Content")
+		if (r.headers['Content-Length'] != "14"):
+			print("worker" + i + ": Bad Content-Length")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test1(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(25):
+		thread = threading.Thread(target=one_hundred_get_requests, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
+	return ""
+
+import os
+
+def one_hundred_post_requests(port: int, nb: int) -> None:
+	for i in range(100000, 1000001, 100000):
+		payload = "a" * i
+		r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
+		if (r.status_code != 200 and r.status_code != 201):
+			print("worker" + str(i) + ": Bad status code: " + str(r.status_code))
+		filename = "./upload/index.html"
+		with open(filename) as f:
+			content = f.readlines()
+		if (len(content[0]) != i):
+			print("Bad size")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test2(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(20):
+		thread = threading.Thread(target=one_hundred_post_requests, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
+	return ""
+
+def one_hundred_post_cgi_requests(port: int, nb: int) -> None:
+	for i in range(20):
+		payload = "a" * 1000000
+		r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
+		if (r.status_code != 200):
+			print("Bad status code {}".format(r.status_code))
+		if (len(r.text) != 1000000):
+			print("Bad content")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test3(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(5):
+		thread = threading.Thread(target=one_hundred_post_cgi_requests, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
 	return ""

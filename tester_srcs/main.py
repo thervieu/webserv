@@ -41,9 +41,13 @@ def run(port: int) -> None:
 	check_test(port, "GET http://webserv:port use of server_name ", server_name)
 	check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
 	check_test(port, "POST /cgi/file.tester sizeof 1000 ", cgi_tester_post)
-	# check_test(port, "GET / ", simple_get_index)
 
-	# check_test(port, "GET / 10 workers 100 times", stress_test)
+	print("Time for some stress tests\n")
+
+
+	check_test(port, "GET / 25 workers 100 times", stress_test1)
+	check_test(port, "POST 100k-1M bits 20 workers 100 times", stress_test2)
+	check_test(port, "POST CGI 1M bits 5 workers 20 times", stress_test3)
 
 if (__name__ == "__main__"):
 	if (len(sys.argv) != 2):
