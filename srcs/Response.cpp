@@ -667,7 +667,7 @@ std::string			Response::findIndex(void)
 	cpy.assign(this->_content.begin() - this->_root.size(), this->_content.end());
 	if (this->_location._index.compare("") != 0)
 	{
-		if (this->_root.compare(this->_request.getConfig()._root) != 0)
+		if (this->_root.compare("." + this->_request.getConfig()._root.substr(0, this->_request.getConfig()._root.size() - (this->_request.getConfig()._root[this->_request.getConfig()._root.size() - 1] == '/' ? 1 : 0))) != 0)
 			ret = this->_root + this->_location._index;
 		else
 			ret = this->_root + this->_location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + this->_location._index;
@@ -928,6 +928,8 @@ std::vector<char>		Response::OPTIONSResponse(void)
 
 location	Response::getLocation(std::string url, std::vector<location> locations)
 {
+	if (url[url.size() - 1] != '/')
+		url.append("/");
 	for (size_t i = 0; i < locations.size(); i++)
 	{
 		if (locations[i]._name == url)
@@ -1040,17 +1042,26 @@ std::vector<char>		Response::sendResponse()
 	this->_root = "." + this->_request.getConfig()._root;
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
+	std::cout << "LOC NAME == " << this->_location._name << std::endl;
 	if (this->_location._root.compare("") != 0)
+	{
 		this->_root = "." + this->_location._root;
-	this->_content = this->_root;
-	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL().substr(this->_location._name.size() - 1, this->_request.getURL().size());
+		this->_content = this->_root;
+		this->_content = this->_content.substr(0, this->_content.size() - ((this->_content[this->_content.size()] == '/') ? 1 : 0)) + this->_request.getURL().substr(this->_location._name.size() - 1, this->_request.getURL().size());
+	}
+	else
+	{
+		this->_content = this->_root;
+		this->_content = this->_content.substr(0, this->_content.size() - ((this->_content[this->_content.size()] == '/') ? 1 : 0)) + this->_request.getURL();
+	}
 	this->_encoding_type = "plain";
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
 	else if (this->VerifyHost() == false)
 		this->_code = 400;
-	if (stat(this->_content.c_str(), &filestat) == -1)
-		this->_code = 404;
+	if (stat(this->_content.c_str(), &filestat) == -1){
+
+		this->_code = 404;	std::cout << this->_content <<std::endl;}
 	else if (S_ISDIR(filestat.st_mode))
 	{
 		if (this->_request.getURL()[this->_request.getURL().size() - 1] != '/')
@@ -1058,9 +1069,7 @@ std::vector<char>		Response::sendResponse()
 			this->_request.setURL(this->_request.getURL() + "/");
 			this->_content.append("/");
 		}
-		std::cout << "THIS ROOT IS EGAL TO ======  " << this->_root << std::endl;
 		this->_content = this->findIndex();
-		std::cout << "THIS INDEX IS EGAL TO ======  " << this->_content << std::endl;
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
 	}
