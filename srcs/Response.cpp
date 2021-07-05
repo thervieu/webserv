@@ -601,7 +601,10 @@ std::vector<char>	Response::getAutoindex(void)
 		this->_content = "ERROR";
 
 	//open directory
-	file_to_open = this->_root + this->_location._name;
+	if (this->_root.compare("." + this->_request.getConfig()._root.substr(0, this->_request.getConfig()._root.size() - (this->_request.getConfig()._root[this->_request.getConfig()._root.size() - 1] == '/' ? 1 : 0))) != 0)
+		file_to_open = this->_root;
+	else
+		file_to_open = this->_root + this->_location._name;
 	directory = opendir(file_to_open.c_str());
 	if (directory == NULL || this->_content.compare("ERROR") == 0)
 	{
