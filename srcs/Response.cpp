@@ -664,10 +664,13 @@ std::string			Response::findIndex(void)
 	std::string		ret;
 
 	ret = "";
-	cpy.assign(this->_content.begin() + 18, this->_content.end());
+	cpy.assign(this->_content.begin() - this->_root.size(), this->_content.end());
 	if (this->_location._index.compare("") != 0)
 	{
-		ret = this->_root + this->_location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + this->_location._index;
+		if (this->_root.compare(this->_request.getConfig()._root) != 0)
+			ret = this->_root + this->_location._index;
+		else
+			ret = this->_root + this->_location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + this->_location._index;
 		// std::cout << "ret = |" << ret << "|\n";
 		int rtn;
 		rtn = -5;
@@ -1035,9 +1038,12 @@ std::vector<char>		Response::sendResponse()
 	_cgi = false;
 	this->_code = 200;
 	this->_root = "." + this->_request.getConfig()._root;
+	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
-	this->_content = "." + this->_request.getConfig()._root;
-	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL();
+	if (this->_location._root.compare("") != 0)
+		this->_root = "." + this->_location._root;
+	this->_content = this->_root;
+	this->_content = this->_content.substr(0, this->_content.size() - 1) + this->_request.getURL().substr(this->_location._name.size() - 1, this->_request.getURL().size());
 	this->_encoding_type = "plain";
 	if (this->_request.getHTTPVersion().compare("HTTP/1.1") != 0)
 		this->_code = 505;
@@ -1052,12 +1058,12 @@ std::vector<char>		Response::sendResponse()
 			this->_request.setURL(this->_request.getURL() + "/");
 			this->_content.append("/");
 		}
-		this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
+		std::cout << "THIS ROOT IS EGAL TO ======  " << this->_root << std::endl;
 		this->_content = this->findIndex();
+		std::cout << "THIS INDEX IS EGAL TO ======  " << this->_content << std::endl;
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
 	}
-	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	if (this->_location._redirections.size())
 		this->VerifyRedirection();
 	if ((size_t)atoi(_request.getContentLength().c_str()) > _request.getConfig()._client_max_body_size)
@@ -1068,11 +1074,9 @@ std::vector<char>		Response::sendResponse()
 			std::cout << f_response[i];
 		return (f_response);
 	}
-	
 	//CGI
 	if (IsCGICalled(_request.getURL()))
 	{
-	
 		_cgi = true;
 		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
 		_content = response;
