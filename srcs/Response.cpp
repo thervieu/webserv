@@ -1042,7 +1042,6 @@ std::vector<char>		Response::sendResponse()
 	this->_root = "." + this->_request.getConfig()._root;
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
-	std::cout << "LOC NAME == " << this->_location._name << std::endl;
 	if (this->_location._root.compare("") != 0)
 	{
 		this->_root = "." + this->_location._root;
@@ -1059,9 +1058,8 @@ std::vector<char>		Response::sendResponse()
 		this->_code = 505;
 	else if (this->VerifyHost() == false)
 		this->_code = 400;
-	if (stat(this->_content.c_str(), &filestat) == -1){
-
-		this->_code = 404;	std::cout << this->_content <<std::endl;}
+	if (stat(this->_content.c_str(), &filestat) == -1)
+		this->_code = 404;
 	else if (S_ISDIR(filestat.st_mode))
 	{
 		if (this->_request.getURL()[this->_request.getURL().size() - 1] != '/')
