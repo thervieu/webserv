@@ -85,13 +85,17 @@ std::vector<std::string>	createVectorLines(std::string file)
 
 int			main(int ac, char **av)
 {
-	if (ac != 2)
+	std::string config_file;
+	if (ac == 1)
+		config_file = "./confs/default_configuration.conf";
+	else if (ac == 2)
+		config_file = av[1];
+	else
 	{
 		std::cout << "Format: ./webserv [path_to_configuration_file]" << std::endl;
 		return (1);
 	}
-	
-	std::string config_file = av[1];
+
 	Config		config(config_file);
 	Server		server;
 
