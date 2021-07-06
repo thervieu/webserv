@@ -221,15 +221,22 @@ def stress_test3(port: int) -> str:
 	return ""
 
 def gen():
-	yield "a" * 100
-	yield "b" * 100
+	var1 = "x=FOO"
+	var2 = "y=FOO123"
+	x = var1.encode('utf8')
+	y = var2.encode('utf8')
+	yield x
+	yield y
 
 def chunked_post_size_two_k(port: int) -> str:
 	print('before request')
 	# g = gen()
 	# print(next(g))
 	# print(next(g))
-	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen())
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen(), headers=headers)
+	print(r.text)
 	print('after request')
 	
 	return ""
