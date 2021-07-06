@@ -663,18 +663,10 @@ std::string			Response::findIndex(void)
 	std::string		cpy;
 	std::string		ret;
 
-	ret = "";
+	ret = this->_content;
 	cpy.assign(this->_content.begin() - this->_root.size(), this->_content.end());
 	if (this->_location._index.compare("") != 0)
 	{
-		// std::cout << "findIndex\n";
-		// std::cout << "root = |" << _root << "|\n";
-		// std::cout << "compare with = |" << "." + this->_request.getConfig()._root.substr(0, this->_request.getConfig()._root.size() - (this->_request.getConfig()._root[this->_request.getConfig()._root.size() - 1] == '/' ? 1 : 0)) << "|\n";
-		if (this->_root.compare("." + this->_request.getConfig()._root.substr(0, this->_request.getConfig()._root.size() - (this->_request.getConfig()._root[this->_request.getConfig()._root.size() - 1] == '/' ? 1 : 0))) != 0)
-			ret = this->_root + this->_location._index;
-		else
-			ret = this->_root + (_root[_root.length() - 1] == '/' ? "" : "/") + this->_location._index;
-		// std::cout << "ret = |" << ret << "|\n";
 		int rtn;
 		rtn = -5;
 		struct stat sb;
@@ -682,7 +674,6 @@ std::string			Response::findIndex(void)
 			return (ret);
 		else
 			this->_code = 404;
-		// std::cout << "rtn = |" << rtn << "|\n";
 	}
 	else if (this->_location._autoindex == true)
 		ret = "autoindex.html";
@@ -1021,7 +1012,6 @@ void					Response::VerifyRedirection()
 	i = 0;
 	while (i < this->_location._redirections.size())
 	{
-		//std::cout << this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end()) << std::endl;
 		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end())) == 0)
 		{
 			this->_content = this->_location._redirections[i + 1];
@@ -1045,17 +1035,12 @@ std::vector<char>		Response::sendResponse()
 	this->_root = "." + this->_request.getConfig()._root;
 	this->_location = getLocation(_request.getURL(), _request.getConfig()._locations);
 	_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
-	// std::cout << "loc name = |" << _location._name << "|\n";
 	if (this->_location._root.compare("") != 0)
 	{
 		this->_root = "." + this->_location._root;
 		_root = _root.substr(0, (_root[_root.length() - 1] == '/' ? _root.length() - 1 : _root.length()));
 		this->_content = this->_root;
-		// std::cout << "content2 = |" << _content << "|\n";
-		// std::cout << "url = |" << _request.getURL() << "|\n";
-
 		this->_content = this->_content + this->_request.getURL().substr(this->_location._name.size() - (_location._name[_location._name.size() - 1] == '/' ? 1 : 0), this->_request.getURL().size());
-		// std::cout << "content3 = |" << _content << "|\n";
 	}
 	else
 	{
@@ -1071,12 +1056,9 @@ std::vector<char>		Response::sendResponse()
 		this->_code = 404;
 	else if (S_ISDIR(filestat.st_mode))
 	{
-		if (this->_request.getURL()[this->_request.getURL().size() - 1] != '/')
-		{
-			this->_request.setURL(this->_request.getURL() + "/");
-			this->_content.append("/");
-		}
-		// std::cout << "content4 = |" << _content << "|\n";
+		this->_request.setURL(this->_request.getURL() + "/");
+		this->_content.append("/");
+		this->_content += this->_location._index;
 		this->_content = this->findIndex();
 		if (this->_content.compare("forbidden") == 0)
 			this->_code = 403;
