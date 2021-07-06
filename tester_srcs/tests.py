@@ -1,6 +1,6 @@
 import requests
 import threading
-import os.path
+import os
 
 def simple_get_index(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port))
@@ -142,6 +142,7 @@ def cgi_tester_post(port: int) -> str:
 		return "Bad status code"
 	if (r.text != "ARGS=OUI&ARGS2=NON"):
 		return "Bad content"
+	print("HERE")
 	return ""
 
 """ 20 workers doing 100 GET requests on /"""
@@ -171,7 +172,6 @@ def stress_test1(port: int) -> str:
 		thread.join()
 	return ""
 
-import os
 
 def one_hundred_post_requests(port: int, nb: int) -> None:
 	for i in range(100000, 1000001, 100000):
@@ -218,4 +218,18 @@ def stress_test3(port: int) -> str:
 		thread.start()
 	for thread in threads:
 		thread.join()
+	return ""
+
+def gen():
+	yield "a" * 100
+	yield "b" * 100
+
+def chunked_post_size_two_k(port: int) -> str:
+	print('before request')
+	# g = gen()
+	# print(next(g))
+	# print(next(g))
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen())
+	print('after request')
+	
 	return ""

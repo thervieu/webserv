@@ -17,8 +17,8 @@ Request::Request(std::string request, std::string client_ip, server_info config)
 	std::string::iterator	ite;
 	int						i;
 	this->setCLientIP(client_ip);
-	// std::cout << "client ip = " << getClientIP() << "\n";
-	// std::cout << request << std::endl;
+
+	std::cout << request << std::endl;
 	this->_arguments = std::vector<std::string>(0);
 	//method
 	i = 0;
