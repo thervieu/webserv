@@ -29,7 +29,7 @@ class Request
 
 		Request();
 		Request(Request const &ref);
-		Request(std::string request, std::string client_ip, server_info config);
+		Request(std::string request, std::string client_ip, server_info config, bool chunked);
 		~Request();
 
 		Request			&operator=(Request const &rhs);
@@ -44,7 +44,7 @@ class Request
 		void			setContentLength(std::string str);
 		void			setContentType(std::string str);
 		std::vector<std::string>	getArguments(void) const;
-		void			ParseBody(std::string body);
+		void			ParseBody(std::string body, bool chunked);
 		std::string		getAcceptCharsets(void) const;
 		std::string		getAcceptLanguage(void) const;
 		std::string		getHost(void) const;
@@ -62,7 +62,7 @@ class Request
 		std::string		getContentType(void) const;
 		server_info		getConfig(void) const;
 		int				getUnknown(void) const;
-		void			parsing(std::string str);
+		void			parsing(std::string str, bool chunked);
 };
 
 #endif

@@ -9,7 +9,7 @@ Request::Request(Request const &ref) :  _method("GET"), _url("/"), _accept_chars
 {
 }
 
-Request::Request(std::string request, std::string client_ip, server_info config) :   _config(config), _request(request), _unknown(0)
+Request::Request(std::string request, std::string client_ip, server_info config, bool chunked) :   _config(config), _request(request), _unknown(0)
 {
 	std::string				line;
 	std::string				tmp;
@@ -94,7 +94,7 @@ Request::Request(std::string request, std::string client_ip, server_info config)
 	//headers
 	line.assign(++ite, request.end());
 	// std::cout << "assign ok\n\n";
-	this->parsing(line);
+	this->parsing(line, chunked);
 	// std::cout << "parsing ok\n\n";
 }
 
@@ -124,7 +124,7 @@ Request		&Request::operator=(Request const &rhs)
 	return (*this);
 }
 
-void		Request::parsing(std::string str)
+void		Request::parsing(std::string str, bool chunked)
 {
 	std::string				line;
 	std::string::iterator	it;
@@ -146,7 +146,7 @@ void		Request::parsing(std::string str)
 			++it;
 		line.assign(ite, it);
 		if (this->_unknown == 2 && this->_method.compare("POST") == 0)
-			this->ParseBody(line);
+			this->ParseBody(line, chunked);
 		else if (setHeader(line) == -2)
 			this->_unknown = 2;
 	}
@@ -325,13 +325,14 @@ std::vector<std::string>	Request::getArguments(void) const
 	return (this->_arguments);
 }
 
-void			Request::ParseBody(std::string request)
+void			Request::ParseBody(std::string request, bool chunked)
 {
 	size_t		i;
 	std::string::iterator	it;
 	std::string::iterator	ite;
 
 	i = 0;
+	(void)chunked;
 	// std::cout << "parse body beg\n\n";
 	this->setContent(request);
 	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0' && i < request.length())

@@ -27,8 +27,8 @@ def run(port: int) -> None:
 	"""run tests"""
 	print("All tests  are done requesting on http://localhost:port (except the one shozcasing server_name)\n")
 	check_test(port, "GET / ", simple_get_index)
-	check_test(port, "GET /auto autoindex", get_autoindex_subdir)
-	check_test(port, "GET /forbidden (403) ", get_forbidden_dir)
+	# check_test(port, "GET /auto autoindex", get_autoindex_subdir)
+	# check_test(port, "GET /forbidden (403) ", get_forbidden_dir)
 	# check_test(port, "GET non_existing_dir (404) ", get_404)
 	# check_test(port, "GET / ports 8080 and 8081", get_index_two_ports)
 	# check_test(port, "GET / 1 worker 50 times", fifty_get_root)

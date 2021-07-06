@@ -81,7 +81,7 @@ int 	isContentWhole(std::string request)
 
 		if ((find_pos = l.find("Transfer-Encoding: chunked")) != std::string::npos && find_pos == 0)
 			return (2);
-		else if ((find_pos = l.find("Content")) != std::string::npos && find_pos == 0)
+		else if ((find_pos = l.find("Content-Length")) != std::string::npos && find_pos == 0)
 			return (1);
 		else if ((find_pos = l.find("\r\n\r\n")) != std::string::npos && find_pos == 0)
 			return (0);
@@ -210,7 +210,7 @@ void	Server::select_loop(void)
 				Response			response;
 				std::vector<char>	message;
 				// std::cout << "bef setRequest\n\n";
-				Request req = Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig());
+				Request req = Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig(), (isContentWhole(client.getRequest()) == 2 ? true : false));
 				response.setRequest(req);
 				// std::cout << "setRequest\n";
 				message = response.sendResponse();
