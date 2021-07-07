@@ -209,7 +209,8 @@ void	Server::select_loop(void)
 			{
 				Response			response;
 				std::vector<char>	message;
-				// std::cout << "bef setRequest\n\n";
+				// std::cout << "\n\n\nNEW REQUEST :\n\nbef SETREQUEST\n\n";
+				// std::cout << "iscontentwhole = " << isContentWhole(client.getRequest()) << "\n";
 				Request req = Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig(), (isContentWhole(client.getRequest()) == 2 ? true : false));
 				response.setRequest(req);
 				// std::cout << "setRequest\n";

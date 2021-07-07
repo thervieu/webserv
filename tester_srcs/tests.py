@@ -145,6 +145,161 @@ def cgi_tester_post(port: int) -> str:
 	print("HERE")
 	return ""
 
+def gen():
+	var1 = "x=FOO&"
+	var2 = "y=FOO123465789"
+	x = var1.encode('utf8')
+	y = var2.encode('utf8')
+	yield x
+	yield y
+
+def chunked_post_no_upload(port: int) -> str:
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return "Bad Status Code"
+	if (len(r.text) != 20):
+		print(len(r.text))
+		return "Bad Length Response Body"
+	return ""
+
+def gen2():
+	var1 = "a" * 1000
+	var2 = "b" * 1000
+	x = var1.encode('utf8')
+	y = var2.encode('utf8')
+	yield x
+	yield y
+
+import time
+def chunked_post_no_upload_size_2k(port: int) -> str:
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen2(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return "Bad Status Code"
+	if (len(r.text) != 2000):
+		print(len(r.text))
+		return "Bad Length Response Body"
+	return ""
+
+def gen3():
+	var1 = "a" * 100000
+	var2 = "b" * 100000
+	var3 = "c" * 100000
+	var4 = "d" * 100000
+	var5 = "e" * 100000
+	v = var1.encode('utf8')
+	w = var2.encode('utf8')
+	x = var3.encode('utf8')
+	y = var4.encode('utf8')
+	z = var5.encode('utf8')
+	yield v
+	yield w
+	yield x
+	yield y
+	yield z
+
+def chunked_post_no_upload_size_500k(port: int) -> str:
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen3(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return "Bad Status Code"
+	if (len(r.text) != 500000):
+		print(len(r.text))
+		return "Bad Length Response Body"
+	return ""
+
+
+def gen():
+	var1 = "x=FOO&"
+	var2 = "y=FOO123465789"
+	x = var1.encode('utf8')
+	y = var2.encode('utf8')
+	yield x
+	yield y
+
+def chunked_post_upload(port: int) -> str:
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return "Bad Status Code"
+	print("status ok")
+	if (len(r.text) != 20):
+		print(len(r.text))
+		return "Bad Length Response Body"
+	print("ok")
+	filename = "./upload/another_file.tester"
+	with open(filename) as f:
+		content = f.readlines()
+	if (len(content[0]) != 20):
+		print(len(content[0]))
+		return "upload_file has wrong text"
+	return ""
+
+def gen2():
+	var1 = "a" * 1000
+	var2 = "b" * 1000
+	x = var1.encode('utf8')
+	y = var2.encode('utf8')
+	yield x
+	yield y
+
+import time
+def chunked_post_size_2k(port: int) -> str:
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen2(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return "Bad Status Code"
+	if (len(r.text) != 2000):
+		print(len(r.text))
+		return "Bad Length Response Body"
+	filename = "./upload/another_file.tester"
+	with open(filename) as f:
+		content = f.readlines()
+	if (len(content[0]) != 2000):
+		print(len(content[0]))
+		return "upload_file has wrong text"
+	return ""
+
+def gen3():
+	var1 = "a" * 100000
+	var2 = "b" * 100000
+	var3 = "c" * 100000
+	var4 = "d" * 100000
+	var5 = "e" * 100000
+	v = var1.encode('utf8')
+	w = var2.encode('utf8')
+	x = var3.encode('utf8')
+	y = var4.encode('utf8')
+	z = var5.encode('utf8')
+	yield v
+	yield w
+	yield x
+	yield y
+	yield z
+
+def chunked_post_size_500k(port: int) -> str:
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+           'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen3(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return "Bad Status Code"
+	if (len(r.text) != 500000):
+		print(len(r.text))
+		return "Bad Length Response Body"
+	filename = "./upload/another_file.tester"
+	with open(filename) as f:
+		content = f.readlines()
+	if (len(content[0]) != 500000):
+		print(len(content[0]))
+		return "upload_file has wrong text"
+	return ""
+
 """ 20 workers doing 100 GET requests on /"""
 
 def one_hundred_get_requests(port: int, nb: int) -> None:
@@ -173,17 +328,45 @@ def stress_test1(port: int) -> str:
 	return ""
 
 
+""" 100 workers doing 20 GET requests on /"""
+
+def one_hundred_get_requestsbis(port: int, nb: int) -> None:
+	if nb % 2 == 0:
+		port += 1
+	for i in range(20):
+		r = requests.get("http://localhost:" + str(port))
+		if (r.status_code != 200):
+			print("worker" + i + ": Bad status code")
+		if (r.text != "Hello World !\n"):
+			print("worker" + i + ": Bad Content")
+		if (r.headers['Content-Length'] != "14"):
+			print("worker" + i + ": Bad Content-Length")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test1bis(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(100):
+		thread = threading.Thread(target=one_hundred_get_requestsbis, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
+	return ""
+
 def one_hundred_post_requests(port: int, nb: int) -> None:
-	for i in range(100000, 1000001, 100000):
-		payload = "a" * i
-		r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
-		if (r.status_code != 200 and r.status_code != 201):
-			print("worker" + str(i) + ": Bad status code: " + str(r.status_code))
-		filename = "./upload/index.html"
-		with open(filename) as f:
-			content = f.readlines()
-		if (len(content[0]) != i):
-			print("Bad size")
+	for j in range(10):
+		for i in range(100000, 1000001, 100000):
+			payload = "a" * i
+			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
+			if (r.status_code != 200 and r.status_code != 201):
+				print("worker" + str(i) + ": Bad status code: " + str(r.status_code))
+			filename = "./upload/index.html"
+			with open(filename) as f:
+				content = f.readlines()
+			if (len(content[0]) != i):
+				print("Bad size")
 	print("worker {} has finished all his tasks".format(str(nb)))
 
 def stress_test2(port: int) -> str:
@@ -198,7 +381,33 @@ def stress_test2(port: int) -> str:
 		thread.join()
 	return ""
 
-def one_hundred_post_cgi_requests(port: int, nb: int) -> None:
+def one_hundred_post_requestsbis(port: int, nb: int) -> None:
+	for j in range(2):
+		for i in range(100000, 1000001, 100000):
+			payload = "a" * i
+			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
+			if (r.status_code != 200 and r.status_code != 201):
+				print("worker" + str(i) + ": Bad status code: " + str(r.status_code))
+			filename = "./upload/index.html"
+			with open(filename) as f:
+				content = f.readlines()
+			if (len(content[0]) != i):
+				print("Bad size")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test2bis(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(100):
+		thread = threading.Thread(target=one_hundred_post_requestsbis, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
+	return ""
+
+def twenty_cgi_requests(port: int, nb: int) -> None:
 	for i in range(20):
 		payload = "a" * 1000000
 		r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
@@ -213,30 +422,98 @@ def stress_test3(port: int) -> str:
 	threads = []
 
 	for i in range(5):
-		thread = threading.Thread(target=one_hundred_post_cgi_requests, args=(port, i))
+		thread = threading.Thread(target=twenty_cgi_requests, args=(port, i))
 		threads.append(thread)
 		thread.start()
 	for thread in threads:
 		thread.join()
 	return ""
 
-def gen():
-	var1 = "x=FOO&"
-	var2 = "y=FOO123465789"
-	x = var1.encode('utf8')
-	y = var2.encode('utf8')
-	yield x
-	yield y
 
-def chunked_post_size_two_k(port: int) -> str:
-	print('before request')
-	# g = gen()
-	# print(next(g))
-	# print(next(g))
-	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
-           'Transfer-Encoding': 'chunked'}
-	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen(), headers=headers)
-	print(r.text)
-	print('after request')
-	
+def twenty_cgi_requestsbis(port: int, nb: int) -> None:
+	for i in range(5):
+		payload = "a" * 1000000
+		r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
+		if (r.status_code != 200):
+			print("Bad status code {}".format(r.status_code))
+		if (len(r.text) != 1000000):
+			print("Bad content")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test3bis(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(20):
+		thread = threading.Thread(target=twenty_cgi_requestsbis, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
+	return ""
+
+def gen4():
+	for i in range(100):
+		var1 = str(chr((ord("a") + i % 26))) * 10000
+		x = var1.encode('utf8')
+		yield x
+
+def POST_CGI_upload_1M(port: int, nb: int) -> None:
+	for i in range (10):
+		headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+			'Transfer-Encoding': 'chunked'}
+		r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file" + str(nb) + ".tester", data=gen4(), headers=headers)
+		if (r.status_code != 200 and r.status_code != 201):
+			print("Bad status code {}".format(r.status_code))
+		if (len(r.text) != 1000000):
+			print(len(r.text))
+			print("Bad Length Response Body")
+		filename = "./upload/another_file" + str(nb) + ".tester"
+		with open(filename) as f:
+			content = f.readlines()
+		if (len(content[0]) != 1000000):
+			print(len(content[0]))
+			print("upload_file has wrong text")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test4(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(5):
+		thread = threading.Thread(target=POST_CGI_upload_1M, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
+	return ""
+
+def POST_CGI_upload_1Mbis(port: int, nb: int) -> None:
+	for i in range (5):
+		headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+			'Transfer-Encoding': 'chunked'}
+		r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file" + str(nb) + ".tester", data=gen4(), headers=headers)
+		if (r.status_code != 200 and r.status_code != 201):
+			print("Bad status code {}".format(r.status_code))
+		if (len(r.text) != 1000000):
+			print(len(r.text))
+			print("Bad Length Response Body")
+		filename = "./upload/another_file" + str(nb) + ".tester"
+		with open(filename) as f:
+			content = f.readlines()
+		if (len(content[0]) != 1000000):
+			print(len(content[0]))
+			print("upload_file has wrong text")
+	print("worker {} has finished all his tasks".format(str(nb)))
+
+def stress_test4bis(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	threads = []
+
+	for i in range(10):
+		thread = threading.Thread(target=POST_CGI_upload_1Mbis, args=(port, i))
+		threads.append(thread)
+		thread.start()
+	for thread in threads:
+		thread.join()
 	return ""

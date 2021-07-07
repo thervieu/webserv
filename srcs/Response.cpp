@@ -732,7 +732,7 @@ std::string	Response::upload(void)
 	size_t pos = _request.getURL().rfind("/");
 	
 	std::string urlFile = _request.getURL().substr(pos + 1 , _request.getURL().length() - pos - 1);
-	std::string path = this->_root + _location._upload_path + "/" + urlFile;
+	std::string path = this->_root + _location._upload_path + (_location._upload_path[_location._upload_path.size() - 1] == '/' ? "" : "/") + urlFile;
 
 	int ret = stat(path.c_str(), &filestat);
 	
@@ -751,7 +751,6 @@ std::string	Response::upload(void)
 	else
 	{
 		// std::cout << "CREATE\n";
-		// std::cout << "PATH = " << path << "\n\n";
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
 			std::cout << strerror(errno) << "\n";
@@ -766,7 +765,7 @@ std::string	Response::upload(void)
 	return (path);
 }
 
-std::vector<char>	Response::GETResponse(void)
+std::vector<char>	Response::MAINResponse(void)
 {
 	std::string			response;
 	std::vector<char>	file_content;
@@ -829,11 +828,6 @@ std::vector<char>	Response::GETResponse(void)
 			std::copy(file_content.begin(), file_content.end(), std::back_inserter<std::vector<char> >(f_response));
 	}
 	return (f_response);
-}
-
-std::vector<char>		Response::POSTResponse(void)
-{
-	return (GETResponse());
 }
 
 std::vector<char>		Response::DELETEResponse(void)
@@ -1068,9 +1062,10 @@ std::vector<char>		Response::sendResponse()
 	if ((size_t)atoi(_request.getContentLength().c_str()) > _location._client_max_body_size)
 	{
 		_code = 413;
-		f_response = GETResponse();
-		for (size_t i = 0; i < f_response.size(); i++)
-			std::cout << f_response[i];
+		f_response = MAINResponse();
+		// for (size_t i = 0; i < f_response.size(); i++)
+		// 	std::cout << f_response[i];
+		// std::cout << "\n";
 		return (f_response);
 	}
 	//CGI
@@ -1082,24 +1077,25 @@ std::vector<char>		Response::sendResponse()
 		size_t pos = _content.rfind("Status: 200");
 		if (pos != std::string::npos)
 			_content = _content.substr(_content.rfind("utf-8") + 9, _content.length());
-		f_response = GETResponse();
-		for (size_t i = 0; i < f_response.size(); i++)
-			std::cout << f_response[i];
+		f_response = MAINResponse();
+		// for (size_t i = 0; i < f_response.size(); i++)
+		// 	std::cout << f_response[i];
+		// std::cout << "\n\n\n";
 		return (f_response);
 	}
 	if (isAllowedMethod() == false)
 		f_response = wrongMethodReponse();
-	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0)
-		f_response = GETResponse();
-	else if (this->_request.getMethod().compare("POST") == 0)
-		f_response = POSTResponse();
+	else if (this->_request.getMethod().compare("GET") == 0 || this->_request.getMethod().compare("HEAD") == 0
+		|| this->_request.getMethod().compare("POST") == 0)
+		f_response = MAINResponse();
 	else if (this->_request.getMethod().compare("DELETE") == 0)
 		f_response = DELETEResponse();
 	else if (this->_request.getMethod().compare("TRACE") == 0)
 		f_response = TRACEResponse();
 	else if (this->_request.getMethod().compare("OPTIONS") == 0)
 		f_response = OPTIONSResponse();
-	for (size_t i = 0; i < f_response.size(); i++)
-		std::cout << f_response[i];
+	// for (size_t i = 0; i < f_response.size(); i++)
+	// 	std::cout << f_response[i];
+	// std::cout << "\n";
 	return (f_response);
 }

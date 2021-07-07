@@ -18,8 +18,10 @@ Request::Request(std::string request, std::string client_ip, server_info config,
 	int						i;
 	this->setCLientIP(client_ip);
 
-	std::cout << request << std::endl << "\n";
+	// std::cout << request << std::endl << "\n";
+	// std::cout << "chunked = " << chunked << std::endl << "\n";
 	this->_arguments = std::vector<std::string>(0);
+
 	//method
 	i = 0;
 	while (request[i] == ' ')
@@ -72,8 +74,6 @@ Request::Request(std::string request, std::string client_ip, server_info config,
 		ite = request.begin() + i;
 		this->_query.assign(pos, ite);
 	}
-	// std::cout << "query.assign = |" << this->getQuery() << "|\n";
-	// std::cout << "hehehe\n\n";
 
 	//http version
 	while (request[i] == ' ')
@@ -94,6 +94,7 @@ Request::Request(std::string request, std::string client_ip, server_info config,
 	//headers
 	line.assign(++ite, request.end());
 	// std::cout << "assign ok\n\n";
+	// std::cout << "chunked end 1 = " << chunked << std::endl << "\n";
 	this->parsing(line, chunked);
 	// std::cout << "parsing ok\n\n";
 }
@@ -130,6 +131,7 @@ void		Request::parsing(std::string str, bool chunked)
 	std::string::iterator	it;
 	std::string::iterator	ite;
 
+	// std::cout << "PARSING BEG str = |" << str << "|\n";
 	it = str.begin();
 	while (*it != '\0')
 	{
@@ -145,9 +147,13 @@ void		Request::parsing(std::string str, bool chunked)
 		while (*it != '\n' && *it != '\0')
 			++it;
 		line.assign(ite, it);
+		// std::cout << "line = |" << line << "|\n";
+		// std::cout << "unknown = |" << _unknown << "|\n";
 		if (this->_unknown == 2 && this->_method.compare("POST") == 0)
 		{
 			line.assign(ite, str.end());
+			// std::cout << "chunked = " << chunked << std::endl << "\n";
+			// std::cout << "line = |" << line << "|\n";
 			this->ParseBody(line, chunked);
 			return ;
 		}
@@ -339,11 +345,11 @@ size_t						Request::hexatoi(std::string hex) const
 	while ((hex[i] >= '0' && hex[i] <= '9') || (hex[i] >= 'a' && hex[i] <= 'f'))
 	{
 		if (hex[i] >= '0' && hex[i] <= '9')
-			nb = (nb * 10) + (hex[i++] - '0');
+			nb = (nb * 16) + (hex[i++] - '0');
 		else
-			nb = nb * 10 + hex[i++] - 'a' + 10;
+			nb = (nb * 16) + hex[i++] - 'a' + 10;
 	}
-	std::cout << "nb = " << nb << std::endl;
+	// std::cout << "nb = " << nb << std::endl;
 	return (nb);
 }
 
@@ -376,8 +382,9 @@ void			Request::ParseBody(std::string request, bool chunked)
 			}
 			else
 			{
-				std::cout << "||||| " << request.substr(i, next_line_size) << " |||||" << std::endl;
 				updated_request += request.substr(i, next_line_size);
+				// std::cout << "||||| " << updated_request << " |||||" << std::endl;
+				// std::cout << "updated request line size = |" << updated_request.length() << "|\n";
 				i += next_line_size + 2;
 				j = 0;
 			}
@@ -386,7 +393,7 @@ void			Request::ParseBody(std::string request, bool chunked)
 	}
 	else
 		this->setContent(request);
-	std::cout << this->_content << std::endl;
+	// std::cout << this->_content << std::endl;
 	i = 0;
 	while (this->_content[i] != '\0' && i < this->_content.length())
 	{
@@ -411,9 +418,9 @@ void			Request::ParseBody(std::string request, bool chunked)
 		}
 		++i;
 	}
-	for (size_t i = 0; i < this->_arguments.size(); i++)
-	{
-		std::cout << "argument number " << i << ": " << this->_arguments[i] << std::endl;
-	}
+	// for (size_t i = 0; i < this->_arguments.size(); i++)
+	// {
+	// 	std::cout << "argument number " << i << ": " << this->_arguments[i] << std::endl;
+	// }
 	// std::cout << "parse body ok\n\n";
 }

@@ -392,7 +392,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		if (splittedLine[1][0] != '^' || splittedLine[1][1] != '/' || splittedLine[1][splittedLine[1].length() - 1] != '$')
 		{
 			std::cout << splittedLine[1] << "\n";
-			std::cout << "1SyntaxError: " << splittedLine[0] << " directive should be in format 'rewrite ^/old_link$ http://new_link [redirection_type]" << std::endl;
+			std::cout << "SyntaxError: " << splittedLine[0] << " directive should be in format 'rewrite ^/old_link$ http://new_link [redirection_type]" << std::endl;
 			exit(1);
 		}
 		if (splittedLine[3].compare("permanent") != 0 && splittedLine[3].compare("temporary") != 0)

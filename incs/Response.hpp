@@ -65,8 +65,7 @@ class Response
 		bool				VerifyHost(void) const;
 		std::string			upload(void);
 
-		std::vector<char>	GETResponse(void);
-		std::vector<char>	POSTResponse(void);
+		std::vector<char>	MAINResponse(void);
 		std::vector<char>	DELETEResponse(void);
 		std::vector<char>	TRACEResponse(void);
 		std::vector<char>	OPTIONSResponse(void);

@@ -40,15 +40,15 @@ char **CGI::getEnv(std::string str)
 	
 	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 	
-	env_map["PATH_INFO"] = _location._name + str;
-	env_map["PATH_TRANSLATED"] = root + _location._name + str;
+	env_map["PATH_INFO"] = _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+	env_map["PATH_TRANSLATED"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
 	env_map["QUERY_STRING"] = _request.getQuery();
 	env_map["REMOTE_ADDR"] = _request.getClientIP();
 	env_map["REMOTE_IDENT"] = "";
 	env_map["REQUEST_METHOD"] = _request.getMethod();
 	env_map["REQUEST_URI"] = _request.getURL();
-	env_map["SCRIPT_NAME"] = root + _location._name + str;
-	env_map["SCRIPT_FILENAME"] = root + _location._name + str;
+	env_map["SCRIPT_NAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+	env_map["SCRIPT_FILENAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
 	env_map["SERVER_NAME"] = _request.getConfig()._host;
 	env_map["SERVER_PORT"] = intToString(_request.getConfig()._port);
 	env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -127,10 +127,10 @@ std::string		CGI::executeCGI(std::string urlFile)
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		
-		argv[0] = newStr(root + _location._name + _location._cgi_path);
+		argv[0] = newStr(root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + _location._cgi_path);
 		argv[1] = newStr(root + _location._name + urlFile);
 		argv[2] = 0;
-		execve(( "." + root + _location._name + _location._cgi_path).c_str(), argv, env);
+		execve(("." + root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") +  _location._cgi_path).c_str(), argv, env);
 		free(argv[0]);
 		free(argv[1]);
 		free(argv);
