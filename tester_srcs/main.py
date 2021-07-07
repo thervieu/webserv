@@ -42,7 +42,7 @@ def run(port: int) -> None:
 	check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
 	check_test(port, "POST /cgi/file.tester sizeof 1000 ", cgi_tester_post)
 
-	# check_test(port, "POST /cgi/file.tester sizeof 1000 ", chunked_post_size_two_k)
+	 check_test(port, "POST /cgi/file.tester sizeof 1000 ", chunked_post_size_two_k)
 
 
 	print("Time for some stress tests\n")

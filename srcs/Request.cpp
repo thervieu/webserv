@@ -146,7 +146,11 @@ void		Request::parsing(std::string str, bool chunked)
 			++it;
 		line.assign(ite, it);
 		if (this->_unknown == 2 && this->_method.compare("POST") == 0)
+		{
+			line.assign(ite, str.end());
 			this->ParseBody(line, chunked);
+			return ;
+		}
 		else if (setHeader(line) == -2)
 			this->_unknown = 2;
 	}
@@ -327,33 +331,68 @@ std::vector<std::string>	Request::getArguments(void) const
 
 void			Request::ParseBody(std::string request, bool chunked)
 {
-	size_t		i;
+	std::string				updated_request;
+	size_t					i;
+	size_t					j;
 	std::string::iterator	it;
 	std::string::iterator	ite;
 
 	i = 0;
-	(void)chunked;
 	// std::cout << "parse body beg\n\n";
-	this->setContent(request);
-	while (request[i] != '\r' && request[i] != '\n' && request[i] != '\0' && i < request.length())
+	if (chunked == true)
 	{
-		if (request[i] == '&')
-			++i;
-		while (request[i] != '\r' && request[i] != '\n' && request[i] != 0 && request[i] != '&' && i < request.length())
+		j = 0;
+		while (request[i] != '\0' && i < request.length())
 		{
-			it = request.begin() + i;
-			while (request[i] != '\r' && request[i] != '\n' && request[i] != '=' && i < request.length())
+			if (j == 0)
+			{
+				while (i < request.length() && request[i] != '\n')
+					i++;
+				++i;
+				j = 1;
+			}
+			else if (i + 4 < request.length() && request[i] == '0' && request[i + 1] == '\r' && request[i + 2] == '\n' && request[i + 3] == '\r' && request[i + 4] == '\n')
+				break;
+			else if (request[i] == '\n')
+			{
+				updated_request += request[i++];
+				j = 0;
+			}
+			else
+				updated_request += request[i++];
+		}
+		this->setContent(updated_request);
+	}
+	else
+		this->setContent(request);
+	std::cout << this->_content << std::endl;
+	i = 0;
+	while (this->_content[i] != '\0' && i < this->_content.length())
+	{
+		if (this->_content[i] == '&')
+			++i;
+		while (this->_content[i] != '\r' && this->_content[i] != '\n' && this->_content[i] != 0 && this->_content[i] != '&' && i < this->_content.length())
+		{
+			it = this->_content.begin() + i;
+			while (this->_content[i] != '\r' && this->_content[i] != '\n' && this->_content[i] != '=' && i < this->_content.length())
 				i++;
-			ite = request.begin() + i;
+			ite = this->_content.begin() + i;
+			if (this->_content[i] != '=')
+				break;
 			this->_arguments.push_back(std::string(it, ite));
 			++i;
-			ite = request.begin() + i;
-			while (request[i] != '\r' && request[i] != '\n' && request[i] != '&' && request[i] != '\0' && i < request.length())
+			ite = this->_content.begin() + i;
+			while (this->_content[i] != '\r' && this->_content[i] != '\n' && this->_content[i] != '&' && this->_content[i] != '\0' && i < this->_content.length())
 				i++;
-			it = request.begin() + i;
+			it = this->_content.begin() + i;
 			this->_arguments.push_back(std::string(ite, it));
 			// std::cout << "parse body mid i = |" << i << "|\n\n";
 		}
+		++i;
+	}
+	for (size_t i = 0; i < this->_arguments.size(); i++)
+	{
+		std::cout << "argument number " << i << ": " << this->_arguments[i] << std::endl;
 	}
 	// std::cout << "parse body ok\n\n";
 }
