@@ -344,15 +344,15 @@ void			Request::ParseBody(std::string request, bool chunked)
 		j = 0;
 		while (request[i] != '\0' && i < request.length())
 		{
-			if (j == 0)
+			if (i + 4 < request.length() && request[i] == '0' && request[i + 1] == '\r' && request[i + 2] == '\n' && request[i + 3] == '\r' && request[i + 4] == '\n')
+				break;
+			else if (j == 0)
 			{
 				while (i < request.length() && request[i] != '\n')
 					i++;
 				++i;
 				j = 1;
 			}
-			else if (i + 4 < request.length() && request[i] == '0' && request[i + 1] == '\r' && request[i + 2] == '\n' && request[i + 3] == '\r' && request[i + 4] == '\n')
-				break;
 			else if (request[i] == '\n')
 			{
 				updated_request += request[i++];
