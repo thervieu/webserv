@@ -329,6 +329,24 @@ std::vector<std::string>	Request::getArguments(void) const
 	return (this->_arguments);
 }
 
+size_t						Request::hexatoi(std::string hex) const
+{
+	size_t		i;
+	size_t		nb;
+
+	i = 0;
+	nb = 0;
+	while ((hex[i] >= '0' && hex[i] <= '9') || (hex[i] >= 'a' && hex[i] <= 'f'))
+	{
+		if (hex[i] >= '0' && hex[i] <= '9')
+			nb = (nb * 10) + (hex[i++] - '0');
+		else
+			nb = nb * 10 + hex[i++] - 'a' + 10;
+	}
+	std::cout << "nb = " << nb << std::endl;
+	return (nb);
+}
+
 void			Request::ParseBody(std::string request, bool chunked)
 {
 	std::string				updated_request;
@@ -336,8 +354,10 @@ void			Request::ParseBody(std::string request, bool chunked)
 	size_t					j;
 	std::string::iterator	it;
 	std::string::iterator	ite;
+	size_t					next_line_size;
 
 	i = 0;
+	next_line_size = 0;
 	// std::cout << "parse body beg\n\n";
 	if (chunked == true)
 	{
@@ -348,18 +368,19 @@ void			Request::ParseBody(std::string request, bool chunked)
 				break;
 			else if (j == 0)
 			{
-				while (i < request.length() && request[i] != '\n')
-					i++;
+				next_line_size = hexatoi(request.substr(i, request.length() - i));
+				while (request[i] != '\n')
+					++i;
 				++i;
 				j = 1;
 			}
-			else if (request[i] == '\n')
+			else
 			{
-				updated_request += request[i++];
+				std::cout << "||||| " << request.substr(i, next_line_size) << " |||||" << std::endl;
+				updated_request += request.substr(i, next_line_size);
+				i += next_line_size + 2;
 				j = 0;
 			}
-			else
-				updated_request += request[i++];
 		}
 		this->setContent(updated_request);
 	}

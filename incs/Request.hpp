@@ -62,6 +62,7 @@ class Request
 		std::string		getContentType(void) const;
 		server_info		getConfig(void) const;
 		int				getUnknown(void) const;
+		size_t			hexatoi(std::string) const;
 		void			parsing(std::string str, bool chunked);
 };
 

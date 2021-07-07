@@ -221,8 +221,8 @@ def stress_test3(port: int) -> str:
 	return ""
 
 def gen():
-	var1 = "x=FOO"
-	var2 = "y=FOO123"
+	var1 = "x=FOO&"
+	var2 = "y=FOO123465789"
 	x = var1.encode('utf8')
 	y = var2.encode('utf8')
 	yield x
