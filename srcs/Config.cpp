@@ -48,7 +48,7 @@ size_t	getNbLastLine(std::vector<std::string> lines, size_t i)
 			return (i);
 	}
 	std::cout << "SyntaxError: braces don't match" << std::endl;
-	exit(1);
+	throw std::exception();
 }
 
 /*
@@ -73,7 +73,7 @@ void	Config::parseConfig(std::string file)
 		else
 		{
 			std::cout << "SyntaxError: Unexpected token: " << splittedLine[0] << std::endl;
-			exit(0);
+			throw std::exception();
 		}
 	}
 	return ;
@@ -108,17 +108,17 @@ void	Config::parseDirective(std::vector<std::string> splittedLine, bool name)
 	if (splittedLine.size() < 2)
 	{
 		std::cout << "SyntaxError: Directives should have at least one argument: " << splittedLine[0] << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 	if (splittedLine[splittedLine.size() - 1][splittedLine[splittedLine.size() - 1].length() - 1] != ';')
 	{
 		std::cout << "SyntaxError: Missing semicolon on " << splittedLine[0] << " directive" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 	if (isDirectiveName(splittedLine[0], (name == true) ? server_directives : location_directives) == false)
 	{
 		std::cout << "SyntaxError: " << splittedLine[0] << " is not a valid directive" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 	return ;
 }
@@ -198,7 +198,7 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 		if (splittedLine.size() != 3)
 		{
 			std::cout << "SyntaxError: " << splittedLine[0] << " [port] [host]" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		_server._port = ft_atoi(splittedLine[1]);
 		_server._host = splittedLine[2];
@@ -208,7 +208,7 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 		if (splittedLine.size() != 2)
 		{
 			std::cout << "SyntaxError: " << splittedLine[0] << " [root_path]" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		_server._root = splittedLine[1];
 	}
@@ -217,7 +217,7 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 		if (splittedLine.size() < 2)
 		{
 			std::cout << "SyntaxError: " << splittedLine[0] << " [server_name]" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		for (size_t i = 1; i < splittedLine.size(); i++)
 			_server._names.push_back(splittedLine[i]);
@@ -227,7 +227,7 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 		if (splittedLine.size() < 3)
 		{
 			std::cout << "SyntaxError: " << splittedLine[0] << " [error_number] ... [file_path]" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		for (size_t i = 1; i < splittedLine.size() - 1; i++)
 		{
@@ -243,7 +243,7 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 		if (splittedLine.size() != 2)
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should be in format <dec, K, M or G>" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		_server._client_max_body_size = ft_atoi(splittedLine[1]);
 		last_char = splittedLine[1][splittedLine[1].size() - 1];
@@ -256,7 +256,7 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 		else if (!std::isdigit(last_char))
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should be in format <dec, K, M or G>" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 	}
 	return ;
@@ -274,7 +274,7 @@ location	Config::parseLocation(std::vector<std::string> lines, size_t start, siz
 	location _location; /* = defaultLocation();*/
 	splittedLine = splitSpaces(lines[start]);
 	if (splittedLine.size() != 3)
-		exit(1);
+		throw std::exception();
 	_location._name = splittedLine[1];
 	start++;	
 	while (start < end - 1)
@@ -297,7 +297,7 @@ bool	onOffBool(std::string str)
 	else if (str == "off")
 		return (false);
 	std::cout << "Invalid boolean parameter: '" << str << "': should be 'on' or 'off'" << std::endl;
-	exit(1);
+	throw std::exception();
 }
 
 /*
@@ -337,7 +337,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 			if (isMethod(splittedLine[i]) == false)
 			{
 				std::cout << "Invalid method: " << splittedLine[i] << std::endl;
-				exit(1);
+				throw std::exception();
 			}
 			else
 				_loc._methods.push_back(splittedLine[i]);
@@ -366,7 +366,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		if (splittedLine.size() != 2)
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		_loc._client_max_body_size = ft_atoi(splittedLine[1]);
 		last_char = splittedLine[1][splittedLine[1].size() - 1];
@@ -379,7 +379,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		else if (!std::isdigit(last_char))
 		{
 			std::cout << "SyntaxError: " << splittedLine[1] << " should in format <dec, K, M or G>" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 	}
 	else if (splittedLine[0] == location_directives[10])
@@ -387,18 +387,18 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		if (splittedLine.size() != 4)
 		{
 			std::cout << "SyntaxError: " << splittedLine[0] << " directive should be in format 'rewrite ^/old_link$ http://new_link [redirection_type]" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		if (splittedLine[1][0] != '^' || splittedLine[1][1] != '/' || splittedLine[1][splittedLine[1].length() - 1] != '$')
 		{
 			std::cout << splittedLine[1] << "\n";
 			std::cout << "SyntaxError: " << splittedLine[0] << " directive should be in format 'rewrite ^/old_link$ http://new_link [redirection_type]" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		if (splittedLine[3].compare("permanent") != 0 && splittedLine[3].compare("temporary") != 0)
 		{
 			std::cout << "SyntaxError: " << splittedLine[0] << " directive should in format have 'permanent' or 'temporary as redirection_type" << std::endl;
-			exit(1);
+			throw std::exception();
 		}
 		_loc._redirections.push_back(splittedLine[1].substr(1, splittedLine[1].length() - 2));
 		_loc._redirections.push_back(splittedLine[2]);

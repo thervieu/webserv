@@ -55,7 +55,7 @@ int		Server::acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set,
 	if((newfd = accept(sd, (struct sockaddr *)&clientaddr, &addrlen)) == -1)
 	{
 		std::cout << "Couldn't accept " << sd << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 
 	// std::cout << "accepted: " << sd << std::endl;

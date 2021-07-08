@@ -19,18 +19,18 @@ Socket::Socket(server_info server)
 	if ((this->_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Error: Unable to create socket" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &this->_opt, sizeof(this->_opt)) < 0)
 	{
 		std::cout << "Error: Unable to set socket options: reuseaddr" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 
 	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
 	{
 		std::cout << "Error: Unable to set socket to non blocking" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 
 	this->_address.sin_family = AF_INET;
@@ -39,17 +39,17 @@ Socket::Socket(server_info server)
 	if (bind(this->_fd, (struct sockaddr *)&this->_address, sizeof(this->_address)) < 0)
 	{
 		std::cout << "Error: bind failed" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 	if (listen(this->_fd, 1000) < 0)
 	{
 		std::cout << "Error: Unable to listen socket" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 	if (!(this->_buff = static_cast<char*>(malloc(this->_server._client_max_body_size * sizeof(char)))))
 	{
 		std::cout << "Error: Memory required too high" << std::endl;
-		exit(1);
+		throw std::exception();
 	}
 }
 
