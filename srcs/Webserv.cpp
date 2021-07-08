@@ -20,7 +20,7 @@ std::string		readFile(std::string _fileName)
 	if (fd < -1)
 	{
 		std::cout << "Error: couldn't open " << _fileName << std::endl;
-		exit(0);
+		throw std::exception();
 	}
 	while ((rtn_value = read(fd, &buffer, BUFFER_SIZE)) > 0)
 	{
@@ -29,7 +29,7 @@ std::string		readFile(std::string _fileName)
 	if (rtn_value < 0)
 	{
 		std::cout << "Error: problem when reading " << _fileName << std::endl;
-		exit(0);
+		throw std::exception();
 	}
 	close(fd);
 	return (rtn);
@@ -86,6 +86,7 @@ std::vector<std::string>	createVectorLines(std::string file)
 int			main(int ac, char **av)
 {
 	std::string config_file;
+
 	if (ac == 1)
 		config_file = "./confs/default_configuration.conf";
 	else if (ac == 2)
@@ -95,22 +96,30 @@ int			main(int ac, char **av)
 		std::cout << "Format: ./webserv [path_to_configuration_file]" << std::endl;
 		return (1);
 	}
-
-	Config		config(config_file);
-	Server		server;
-
-	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
 	try
 	{
-		for (size_t i = 0; i < config.getServers().size(); i++)
-			server.addSocket(new Socket(config.getServers()[i]));
-		server.select_loop();
+		Config		config(config_file);
+		Server		server;
+
+		signal(SIGINT, signal_handler);
+		signal(SIGQUIT, signal_handler);
+		try
+		{
+			for (size_t i = 0; i < config.getServers().size(); i++)
+				server.addSocket(new Socket(config.getServers()[i]));
+			server.select_loop();
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << "Server closing now" << std::endl;
+			server.endServer();
+			return (1);
+		}
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "closing server now" << std::endl;
-		server.endServer();
+		std::cerr << "Config Error, closing now" << std::endl;
+		return (1);
 	}
 	return (0);
 }

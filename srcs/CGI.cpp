@@ -165,7 +165,7 @@ std::string		CGI::executeCGI(std::string urlFile)
 	delete[] env;
 
 	if (!pid)
-		exit(0);
+		throw std::exception();
 
 	return (rtnContent);
 }

@@ -26,27 +26,27 @@ int main(int argc, char const *argv[])
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
 	{
 		perror("socket failed");
-		exit(EXIT_FAILURE);
+		throw std::exception();
 	}
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
 	{
 		perror("setsockopt");
-		exit(EXIT_FAILURE);
+		throw std::exception();
 	}
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 	{
 		perror("bind failed");
-		exit(EXIT_FAILURE);
+		throw std::exception();
 	}
 	if (listen(server_fd, 3) < 0)
 	{
 		perror("listen");
-		exit(EXIT_FAILURE);
+		throw std::exception();
 	}
 	if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
 	{
 		perror("accept");
-		exit(EXIT_FAILURE);
+		throw std::exception();
 	}
 	buff = static_cast<char *>(malloc(10000000));
 	valread = read(new_socket, buff, 1024);

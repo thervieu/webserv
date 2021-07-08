@@ -748,7 +748,7 @@ std::string	Response::upload(void)
 	{
 		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
 		{
-			exit(1);
+			throw std::exception();
 		}
 		write(fd, _request.getContent().c_str(), _request.getContent().length());
 		close(fd);
@@ -759,7 +759,7 @@ std::string	Response::upload(void)
 	{
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
-			exit(1);
+			throw std::exception();
 		}
 		write(fd, _request.getContent().c_str(), _request.getContent().length());
 		close(fd);
