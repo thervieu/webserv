@@ -58,7 +58,6 @@ int		Server::acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set,
 		throw std::exception();
 	}
 
-	// std::cout << "accepted: " << sd << std::endl;
 	addClient(new Client(_sockets[i], ft_inet_ntoa(clientaddr.sin_addr), newfd));
 	FD_SET(newfd, read_set);
 	FD_SET(newfd, write_set);
@@ -122,18 +121,12 @@ int		Server::receiveConnection(int sd, std::string &request)
 
 	int rtn_read = 0;
     rtn_read = read(sd, buffer_recv, BUFFER_SIZE);
-	// std::cout << "rtn read = |" << rtn_read << "|\n";
-	// std::cout << "REQUEST BEF = |" << request << "|\n";
-	// std::cout << "BUFFER = |" << buffer_recv << "|\n";
 	
 	if (rtn_read > 0)
 	{
 		request.append(buffer_recv);
-		// std::cout << "REQUEST AFT = |" << request << "|\n";
-		// Verification that content exists \r\n etc
 
 		int _complete = isContentWhole(request);
-		// std::cout << "complete = |" << _complete << "|\n";
 		size_t find_pos;
 		if ((find_pos = request.find("\r\n\r\n")) != std::string::npos && _complete == 0)
 			return (0);
@@ -141,13 +134,11 @@ int		Server::receiveConnection(int sd, std::string &request)
 		if (_complete > 0)
 		{
 			std::string rest = request.substr(find_pos + 4, request.length() - (find_pos + 4));
-			// std::cout << "rest = |" << rest << "|\n";
 
 			if (_complete == 1 && (rest.length() == getContentLen(request)))
 				return (0);
 			
 			std::string to_find = "\r\n\r\n";
-			//https://fr.wikipedia.org/wiki/Chunked_transfer_encoding
 			if (_complete == 2)
 				to_find = "0" + to_find;
 			if ((find_pos = rest.find(to_find)) != std::string::npos)
@@ -188,7 +179,6 @@ void	Server::select_loop(void)
 		read_set = master_read_set;
 		write_set = master_write_set;
 
-		// std::cout << "bef select sockets size = |" << _sockets.size() << "|\n";
 		select(max_sd + 1, &read_set, &write_set, NULL, NULL);
 		for (size_t i = 0; i < _sockets.size(); i++)
 		{
@@ -204,21 +194,15 @@ void	Server::select_loop(void)
 			int client_sd;
 			client_sd = client.getSocketDescriptor();
 			bool bool_treat = false;
-			// std::cout << "client nb = |" << client_nb << "| clients len = |" << _clients.size()<< "| sockets len = |" << _sockets.size() << "|\nCheck FD_ISSET client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
 			if (FD_ISSET(client_sd, &write_set) && client.getReceived() == true)
 			{
 				Response			response;
 				std::vector<char>	message;
-				// std::cout << "\n\n\nNEW REQUEST :\n\nbef SETREQUEST\n\n";
-				// std::cout << "iscontentwhole = " << isContentWhole(client.getRequest()) << "\n";
 				Request req = Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig(), (isContentWhole(client.getRequest()) == 2 ? true : false));
 				response.setRequest(req);
-				// std::cout << "setRequest\n";
 				message = response.sendResponse();
-				// std::cout << "sendResponse ok\n";
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
 				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
-				// std::cout << "\nResponse sent !\n" << std::endl;
 				
 				client.setReceived(false);
 				client.getRequest().clear();
@@ -227,32 +211,21 @@ void	Server::select_loop(void)
 			if (FD_ISSET(client_sd, &read_set) && bool_treat == false)
 			{
 				int rtn = receiveConnection(client_sd, client.getRequest());
-				// std::cout << "rtn receive = |" << rtn << "|\n";
 				if (rtn < 0)
 				{
-					// std::cout << "bad rtn\n";
 					close(client_sd);
-					// std::cout << "client sd closed rtn\n";
 					FD_CLR(client_sd, &master_read_set);
-					// std::cout << "fdclr read\n";
 					FD_CLR(client_sd, &master_write_set);
-					// std::cout << "fdclr write\n";
+
 					if (client_sd == max_sd)
 						while (FD_ISSET(max_sd, &master_read_set) == false)
 							max_sd -= 1;
-					// std::cout << "max sd -=\n";
 					delete _clients[client_nb];
-					// std::cout << "delete\n";
 					_clients.erase(_clients.begin() + client_nb);
-					// std::cout << "erase\n";
 					client_nb--;
-					// std::cout << "client_nb--\n";
 				}
 				else if (rtn == 0)
-				{
 					client.setReceived(true);
-					// std::cout << "rtn = 0  client nb = |" << client_nb << "| clients len = |" << _clients.size() << "| client sd = |" << client_sd << "| bool = |" << client.getReceived() << "|\n";
-				}
 			}
 		}
 	}
