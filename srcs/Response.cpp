@@ -487,16 +487,24 @@ std::string			Response::getExtension(std::string extension)
 
 std::string			Response::getContentType()
 {
-	std::string				ret;
-	std::string::iterator	it;
+		std::string				ret;
+	if (this->_content.length() < 1000000)
+	{
+		std::string::iterator	it;
 
-	it = this->_content.end();
-	--it;
-	while (*it != '.')
+		it = this->_content.end();
 		--it;
-	std::string	extension(it, this->_content.end());
-	ret = "Content-Type: ";
-	ret += this->getExtension(extension);
+		while (*it != '.')
+			--it;
+		std::string	extension(it, this->_content.end());
+		ret = "Content-Type: ";
+		ret += this->getExtension(extension);
+	}
+	else
+	{
+		ret = "Content-Type: ";
+		ret += this->getExtension("");
+	}
 	return (ret);
 }
 
@@ -740,7 +748,6 @@ std::string	Response::upload(void)
 	{
 		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
 		{
-			std::cout << "NON\n";
 			exit(1);
 		}
 		write(fd, _request.getContent().c_str(), _request.getContent().length());
@@ -750,11 +757,8 @@ std::string	Response::upload(void)
 	}
 	else
 	{
-		// std::cout << "CREATE\n";
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
-			std::cout << strerror(errno) << "\n";
-			std::cout << "NON2\n";
 			exit(1);
 		}
 		write(fd, _request.getContent().c_str(), _request.getContent().length());

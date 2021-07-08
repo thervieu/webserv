@@ -519,3 +519,27 @@ def stress_test4bis(port: int) -> str:
 	for thread in threads:
 		thread.join()
 	return ""
+
+def gen5():
+	for i in range(2000):
+		var1 = str(chr((ord("a") + i % 26))) * 50000
+		x = var1.encode('utf8')
+		yield x
+
+def chunked_post_size_100M(port: int) -> str:
+	print("Please wait a few seconds for the stress test to finish ...")
+	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
+		'Transfer-Encoding': 'chunked'}
+	r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file.tester", data=gen5(), headers=headers)
+	if (r.status_code != 200 and r.status_code != 201):
+		return ("Bad status code {}".format(r.status_code))
+	if (len(r.text) != 100000058):
+		print(len(r.text))
+		return("Bad Length Response Body")
+	filename = "./upload/another_file.tester"
+	with open(filename) as f:
+		content = f.readlines()
+	if (len(content[0]) != 100000000):
+		print(len(content[0]))
+		return ("upload_file has wrong text")
+	return ""

@@ -50,7 +50,7 @@ def run(port: int) -> None:
 
 	check_test(port, "POST /post-upload/another_file.tester 20 bits", chunked_post_upload)
 	check_test(port, "POST /post-upload/another_file.tester 2k bits", chunked_post_size_2k)
-	check_test(port, "POST /post-ucdpload/another_file.tester 500k bits", chunked_post_size_500k)
+	check_test(port, "POST /post-upload/another_file.tester 500k bits", chunked_post_size_500k)
 
 
 	print("\nSTRESS TESTS:")
@@ -62,6 +62,7 @@ def run(port: int) -> None:
 	check_test(port, "POST CGI 1M bits 20 workers 5 times", stress_test3bis)
 	check_test(port, "POST CGI w/ upload 1M bits 5 workers 10 times", stress_test4)
 	check_test(port, "POST CGI w/ upload 1M bits 10 workers 5 times", stress_test4bis)
+	check_test(port, "POST /post-upload/another_file.tester 100M bits", chunked_post_size_100M)
 
 if (__name__ == "__main__"):
 	if (len(sys.argv) != 2):

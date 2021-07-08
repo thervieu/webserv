@@ -364,7 +364,6 @@ void			Request::ParseBody(std::string request, bool chunked)
 
 	i = 0;
 	next_line_size = 0;
-	// std::cout << "parse body beg\n\n";
 	if (chunked == true)
 	{
 		j = 0;
@@ -393,7 +392,6 @@ void			Request::ParseBody(std::string request, bool chunked)
 	}
 	else
 		this->setContent(request);
-	// std::cout << this->_content << std::endl;
 	i = 0;
 	while (this->_content[i] != '\0' && i < this->_content.length())
 	{
