@@ -1,0 +1,1 @@
+A server must have the following directives: listen, root, error_page and at least one location.$

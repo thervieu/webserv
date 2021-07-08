@@ -76,9 +76,32 @@ void	Config::parseConfig(std::string file)
 			throw std::exception();
 		}
 	}
+	if (verifyServers())
+		throw std::exception();
 	return ;
 }
 
+int		Config::verifyServers(void)
+{
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		if (_servers[i]._root.compare("") == 0 || _servers[i]._host.compare("") == 0
+			|| _servers[i]._locations.size() == 0)
+		{
+			std::cout << "A server must have the following directives: listen, root and at least one location.\n";
+			return (1);
+		}
+		for (size_t j = 0; j < _servers[i]._locations.size(); j++)
+		{
+			if (_servers[i]._locations[j]._methods.size() == 0)
+			{
+				std::cout << "A location must have the following directive: method. (autoindex is set at 0)\n";
+				return (1);
+			}
+		}
+	}
+	return (0);
+}
 /*
 *	verifies that the directive name is valid
 *	(is asked to be implemented by the subject)
@@ -271,7 +294,8 @@ location	Config::parseLocation(std::vector<std::string> lines, size_t start, siz
 {
 	std::vector<std::string>	splittedLine;
 
-	location _location; /* = defaultLocation();*/
+	location _location;
+	_location._autoindex = false;
 	splittedLine = splitSpaces(lines[start]);
 	if (splittedLine.size() != 3)
 		throw std::exception();

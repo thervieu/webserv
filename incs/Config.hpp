@@ -43,6 +43,7 @@ class Config
 	private:
 
 		std::vector<server_info>	_servers;
+		int					verifyServers(void);
 		void				parseServer(std::vector<std::string> vectorFile, size_t start, size_t end);
 		location			parseLocation(std::vector<std::string> vectorFile, size_t start, size_t end);
 		void				parseConfig(std::string file);
