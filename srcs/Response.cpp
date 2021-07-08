@@ -839,7 +839,6 @@ std::vector<char>		Response::DELETEResponse(void)
 		this->_code = 404;
 	else
 		this->_code = 204;
-	// std::cout << "CODE = |" << _code << "|\n";
 	response = this->getCode() + "\r\n";
 	response += this->getDate(0) + "\r\n";
 	if (this->_code == 404)
@@ -1069,14 +1068,11 @@ std::vector<char>		Response::sendResponse()
 		return (f_response);
 	}
 	//CGI
-	if (IsCGICalled(_request.getURL()))
+	if (_code != 404 && IsCGICalled(_request.getURL()))
 	{
 		_cgi = true;
 		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
 		_content = response;
-		size_t pos = _content.rfind("Status: 200");
-		if (pos != std::string::npos)
-			_content = _content.substr(_content.rfind("utf-8") + 9, _content.length());
 		f_response = MAINResponse();
 		// for (size_t i = 0; i < f_response.size(); i++)
 		// 	std::cout << f_response[i];

@@ -88,7 +88,8 @@ def post_too_big(port:int) -> str:
 def post_with_upload(port:int) -> str:
 	payload = "fname=test_fname&lname=test_lname"
 	r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
-	if (r.status_code != 201):
+	if (r.status_code != 200 and r.status_code != 201):
+		print(r.status_code)
 		return "Bad status code."
 	filename = "./upload/index.html"
 	with open(filename) as f:
@@ -140,9 +141,11 @@ def cgi_tester_post(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
 	if (r.status_code != 200):
 		return "Bad status code"
-	if (r.text != "ARGS=OUI&ARGS2=NON"):
+	if (r.text.find("ARGS=OUI&ARGS2=NON") == -1):
 		return "Bad content"
-	print("HERE")
+	if (len(r.text) != 76):
+		print(len(r.text))
+		return "Bad content"
 	return ""
 
 def gen():
@@ -159,7 +162,7 @@ def chunked_post_no_upload(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 20):
+	if (len(r.text) != 78):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	return ""
@@ -179,7 +182,7 @@ def chunked_post_no_upload_size_2k(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen2(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 2000):
+	if (len(r.text) != 2058):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	return ""
@@ -207,7 +210,7 @@ def chunked_post_no_upload_size_500k(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen3(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 500000):
+	if (len(r.text) != 500058):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	return ""
@@ -227,11 +230,10 @@ def chunked_post_upload(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	print("status ok")
-	if (len(r.text) != 20):
+	if (len(r.text) != 78):
+		print(r.text)
 		print(len(r.text))
 		return "Bad Length Response Body"
-	print("ok")
 	filename = "./upload/another_file.tester"
 	with open(filename) as f:
 		content = f.readlines()
@@ -255,7 +257,7 @@ def chunked_post_size_2k(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen2(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 2000):
+	if (len(r.text) != 2058):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	filename = "./upload/another_file.tester"
@@ -289,7 +291,7 @@ def chunked_post_size_500k(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen3(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 500000):
+	if (len(r.text) != 500058):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	filename = "./upload/another_file.tester"
@@ -366,7 +368,7 @@ def one_hundred_post_requests(port: int, nb: int) -> None:
 			with open(filename) as f:
 				content = f.readlines()
 			if (len(content[0]) != i):
-				print("Bad size")
+				print("worker" + str(nb) + ": Bad size")
 	print("worker {} has finished all his tasks".format(str(nb)))
 
 def stress_test2(port: int) -> str:
@@ -392,7 +394,7 @@ def one_hundred_post_requestsbis(port: int, nb: int) -> None:
 			with open(filename) as f:
 				content = f.readlines()
 			if (len(content[0]) != i):
-				print("Bad size")
+				print("worker" + str(nb) + ": Bad size")
 	print("worker {} has finished all his tasks".format(str(nb)))
 
 def stress_test2bis(port: int) -> str:
@@ -413,7 +415,7 @@ def twenty_cgi_requests(port: int, nb: int) -> None:
 		r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
 		if (r.status_code != 200):
 			print("Bad status code {}".format(r.status_code))
-		if (len(r.text) != 1000000):
+		if (len(r.text) != 1000058):
 			print("Bad content")
 	print("worker {} has finished all his tasks".format(str(nb)))
 
@@ -436,7 +438,7 @@ def twenty_cgi_requestsbis(port: int, nb: int) -> None:
 		r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
 		if (r.status_code != 200):
 			print("Bad status code {}".format(r.status_code))
-		if (len(r.text) != 1000000):
+		if (len(r.text) != 1000058):
 			print("Bad content")
 	print("worker {} has finished all his tasks".format(str(nb)))
 
@@ -462,13 +464,13 @@ def POST_CGI_upload_1M(port: int, nb: int) -> None:
 	for i in range (10):
 		headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
 			'Transfer-Encoding': 'chunked'}
-		r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file" + str(nb) + ".tester", data=gen4(), headers=headers)
+		r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file.tester", data=gen4(), headers=headers)
 		if (r.status_code != 200 and r.status_code != 201):
 			print("Bad status code {}".format(r.status_code))
-		if (len(r.text) != 1000000):
+		if (len(r.text) != 1000058):
 			print(len(r.text))
 			print("Bad Length Response Body")
-		filename = "./upload/another_file" + str(nb) + ".tester"
+		filename = "./upload/another_file.tester"
 		with open(filename) as f:
 			content = f.readlines()
 		if (len(content[0]) != 1000000):
@@ -492,13 +494,13 @@ def POST_CGI_upload_1Mbis(port: int, nb: int) -> None:
 	for i in range (5):
 		headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
 			'Transfer-Encoding': 'chunked'}
-		r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file" + str(nb) + ".tester", data=gen4(), headers=headers)
+		r = requests.post("http://localhost:" + str(port) + "/post_upload/" + "another_file.tester", data=gen4(), headers=headers)
 		if (r.status_code != 200 and r.status_code != 201):
 			print("Bad status code {}".format(r.status_code))
-		if (len(r.text) != 1000000):
+		if (len(r.text) != 1000058):
 			print(len(r.text))
 			print("Bad Length Response Body")
-		filename = "./upload/another_file" + str(nb) + ".tester"
+		filename = "./upload/another_file.tester"
 		with open(filename) as f:
 			content = f.readlines()
 		if (len(content[0]) != 1000000):

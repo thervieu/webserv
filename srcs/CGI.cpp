@@ -167,6 +167,5 @@ std::string		CGI::executeCGI(std::string urlFile)
 	if (!pid)
 		exit(0);
 
-	// std::cout << "rtnContent = |" << rtnContent << "|\n";
 	return (rtnContent);
 }
