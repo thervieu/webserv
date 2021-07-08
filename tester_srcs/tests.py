@@ -5,6 +5,7 @@ import os
 def simple_get_index(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port))
 	if (r.status_code != 200):
+		print(r.status_code)
 		return "Bad status code"
 	if (r.text != "Hello World !\n"):
 		return "Bad Content"
@@ -16,6 +17,7 @@ def get_index_two_ports(port: int) -> str:
 	for i in range(10):
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
+			print(r.status_code)
 			return "Bad status code"
 		if (r.text != "Hello World !\n"):
 			return "Bad Content"
@@ -34,12 +36,14 @@ def get_index_two_ports(port: int) -> str:
 def get_forbidden_dir(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port) + "/forbidden")
 	if (r.status_code != 403):
+		print(r.status_code)
 		return "Bad status code"
 	return ""
 
 def get_404(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port) + "/nonsense")
 	if (r.status_code != 404):
+		print(r.status_code)
 		return "Bad status code"
 	if (r.text.find("This is a 404 error page") == -1):
 		return "Bad Content"
@@ -48,6 +52,7 @@ def get_404(port: int) -> str:
 def get_autoindex_subdir(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port) + "/auto")
 	if (r.status_code != 200):
+		print(r.status_code)
 		return "Bad status code"
 	if (r.text.find("Index of /auto") == -1):
 		return "Bad Content"
@@ -57,6 +62,7 @@ def fifty_get_root(port: int) -> str:
 	for i in range(50):
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
+			print(r.status_code)
 			return "Bad status code"
 		if (r.text != "Hello World !\n"):
 			return "Bad Content"
@@ -67,6 +73,7 @@ def fifty_get_root(port: int) -> str:
 def wrong_method(port: int) -> str:
 	r = requests.post("http://localhost:" + str(port))
 	if (r.status_code != 405):
+		print(r.status_code)
 		return "Bad status code"
 	return ""
 
@@ -74,6 +81,7 @@ def simple_post(port:int) -> str:
 	payload = "a"
 	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
 	if (r.status_code != 200):
+		print(r.status_code)
 		return "Bad status code."
 	return ""
 
@@ -82,6 +90,7 @@ def post_too_big(port:int) -> str:
 	payload = "a" * 1025
 	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
 	if (r.status_code != 413):
+		print(r.status_code)
 		return "Bad status code."
 	return ""
 
@@ -104,6 +113,7 @@ def delete(port: int) -> str:
 		print("File exists")
 	r = requests.delete("http://localhost:" + str(port) + filename)
 	if (r.status_code != 204):
+		print(r.status_code)
 		return "Bad status code for DELETE."
 	if (os.path.isfile("." + filename)):
 		return "File still exists"
@@ -116,6 +126,23 @@ def delete_already_deleted(port: int) -> str:
 	r = requests.delete("http://localhost:" + str(port) + filename)
 	if (r.status_code != 404):
 		return "Bad status code for DELETE."
+	return ""
+
+def redirect_get_ok(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/redirect_me/please")
+	if (r.status_code != 200):
+		print(r.status_code)
+		return "Bad status code"
+	if (r.text != "redirection index :)"):
+		print(r.text)
+		return "Bad Content"
+	return ""
+
+def redirect_get_non_existing(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/redirect_me/wrong")
+	if (r.status_code != 404):
+		print(r.status_code)
+		return "Bad status code"
 	return ""
 
 def server_name(port: int) -> str:

@@ -20,7 +20,7 @@ def check_test(port: int, name_test: str, test: Callable) -> None:
 	else:
 		check = RED + "X" + DEFAULT
 	
-	print("test : {:50} | result : {} {}".format(name_test, check, str_result))
+	print("test : {:65} | result : {} {}".format(name_test, check, str_result))
 
 
 def run(port: int) -> None:
@@ -36,10 +36,13 @@ def run(port: int) -> None:
 	check_test(port, "POST / method not authorized (405)  ", wrong_method)
 	check_test(port, "POST /post ", simple_post)
 	check_test(port, "POST /post request too big (413)", post_too_big)
-	check_test(port, "POST /post_upload -> upload in /upload", post_with_upload)
+	check_test(port, "POST /post_upload upload in /upload", post_with_upload)
 	check_test(port, "DELETE /delete_folder/index.html", delete)
 	check_test(port, "DELETE /delete_folder/index.html (404)", delete_already_deleted)
 	check_test(port, "GET http://webserv:port use of server_name ", server_name)
+	check_test(port, "GET /redirect_me/please redirect 301 in /redirection/index.html", redirect_get_ok)
+	check_test(port, "GET /redirect_me/wrong redirect 301 in /redirection/lol.html", redirect_get_non_existing)
+	check_test(port, "POST /post_upload upload in /upload", post_with_upload)
 	check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
 	check_test(port, "POST /cgi/file.tester", cgi_tester_post)
 
@@ -74,6 +77,6 @@ if (__name__ == "__main__"):
 		print("please input a valid port (int)")
 		exit(1)
 	os.chdir("tester_documents")
+	run(port)
 	os.system("rm -rf ./upload/*")
 	os.system("echo \"Delete me please\" > ./delete_folder/index.html")
-	run(port)

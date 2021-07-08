@@ -412,7 +412,6 @@ void			Request::ParseBody(std::string request, bool chunked)
 				i++;
 			it = this->_content.begin() + i;
 			this->_arguments.push_back(std::string(ite, it));
-			// std::cout << "parse body mid i = |" << i << "|\n\n";
 		}
 		++i;
 	}
@@ -420,5 +419,4 @@ void			Request::ParseBody(std::string request, bool chunked)
 	// {
 	// 	std::cout << "argument number " << i << ": " << this->_arguments[i] << std::endl;
 	// }
-	// std::cout << "parse body ok\n\n";
 }

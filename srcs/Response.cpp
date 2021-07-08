@@ -1096,6 +1096,6 @@ std::vector<char>		Response::sendResponse()
 		f_response = OPTIONSResponse();
 	// for (size_t i = 0; i < f_response.size(); i++)
 	// 	std::cout << f_response[i];
-	// std::cout << "\n";
+	// std::cout << "\n\n\n";
 	return (f_response);
 }
