@@ -9,7 +9,7 @@ Request::Request(Request const &ref) :  _method("GET"), _url("/"), _accept_chars
 {
 }
 
-Request::Request(std::string request, std::string client_ip, server_info config, bool chunked) :   _config(config), _request(request), _unknown(0)
+Request::Request(std::string request, std::string client_ip, bool chunked) : _request(request), _unknown(0)
 {
 	std::string				line;
 	std::string				tmp;
@@ -18,8 +18,7 @@ Request::Request(std::string request, std::string client_ip, server_info config,
 	int						i;
 	this->setCLientIP(client_ip);
 
-	// std::cout << request << std::endl << "\n";
-	// std::cout << "chunked = " << chunked << std::endl << "\n";
+	// std::cout << request << std::endl << "\n\n";
 	this->_arguments = std::vector<std::string>(0);
 
 	//method
@@ -198,6 +197,11 @@ int			Request::setHeader(std::string str)
 	else
 		return (-1);
 	return (0);
+}
+
+void		Request::setConfig(server_info config)
+{
+	this->_config = config;
 }
 
 server_info		Request::getConfig(void) const

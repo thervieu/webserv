@@ -21,10 +21,11 @@ void	Server::addClient(Client *client)
 	_clients.push_back(client);
 }
 
-int		Server::getSocket(int i)
+std::vector<Socket *>		Server::getSockets(void)
 {
-	return (this->_sockets[i]->getSocketDescriptor());
+	return (this->_sockets);
 }
+
 
 int		Server::getMaxSd(void)
 {
@@ -54,10 +55,13 @@ int		Server::acceptSocketDescriptor(int i, int sd, int max_sd, fd_set *read_set,
 
 	if((newfd = accept(sd, (struct sockaddr *)&clientaddr, &addrlen)) == -1)
 	{
-		std::cout << "Couldn't accept " << sd << std::endl;
-		throw std::exception();
+		if (errno != EWOULDBLOCK)
+		{
+			std::cout << "Couldn't accept sd " << sd << std::endl;
+			throw std::exception();
+		}
+		return (max_sd);
 	}
-
 	addClient(new Client(_sockets[i], ft_inet_ntoa(clientaddr.sin_addr), newfd));
 	FD_SET(newfd, read_set);
 	FD_SET(newfd, write_set);
@@ -155,6 +159,23 @@ int		Server::receiveConnection(int sd, std::string &request)
 	return (1);
 }
 
+server_info		Server::findRequestConfig(int sd, std::string host)
+{
+	size_t pos = host.rfind(":");
+	if (pos != std::string::npos)
+		host = host. substr(0, pos);
+	for (size_t i = 0; i < _sockets.size(); i++)
+		if (sd == _sockets[i]->getSocketDescriptor())
+			for (size_t j = 0; j < _sockets[i]->getServerConfig()._names.size(); j++)
+				if (_sockets[i]->getServerConfig()._names[j].compare(host) == 0)
+					return (_sockets[i]->getServerConfig());
+	for (size_t i = 0; i < _sockets.size(); i++)
+		if (sd == _sockets[i]->getSocketDescriptor())
+			return (_sockets[i]->getServerConfig());
+	exit(1);
+	return (server_info());
+}
+
 // Thanks to https:www.tenouk.com/Module41.html
 void	Server::select_loop(void)
 {
@@ -194,11 +215,13 @@ void	Server::select_loop(void)
 			int client_sd;
 			client_sd = client.getSocketDescriptor();
 			bool bool_treat = false;
+
 			if (FD_ISSET(client_sd, &write_set) && client.getReceived() == true)
 			{
 				Response			response;
 				std::vector<char>	message;
-				Request req = Request(client.getRequest(), client.getIP(), client.getServerSocket().getServerConfig(), (isContentWhole(client.getRequest()) == 2 ? true : false));
+				Request req = Request(client.getRequest(), client.getIP(), (isContentWhole(client.getRequest()) == 2 ? true : false));
+				req.setConfig(findRequestConfig(client.getServerSocket().getSocketDescriptor(), req.getHost()));
 				response.setRequest(req);
 				message = response.sendResponse();
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
@@ -240,7 +263,7 @@ void Server::endServer(void)
 	}
 	for (size_t socket_nb = 0; socket_nb < _sockets.size(); socket_nb++)
 	{
-		free(this->_sockets[socket_nb]->getBuffer());
+
 		close(_sockets[socket_nb]->getSocketDescriptor());
 		delete _sockets[socket_nb];
 	}

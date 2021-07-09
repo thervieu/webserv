@@ -85,6 +85,13 @@ def simple_post(port:int) -> str:
 		return "Bad status code."
 	return ""
 
+def post_size_0(port:int) -> str:
+	payload = ""
+	r = requests.post("http://localhost:" + str(port) + "/post/", data=payload)
+	if (r.status_code != 200):
+		print(r.status_code)
+		return "Bad status code."
+	return ""
 
 def post_too_big(port:int) -> str:
 	payload = "a" * 1025

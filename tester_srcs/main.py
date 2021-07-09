@@ -35,6 +35,7 @@ def run(port: int) -> None:
 	check_test(port, "GET / 1 worker 50 times", fifty_get_root)
 	check_test(port, "POST / method not authorized (405)  ", wrong_method)
 	check_test(port, "POST /post ", simple_post)
+	check_test(port, "POST /post content length = 0", post_size_0)
 	check_test(port, "POST /post request too big (413)", post_too_big)
 	check_test(port, "POST /post_upload upload in /upload", post_with_upload)
 	check_test(port, "DELETE /delete_folder/index.html", delete)

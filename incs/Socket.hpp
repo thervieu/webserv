@@ -16,7 +16,6 @@ class Socket
 		struct sockaddr_in	_address;
 		int					_addrlen;
 		server_info			_server;
-		char				*_buff;
 
 
 	public:
@@ -24,11 +23,11 @@ class Socket
 		Socket(void);
 		Socket(int fd);
 		Socket(const Socket &other);
+		Socket(int fd, server_info server);
 		Socket(server_info _server);
 		~Socket(void);
 
 		int				getSocketDescriptor(void);
-		char			*getBuffer(void);
 		server_info		getServerConfig(void);
 
 };

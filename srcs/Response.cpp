@@ -748,6 +748,7 @@ std::string	Response::upload(void)
 	{
 		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
 		{
+			std::cerr << "could not open " << path << std::endl;
 			throw std::exception();
 		}
 		write(fd, _request.getContent().c_str(), _request.getContent().length());
@@ -759,6 +760,7 @@ std::string	Response::upload(void)
 	{
 		if ((fd = open(path.c_str(), O_CREAT | O_APPEND | O_WRONLY, 0644)) == -1)
 		{
+			std::cerr << "could not create " << path << std::endl;
 			throw std::exception();
 		}
 		write(fd, _request.getContent().c_str(), _request.getContent().length());
@@ -953,7 +955,6 @@ bool		Response::VerifyHost(void) const
 	for (size_t i = 0; i < this->_request.getConfig()._names.size(); i++)
 	{
 		tmp = this->_request.getConfig()._names[i] + ":" + convert.str();
-		//std::cout << tmp << std::endl;
 		if (tmp.compare(this->_request.getHost()) == 0)
 			return (true);
 	}
@@ -971,7 +972,6 @@ bool		Response::IsCGICalled(std::string url)
 	if (dot == std::string::npos)
 		return (false);
 	std::string extension = url.substr(dot, url.length() - dot);
-	// std::cout << "extension_url = |" << extension << "|\n";
 	for (size_t i = 0; i < _location._cgi_extensions.size(); i++)
 	{
 		if (extension.compare(_location._cgi_extensions[i]) == 0)

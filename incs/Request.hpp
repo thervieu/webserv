@@ -29,10 +29,11 @@ class Request
 
 		Request();
 		Request(Request const &ref);
-		Request(std::string request, std::string client_ip, server_info config, bool chunked);
+		Request(std::string request, std::string client_ip, bool chunked);
 		~Request();
 
 		Request			&operator=(Request const &rhs);
+		void			setConfig(server_info config);
 		int				setHeader(std::string str);
 		void			setAcceptCharsets(std::string header);
 		void			setAcceptLanguage(std::string header);

@@ -106,7 +106,16 @@ int			main(int ac, char **av)
 		try
 		{
 			for (size_t i = 0; i < config.getServers().size(); i++)
-				server.addSocket(new Socket(config.getServers()[i]));
+			{
+				Socket *same_port = NULL;
+				for (size_t sock_nb = 0; sock_nb < server.getSockets().size(); sock_nb++)
+					if (config.getServers()[i]._port == server.getSockets()[sock_nb]->getServerConfig()._port)
+						same_port = server.getSockets()[sock_nb];
+				if (!same_port)
+					server.addSocket(new Socket(config.getServers()[i]));
+				else
+					server.addSocket(new Socket(same_port->getSocketDescriptor(), config.getServers()[i]));
+			}
 			server.select_loop();
 		}
 		catch(const std::exception& e)
