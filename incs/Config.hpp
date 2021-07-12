@@ -77,10 +77,9 @@ static const char * valid_methods[] =
 	"GET",
 	"HEAD",
 	"POST",
-	"PUT",
 	"DELETE",
 	"TRACE",
-	"CONNECT",
+	"OPTIONS",
 	NULL
 };
 
