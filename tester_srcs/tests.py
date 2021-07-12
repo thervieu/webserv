@@ -336,6 +336,33 @@ def chunked_post_size_500k(port: int) -> str:
 		return "upload_file has wrong text"
 	return ""
 
+
+""" BONUS METHODS  """
+
+def simple_head_index(port: int) -> str:
+	r = requests.head("http://localhost:" + str(port))
+	if (r.status_code != 200):
+		print(r.status_code)
+		return "Bad status code"
+	if (len(r.text) != 0):
+		print(len(r.text))
+		print(r.text)
+		return "Bad Content"
+	return ""
+
+def simple_options_index(port: int) -> str:
+	r = requests.options("http://localhost:" + str(port))
+	if (r.status_code != 200):
+		return "Bad status code"
+	if (len(r.text) != 0):
+		print(r.text)
+		return "Bad Content"
+	if (r.headers['Allow'] != "GET, HEAD, OPTIONS"):
+		print(r.headers['Allow'])
+		return "Bad Allow header"
+	return ""
+
+
 """ 20 workers doing 100 GET requests on /"""
 
 def one_hundred_get_requests(port: int, nb: int) -> None:
@@ -576,4 +603,5 @@ def chunked_post_size_100M(port: int) -> str:
 	if (len(content[0]) != 100000000):
 		print(len(content[0]))
 		return ("upload_file has wrong text")
+	print("worker 0 has finished all his tasks")
 	return ""

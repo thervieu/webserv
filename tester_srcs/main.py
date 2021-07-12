@@ -56,6 +56,9 @@ def run(port: int) -> None:
 	check_test(port, "POST /post-upload/another_file.tester 2k bits", chunked_post_size_2k)
 	check_test(port, "POST /post-upload/another_file.tester 500k bits", chunked_post_size_500k)
 
+	print("\nBONUS METHODS TESTS (HEAD, and OPTIONS):")
+	check_test(port, "HEAD / ", simple_head_index)
+	check_test(port, "OPTIONS / ", simple_options_index)
 
 	print("\nSTRESS TESTS:")
 	check_test(port, "GET / 25 workers 100 times", stress_test1)
@@ -78,6 +81,6 @@ if (__name__ == "__main__"):
 		print("please input a valid port (int)")
 		exit(1)
 	os.chdir("tester_documents")
+	os.system("echo \"Delete me please\" > ./delete_folder/index.html")
 	run(port)
 	os.system("rm -rf ./upload/*")
-	os.system("echo \"Delete me please\" > ./delete_folder/index.html")

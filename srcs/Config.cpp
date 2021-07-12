@@ -210,8 +210,6 @@ size_t	ft_atoi(std::string str)
 
 void	Config::parseServerDirectives(server_info &_server, std::vector<std::string> splittedLine)
 {
-	char last_char;
-
 	parseDirective(splittedLine, true);
 	
 	splittedLine[splittedLine.size() - 1] = std::string(splittedLine[splittedLine.size() - 1], 0, splittedLine[splittedLine.size() - 1].length() - 1);
@@ -261,27 +259,6 @@ void	Config::parseServerDirectives(server_info &_server, std::vector<std::string
 	}
 	else if (splittedLine[0] == server_directives[4])
 		_server._index = splittedLine[1];
-	else if (splittedLine[0] == server_directives[5])
-	{
-		if (splittedLine.size() != 2)
-		{
-			std::cout << "SyntaxError: " << splittedLine[1] << " should be in format <dec, K, M or G>" << std::endl;
-			throw std::exception();
-		}
-		_server._client_max_body_size = ft_atoi(splittedLine[1]);
-		last_char = splittedLine[1][splittedLine[1].size() - 1];
-		if (last_char == 'K' || last_char == 'k')
-			_server._client_max_body_size *= 1024;
-		else if (last_char == 'M' || last_char == 'm')
-			_server._client_max_body_size *= 1024 * 1024;
-		else if (last_char == 'G' || last_char == 'G')
-			_server._client_max_body_size *= 1024 * 1024 * 1024;
-		else if (!std::isdigit(last_char))
-		{
-			std::cout << "SyntaxError: " << splittedLine[1] << " should be in format <dec, K, M or G>" << std::endl;
-			throw std::exception();
-		}
-	}
 	return ;
 }
 
@@ -296,6 +273,7 @@ location	Config::parseLocation(std::vector<std::string> lines, size_t start, siz
 
 	location _location;
 	_location._autoindex = false;
+	_location._client_max_body_size = 1024 * 1024;
 	splittedLine = splitSpaces(lines[start]);
 	if (splittedLine.size() != 3)
 		throw std::exception();
@@ -372,19 +350,15 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 	else if (splittedLine[0] == location_directives[3])
 		_loc._index = splittedLine[1];
 	else if (splittedLine[0] == location_directives[4])
-		_loc._upload = onOffBool(splittedLine[1]);
-	else if (splittedLine[0] == location_directives[5])
 		_loc._upload_path = splittedLine[1];
-	else if (splittedLine[0] == location_directives[6])
-		_loc._upload_cleanup = ft_atoi(splittedLine[1]);
-	else if (splittedLine[0] == location_directives[7])
+	else if (splittedLine[0] == location_directives[5])
 	{
 		for (size_t i = 1; i < splittedLine.size(); ++i)
 			_loc._cgi_extensions.push_back(splittedLine[i]);
 	}
-	else if (splittedLine[0] == location_directives[8])
+	else if (splittedLine[0] == location_directives[6])
 		_loc._cgi_path = splittedLine[1];
-	else if (splittedLine[0] == location_directives[9])
+	else if (splittedLine[0] == location_directives[7])
 	{
 		_loc._client_max_body_size = 0;
 		if (splittedLine.size() != 2)
@@ -406,7 +380,7 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 			throw std::exception();
 		}
 	}
-	else if (splittedLine[0] == location_directives[10])
+	else if (splittedLine[0] == location_directives[8])
 	{
 		if (splittedLine.size() != 4)
 		{
@@ -427,9 +401,6 @@ void	Config::parseLocationDirectives(location &_loc, std::vector<std::string> sp
 		_loc._redirections.push_back(splittedLine[1].substr(1, splittedLine[1].length() - 2));
 		_loc._redirections.push_back(splittedLine[2]);
 		_loc._redirections.push_back(splittedLine[3]);
-		// std::cout << "redir 0 = " << _loc._redirections[0] << "\n";
-		// std::cout << "redir 1 = " << _loc._redirections[1] << "\n";
-		// std::cout << "redir 2 = " << _loc._redirections[2] << "\n";
 	}
 	return ;
 }

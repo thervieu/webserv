@@ -18,7 +18,7 @@ Request::Request(std::string request, std::string client_ip, bool chunked) : _re
 	int						i;
 	this->setCLientIP(client_ip);
 
-	// std::cout << request << std::endl << "\n\n";
+	// std::cout << request << "\n\n\n";
 	this->_arguments = std::vector<std::string>(0);
 
 	//method

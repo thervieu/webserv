@@ -68,7 +68,6 @@ static const char * server_directives[] =
 	"server_name",
 	"error_page",
 	"index",
-	"client_max_body_size",
 	NULL
 };
 
@@ -78,7 +77,6 @@ static const char * valid_methods[] =
 	"HEAD",
 	"POST",
 	"DELETE",
-	"TRACE",
 	"OPTIONS",
 	NULL
 };
@@ -89,9 +87,7 @@ static const char * location_directives[] =
 	"method",
 	"autoindex",
 	"index",
-	"upload_enable",
 	"upload_path",
-	"upload_cleanup",
 	"cgi_extension",
 	"cgi_path",
 	"client_max_body_size",

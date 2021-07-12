@@ -67,7 +67,6 @@ class Response
 
 		std::vector<char>	MAINResponse(void);
 		std::vector<char>	DELETEResponse(void);
-		std::vector<char>	TRACEResponse(void);
 		std::vector<char>	OPTIONSResponse(void);
 		std::vector<char>	wrongMethodReponse(void);
 

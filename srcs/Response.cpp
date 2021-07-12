@@ -545,16 +545,20 @@ std::string			Response::getAllow()
 	while (ret.size() == 6 && cpy.size() > 0)
 	{
 		i = -1;
+		ret += " ";
 		if (this->_location._methods.size() != 0)
-			while (++i < this->_location._methods.size())
-				ret += " " + this->_location._methods[i];
+		{
+			while (++i < this->_location._methods.size() - 1)
+				ret += this->_location._methods[i] + ", ";
+			ret += this->_location._methods[i];
+		}
 		do
 		{
 			cpy = cpy.substr(0, cpy.size() - 1);
 		} while (cpy[cpy.size() - 1] != '/' && cpy.size() > 0);
 	}
 	if (ret.size() == 6)
-		ret += " GET HEAD TRACE OPTIONS";
+		ret += " GET, HEAD, OPTIONS";
 	return (ret);
 }
 
@@ -891,30 +895,18 @@ std::vector<char>		Response::wrongMethodReponse(void)
 	return (f_response);
 }
 
-std::vector<char>		Response::TRACEResponse(void)
-{
-	std::string			response;
-	std::vector<char>	f_response;
-
-	this->_code = 200;
-	response = this->getCode() + "\r\n";
-	this->_content = "lol.html";
-	response += this->getContentType() + "\r\n";
-	response += this->_request.getRequest();
-	f_response.assign(response.begin(), response.end());
-	return (f_response);
-}
-
 std::vector<char>		Response::OPTIONSResponse(void)
 {
 	std::vector<char>	f_response;
 	std::string			response;
 
-	this->_code = 204;
+	this->_code = 200;
 	response = this->getCode() + "\r\n";
 	response += this->getDate(0) + "\r\n";
 	response += this->getServer() + "\r\n";
-	response += this->getAllow() + "\r\n";
+	response += "Content-Length: 0\r\n";
+	response += this->getAllow() + "\r\n\r\n";
+	f_response.assign(response.begin(), response.end());
 	return (f_response);
 }
 
@@ -1090,8 +1082,6 @@ std::vector<char>		Response::sendResponse()
 		f_response = MAINResponse();
 	else if (this->_request.getMethod().compare("DELETE") == 0)
 		f_response = DELETEResponse();
-	else if (this->_request.getMethod().compare("TRACE") == 0)
-		f_response = TRACEResponse();
 	else if (this->_request.getMethod().compare("OPTIONS") == 0)
 		f_response = OPTIONSResponse();
 	// for (size_t i = 0; i < f_response.size(); i++)
