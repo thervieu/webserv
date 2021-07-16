@@ -23,53 +23,52 @@ def check_test(port: int, name_test: str, test: Callable) -> None:
 	print("test : {:65} | result : {} {}".format(name_test, check, str_result))
 
 
-def run(port: int) -> None:
+def run(option: str, port: int) -> None:
 	"""run tests"""
-	print("All tests  are done requesting on http://localhost:port (except the one showcasing server_name)\n")
-	print("BASIC TESTS:")
-	check_test(port, "GET / ", simple_get_index)
-	check_test(port, "GET /auto autoindex", get_autoindex_subdir)
-	check_test(port, "GET /forbidden (403) ", get_forbidden_dir)
-	check_test(port, "GET non_existing_dir (404) ", get_404)
-	check_test(port, "GET / ports 8080 and 8081", get_index_two_ports)
-	check_test(port, "GET / 1 worker 50 times", fifty_get_root)
-	check_test(port, "POST / method not authorized (405)  ", wrong_method)
-	check_test(port, "POST /post ", simple_post)
-	check_test(port, "POST /post content length = 0", post_size_0)
-	check_test(port, "POST /post request too big (413)", post_too_big)
-	check_test(port, "POST /post_upload upload in /upload", post_with_upload)
-	check_test(port, "DELETE /delete_folder/index.html", delete)
-	check_test(port, "DELETE /delete_folder/index.html (404)", delete_already_deleted)
-	check_test(port, "GET http://webserv:port use of server_name ", server_name)
-	check_test(port, "GET /redirect_me/please redirect 301 in /redirection/index.html", redirect_get_ok)
-	check_test(port, "GET /redirect_me/wrong redirect 301 in /redirection/lol.html", redirect_get_non_existing)
-	check_test(port, "POST /post_upload upload in /upload", post_with_upload)
-	check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
-	check_test(port, "POST /cgi/file.tester", cgi_tester_post)
+	
+	print("All tests  are done requesting on http://localhost:port\n")
 
-	print("\nCGI TESTS & CHUNKED REQUESTS:")
-	check_test(port, "POST /cgi/file.tester 20 bits", chunked_post_no_upload)
-	check_test(port, "POST /cgi/file.tester 2k bits", chunked_post_no_upload_size_2k)
-	check_test(port, "POST /cgi/file.tester 500k bits", chunked_post_no_upload_size_500k)
+	if (option == "basic"):
+		check_test(port, "GET / ", simple_get_index)
+		check_test(port, "GET /auto autoindex", get_autoindex_subdir)
+		check_test(port, "GET /forbidden (403) ", get_forbidden_dir)
+		check_test(port, "GET non_existing_dir (404) ", get_404)
+		check_test(port, "GET / ports 8080 and 8081", get_index_two_ports)
+		check_test(port, "GET / 1 worker 50 times", fifty_get_root)
+		check_test(port, "POST / method not authorized (405)  ", wrong_method)
+		check_test(port, "POST /post ", simple_post)
+		check_test(port, "POST /post content length = 0", post_size_0)
+		check_test(port, "POST /post request too big (413)", post_too_big)
+		check_test(port, "POST /post_upload upload in /upload", post_with_upload)
+		check_test(port, "DELETE /delete_folder/index.html", delete)
+		check_test(port, "DELETE /delete_folder/index.html (404)", delete_already_deleted)
+		check_test(port, "GET http://webserv:port use of server_name ", server_name)
+		check_test(port, "GET /redirect_me/please redirect 301 in /redirection/index.html", redirect_get_ok)
+		check_test(port, "GET /redirect_me/wrong redirect 301 in /redirection/lol.html", redirect_get_non_existing)
+		check_test(port, "POST /post_upload upload in /upload", post_with_upload)
+		check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
+		check_test(port, "POST /cgi/file.tester", cgi_tester_post)
 
-	check_test(port, "POST /post-upload/another_file.tester 20 bits", chunked_post_upload)
-	check_test(port, "POST /post-upload/another_file.tester 2k bits", chunked_post_size_2k)
-	check_test(port, "POST /post-upload/another_file.tester 500k bits", chunked_post_size_500k)
+		print("\nCGI TESTS & CHUNKED REQUESTS:")
+		check_test(port, "POST /cgi/file.tester 20 bits", chunked_post_no_upload)
+		check_test(port, "POST /cgi/file.tester 2k bits", chunked_post_no_upload_size_2k)
+		check_test(port, "POST /cgi/file.tester 500k bits", chunked_post_no_upload_size_500k)
 
-	print("\nBONUS METHODS TESTS (HEAD, and OPTIONS):")
-	check_test(port, "HEAD / ", simple_head_index)
-	check_test(port, "OPTIONS / ", simple_options_index)
+		check_test(port, "POST /post-upload/another_file.tester 20 bits", chunked_post_upload)
+		check_test(port, "POST /post-upload/another_file.tester 2k bits", chunked_post_size_2k)
+		check_test(port, "POST /post-upload/another_file.tester 500k bits", chunked_post_size_500k)
 
-	print("\nSTRESS TESTS:")
-	check_test(port, "GET / 25 workers 100 times", stress_test1)
-	check_test(port, "GET / 100 workers 25 times", stress_test1bis)
-	check_test(port, "POST 100k-1M bits 10 workers 100 times", stress_test2)
-	check_test(port, "POST 100k-1M bits 100 workers 10 times", stress_test2bis)
-	check_test(port, "POST CGI 1M bits 5 workers 20 times", stress_test3)
-	check_test(port, "POST CGI 1M bits 20 workers 5 times", stress_test3bis)
-	check_test(port, "POST CGI w/ upload 1M bits 5 workers 10 times", stress_test4)
-	check_test(port, "POST CGI w/ upload 1M bits 10 workers 5 times", stress_test4bis)
-	check_test(port, "POST /post-upload/another_file.tester 100M bits", chunked_post_size_100M)
+	if (option == "stress"):
+		print("STRESS TESTS:")
+		check_test(port, "GET / 25 workers 100 times", stress_test1)
+		check_test(port, "GET / 100 workers 25 times", stress_test1bis)
+		check_test(port, "POST 100k-1M bits 10 workers 100 times", stress_test2)
+		check_test(port, "POST 100k-1M bits 100 workers 10 times", stress_test2bis)
+		check_test(port, "POST CGI 1M bits 5 workers 20 times", stress_test3)
+		check_test(port, "POST CGI 1M bits 20 workers 5 times", stress_test3bis)
+		check_test(port, "POST CGI w/ upload 1M bits 5 workers 10 times", stress_test4)
+		check_test(port, "POST CGI w/ upload 1M bits 10 workers 5 times", stress_test4bis)
+		check_test(port, "POST /post-upload/another_file.tester 100M bits", chunked_post_size_100M)
 
 if (__name__ == "__main__"):
 	if (len(sys.argv) != 2):
@@ -80,7 +79,16 @@ if (__name__ == "__main__"):
 	except:
 		print("please input a valid port (int)")
 		exit(1)
+
 	os.chdir("tester_documents")
-	os.system("echo \"Delete me please\" > ./delete_folder/index.html")
-	run(port)
 	os.system("rm -rf ./upload/*")
+	os.system("echo \"Delete me please\" > ./delete_folder/index.html")
+
+	option = ""
+	while (option != 'basic' and option != 'stress'):
+		print("Available tests options 'basic' and 'stress'")
+		print('Please type the type of tests you want to do:')
+		option = input()
+		print()
+	
+	run(option, port)

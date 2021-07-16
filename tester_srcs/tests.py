@@ -363,7 +363,7 @@ def simple_options_index(port: int) -> str:
 	return ""
 
 
-""" 20 workers doing 100 GET requests on /"""
+""" 20 clients doing 100 GET requests on /"""
 
 def one_hundred_get_requests(port: int, nb: int) -> None:
 	if nb % 2 == 0:
@@ -371,12 +371,12 @@ def one_hundred_get_requests(port: int, nb: int) -> None:
 	for i in range(100):
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
-			print("worker" + i + ": Bad status code")
+			print("client" + i + ": Bad status code")
 		if (r.text != "Hello World !\n"):
-			print("worker" + i + ": Bad Content")
+			print("client" + i + ": Bad Content")
 		if (r.headers['Content-Length'] != "14"):
-			print("worker" + i + ": Bad Content-Length")
-	print("worker {} has finished all his tasks".format(str(nb)))
+			print("client" + i + ": Bad Content-Length")
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test1(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -391,7 +391,7 @@ def stress_test1(port: int) -> str:
 	return ""
 
 
-""" 100 workers doing 20 GET requests on /"""
+""" 100 clients doing 20 GET requests on /"""
 
 def one_hundred_get_requestsbis(port: int, nb: int) -> None:
 	if nb % 2 == 0:
@@ -399,12 +399,12 @@ def one_hundred_get_requestsbis(port: int, nb: int) -> None:
 	for i in range(20):
 		r = requests.get("http://localhost:" + str(port))
 		if (r.status_code != 200):
-			print("worker" + i + ": Bad status code")
+			print("client" + i + ": Bad status code")
 		if (r.text != "Hello World !\n"):
-			print("worker" + i + ": Bad Content")
+			print("client" + i + ": Bad Content")
 		if (r.headers['Content-Length'] != "14"):
-			print("worker" + i + ": Bad Content-Length")
-	print("worker {} has finished all his tasks".format(str(nb)))
+			print("client" + i + ": Bad Content-Length")
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test1bis(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -424,13 +424,13 @@ def one_hundred_post_requests(port: int, nb: int) -> None:
 			payload = "a" * i
 			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
 			if (r.status_code != 200 and r.status_code != 201):
-				print("worker" + str(i) + ": Bad status code: " + str(r.status_code))
+				print("client" + str(i) + ": Bad status code: " + str(r.status_code))
 			filename = "./upload/index.html"
 			with open(filename) as f:
 				content = f.readlines()
 			if (len(content[0]) != i):
-				print("worker" + str(nb) + ": Bad size")
-	print("worker {} has finished all his tasks".format(str(nb)))
+				print("client" + str(nb) + ": Bad size")
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test2(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -450,13 +450,13 @@ def one_hundred_post_requestsbis(port: int, nb: int) -> None:
 			payload = "a" * i
 			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
 			if (r.status_code != 200 and r.status_code != 201):
-				print("worker" + str(i) + ": Bad status code: " + str(r.status_code))
+				print("client" + str(i) + ": Bad status code: " + str(r.status_code))
 			filename = "./upload/index.html"
 			with open(filename) as f:
 				content = f.readlines()
 			if (len(content[0]) != i):
-				print("worker" + str(nb) + ": Bad size")
-	print("worker {} has finished all his tasks".format(str(nb)))
+				print("client" + str(nb) + ": Bad size")
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test2bis(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -478,7 +478,7 @@ def twenty_cgi_requests(port: int, nb: int) -> None:
 			print("Bad status code {}".format(r.status_code))
 		if (len(r.text) != 1000058):
 			print("Bad content")
-	print("worker {} has finished all his tasks".format(str(nb)))
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test3(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -501,7 +501,7 @@ def twenty_cgi_requestsbis(port: int, nb: int) -> None:
 			print("Bad status code {}".format(r.status_code))
 		if (len(r.text) != 1000058):
 			print("Bad content")
-	print("worker {} has finished all his tasks".format(str(nb)))
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test3bis(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -537,7 +537,7 @@ def POST_CGI_upload_1M(port: int, nb: int) -> None:
 		if (len(content[0]) != 1000000):
 			print(len(content[0]))
 			print("upload_file has wrong text")
-	print("worker {} has finished all his tasks".format(str(nb)))
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test4(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -567,7 +567,7 @@ def POST_CGI_upload_1Mbis(port: int, nb: int) -> None:
 		if (len(content[0]) != 1000000):
 			print(len(content[0]))
 			print("upload_file has wrong text")
-	print("worker {} has finished all his tasks".format(str(nb)))
+	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test4bis(port: int) -> str:
 	print("Please wait a few seconds for the stress test to finish ...")
@@ -603,5 +603,5 @@ def chunked_post_size_100M(port: int) -> str:
 	if (len(content[0]) != 100000000):
 		print(len(content[0]))
 		return ("upload_file has wrong text")
-	print("worker 0 has finished all his tasks")
+	print("client 0 has finished all his tasks")
 	return ""

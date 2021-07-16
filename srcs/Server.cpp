@@ -225,11 +225,28 @@ void	Server::select_loop(void)
 				response.setRequest(req);
 				message = response.sendResponse();
 				// https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
-				send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
-				
-				client.setReceived(false);
-				client.getRequest().clear();
-				bool_treat = true;
+				int rtn_send = send(client_sd, &message[0], message.size(), MSG_NOSIGNAL);
+				// std::cout << "rtn_send = |" << rtn_send << "|\n";
+				if (rtn_send < 1)
+				{
+					close(client_sd);
+					FD_CLR(client_sd, &master_read_set);
+					FD_CLR(client_sd, &master_write_set);
+
+					if (client_sd == max_sd)
+						while (FD_ISSET(max_sd, &master_read_set) == false)
+							max_sd -= 1;
+					delete _clients[client_nb];
+					_clients.erase(_clients.begin() + client_nb);
+					client_nb--;
+					client_sd = 0;
+				}
+				else
+				{
+					client.setReceived(false);
+					client.getRequest().clear();
+					bool_treat = true;
+				}
 			}
 			if (FD_ISSET(client_sd, &read_set) && bool_treat == false)
 			{
