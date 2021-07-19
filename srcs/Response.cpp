@@ -1066,9 +1066,9 @@ std::vector<char>		Response::sendResponse()
 	//CGI
 	if (_code != 404 && IsCGICalled(_request.getURL()))
 	{
-		_cgi = true;
-		std::string response = CGI(_request, _location).executeCGI(getScriptName(_request.getURL()));
-		_content = response;
+		this->_cgi = true;
+		std::string response = CGI(this->_request, this->_location, this->_root).executeCGI(getScriptName(this->_request.getURL()));
+		this->_content = response;
 		f_response = MAINResponse();
 		// for (size_t i = 0; i < f_response.size(); i++)
 		// 	std::cout << f_response[i];

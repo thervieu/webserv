@@ -1,1 +1,13 @@
-A server must have the following directives: listen, root, error_page and at least one location.$
+path_info = |/server-documents/cgi_directory/file.cgi_call|
+path_translated = |/server-documents/cgi_directory/file.cgi_call|
+root = |./server-documents/cgi_directory/|
+cgi_path = |ubuntu_cgi_tester|
+urlfile = |file.cgi_call|
+ctrl-c detected, closing application...
+
+path_info = |/server-documents/cgi_directory/file.cgi_call|
+path_translated = |/server-documents/cgi_directory/file.cgi_call|
+root = |./server-documents/cgi_directory/|
+cgi_path = |ubuntu_cgi_tester|
+urlfile = |file.cgi_call|
+ctrl-c detected, closing application...

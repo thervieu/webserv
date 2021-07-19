@@ -1,17 +1,18 @@
 #include "../incs/CGI.hpp"
 
 // ressource should be in _loc ?
-CGI::CGI(Request & request, location loc)
+CGI::CGI(Request & request, location loc, std::string root)
 {
 	setRequest(request);
 	// std::cout << "req root = |" << request.getConfig()._root << "|\n";
 	// std::cout << "root = |" << _request.getConfig()._root << "|\n";
-	_location = loc;
+	this->_location = loc;
+	this->_root = root;
 }
 
 void CGI::setRequest(Request & req)
 {
-	_request = req;
+	this->_request = req;
 }
 
 //if need to del sthg
@@ -37,18 +38,35 @@ char **CGI::getEnv(std::string str)
 	env_map["CONTENT_LENGTH"] = _request.getContentLength().length() > 0 ? _request.getContentLength() : "0";
 	env_map["CONTENT_TYPE"] = _request.getContentType();
 	env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
-	
-	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
-	
-	env_map["PATH_INFO"] = _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
-	env_map["PATH_TRANSLATED"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+	if (this->_location._root.empty())
+	{
+		std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
+		
+		env_map["PATH_INFO"] = _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+		env_map["PATH_TRANSLATED"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+		env_map["SCRIPT_NAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+		env_map["SCRIPT_FILENAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+	}
+	else
+	{
+		std::string root = this->_root.substr(1, _root.length() - 1);
+		std::string better_pinfo = root;
+		
+		size_t pos =  0;
+		pos = root.rfind("/");
+		if (pos != std::string::npos)
+			better_pinfo = root.substr(pos, root.size() - pos);
+
+		env_map["PATH_INFO"] = better_pinfo + (better_pinfo[better_pinfo.length() - 1] == '/' ? "" : "/") + str;
+		env_map["PATH_TRANSLATED"] = root + (root[root.length() - 1] == '/' ? "" : "/") + str;
+		env_map["SCRIPT_NAME"] = root + (root[root.length() - 1] == '/' ? "" : "/") + str;
+		env_map["SCRIPT_FILENAME"] = root + (root[root.length() - 1] == '/' ? "" : "/") + str;
+	}
 	env_map["QUERY_STRING"] = _request.getQuery();
 	env_map["REMOTE_ADDR"] = _request.getClientIP();
 	env_map["REMOTE_IDENT"] = "";
 	env_map["REQUEST_METHOD"] = _request.getMethod();
 	env_map["REQUEST_URI"] = _request.getURL();
-	env_map["SCRIPT_NAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
-	env_map["SCRIPT_FILENAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
 	env_map["SERVER_NAME"] = _request.getConfig()._host;
 	env_map["SERVER_PORT"] = intToString(_request.getConfig()._port);
 	env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -109,7 +127,11 @@ std::string		CGI::executeCGI(std::string urlFile)
 	long	fdOut = fileno(fOut);
 	int		ret = 1;
 
-	std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
+	std::string root;
+	if (this->_location._root.empty())
+		root = "." + _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1) + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/");
+	else
+		root = this->_root + (_root[_root.length() - 1] == '/' ? "" : "/");
 	write(fdIn, _request.getContent().c_str(), _request.getContent().size());
 	lseek(fdIn, 0, SEEK_SET);
 
@@ -127,10 +149,10 @@ std::string		CGI::executeCGI(std::string urlFile)
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		
-		argv[0] = newStr(root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + _location._cgi_path);
-		argv[1] = newStr(root + _location._name + urlFile);
+		argv[0] = newStr(root + _location._cgi_path);
+		argv[1] = newStr(root + urlFile);
 		argv[2] = 0;
-		execve(("." + root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") +  _location._cgi_path).c_str(), argv, env);
+		execve((root +  _location._cgi_path).c_str(), argv, env);
 		free(argv[0]);
 		free(argv[1]);
 		free(argv);

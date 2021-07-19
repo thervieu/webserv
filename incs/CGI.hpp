@@ -15,10 +15,11 @@ class CGI
 
 		Request _request;
 		location _location;
+		std::string _root;
 
 	public:
 
-		CGI(Request & , location);
+		CGI(Request & , location, std::string);
 		~CGI(void);
 		void setRequest(Request &);
 		std::string executeCGI(std::string);

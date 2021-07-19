@@ -90,6 +90,6 @@ if (__name__ == "__main__"):
 		print('Please type the type of tests you want to do:')
 		option = input()
 		print()
-	os.system("rm -rf ./upload/*")
 	
 	run(option, port)
+	os.system("rm -rf ./upload/*")
