@@ -162,13 +162,70 @@ def server_name(port: int) -> str:
 		return "Bad Content-Length"
 	return ""
 
+def get_loc_root(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/use_location_root/")
+	if (r.status_code != 200):
+		print(r.status_code)
+		return "Bad status code"
+	if (r.text != "Hello World !\n"):
+		return "Bad Content"
+	if (r.headers['Content-Length'] != "14"):
+		return "Bad Content-Length"
+	return ""
+
+def post_loc_root(port: int) -> str:
+	payload = "args=oui&args2=non"
+	r = requests.post("http://localhost:" + str(port) + "/use_location_root/", data=payload)
+	if (r.status_code != 200):
+		print(r.status_code)
+		return "Bad status code"
+	if (r.text != "Hello World !\n"):
+		return "Bad Content"
+	if (r.headers['Content-Length'] != "14"):
+		return "Bad Content-Length"
+	return ""
+
 def cgi_tester_get(port: int) -> str:
 	r = requests.get("http://localhost:" + str(port) + "/cgi/file.tester")
 	if (r.status_code != 200):
 		return "Bad status code"
 	return ""
 
+def cgi_tester_post(port: int) -> str:
+	payload = "args=oui&args2=non"
+	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=payload)
+	if (r.status_code != 200):
+		return "Bad status code"
+	if (r.text.find("ARGS=OUI&ARGS2=NON") == -1):
+		return "Bad content"
+	if (len(r.text) != 76):
+		print(len(r.text))
+		return "Bad content"
+	return ""
 
+def cgi_tester_get_loc_root(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/use_location_root_cgi/file.tester")
+	if (r.status_code != 200):
+		return "Bad status code"
+	return ""
+
+def cgi_tester_post_loc_root(port: int) -> str:
+	payload = "args=oui&args2=non"
+	r = requests.post("http://localhost:" + str(port) + "/use_location_root_cgi/file.tester", data=payload)
+	if (r.status_code != 200):
+		return "Bad status code"
+	if (r.text.find("ARGS=OUI&ARGS2=NON") == -1):
+		return "Bad content"
+	if (len(r.text) != 76):
+		print(len(r.text))
+		return "Bad content"
+	return ""
+
+def cgi_tester_get(port: int) -> str:
+	r = requests.get("http://localhost:" + str(port) + "/cgi/file.tester")
+	if (r.status_code != 200):
+		return "Bad status code"
+	return ""
 
 def cgi_tester_post(port: int) -> str:
 	payload = "args=oui&args2=non"
@@ -209,7 +266,6 @@ def gen2():
 	yield x
 	yield y
 
-import time
 def chunked_post_no_upload_size_500(port: int) -> str:
 	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
            'Transfer-Encoding': 'chunked'}

@@ -42,8 +42,7 @@ char **CGI::getEnv(std::string str)
 	{
 		std::string root = _request.getConfig()._root.substr(0, _request.getConfig()._root.length() - 1);
 		
-		env_map["PATH_INFO"] = _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
-		env_map["PATH_TRANSLATED"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
+		env_map["PATH_INFO"] = _request.getURL();
 		env_map["SCRIPT_NAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
 		env_map["SCRIPT_FILENAME"] = root + _location._name + (_location._name[_location._name.length() - 1] == '/' ? "" : "/") + str;
 	}
@@ -57,8 +56,7 @@ char **CGI::getEnv(std::string str)
 		if (pos != std::string::npos)
 			better_pinfo = root.substr(pos, root.size() - pos);
 
-		env_map["PATH_INFO"] = better_pinfo + (better_pinfo[better_pinfo.length() - 1] == '/' ? "" : "/") + str;
-		env_map["PATH_TRANSLATED"] = root + (root[root.length() - 1] == '/' ? "" : "/") + str;
+		env_map["PATH_INFO"] = _request.getURL();
 		env_map["SCRIPT_NAME"] = root + (root[root.length() - 1] == '/' ? "" : "/") + str;
 		env_map["SCRIPT_FILENAME"] = root + (root[root.length() - 1] == '/' ? "" : "/") + str;
 	}

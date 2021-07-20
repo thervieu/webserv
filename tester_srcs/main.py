@@ -36,20 +36,33 @@ def run(option: str, port: int) -> None:
 		check_test(port, "GET / ports 8080 and 8081", get_index_two_ports)
 		check_test(port, "GET / 1 worker 50 times", fifty_get_root)
 		check_test(port, "POST / method not authorized (405)  ", wrong_method)
+		
 		check_test(port, "POST /post ", simple_post)
 		check_test(port, "POST /post content length = 0", post_size_0)
 		check_test(port, "POST /post request too big (413)", post_too_big)
 		check_test(port, "POST /post_upload upload in /upload", post_with_upload)
+		
 		check_test(port, "DELETE /delete_folder/index.html", delete)
 		check_test(port, "DELETE /delete_folder/index.html (404)", delete_already_deleted)
+		
 		check_test(port, "GET http://webserv:port use of server_name ", server_name)
 		check_test(port, "GET /redirect_me/please redirect 301 in /redirection/index.html", redirect_get_ok)
 		check_test(port, "GET /redirect_me/wrong redirect 301 in /redirection/lol.html", redirect_get_non_existing)
+
 		check_test(port, "POST /post_upload upload in /upload", post_with_upload)
+
+		check_test(port, "POST /post_upload upload in /upload", post_with_upload)
+		check_test(port, "POST /post_upload upload in /upload", post_with_upload)
+
+		check_test(port, "GET /use_location_root/", get_loc_root)
+		check_test(port, "POST /use_location_root/", post_loc_root)
+		
+		print("\nCGI TESTS & CHUNKED REQUESTS:")
 		check_test(port, "GET /cgi/file.tester ", cgi_tester_get)
 		check_test(port, "POST /cgi/file.tester", cgi_tester_post)
+		check_test(port, "GET /use_location_root_cgi/file.tester ", cgi_tester_get_loc_root)
+		check_test(port, "POST /use_location_root_cgi/file.tester", cgi_tester_post_loc_root)
 
-		print("\nCGI TESTS & CHUNKED REQUESTS:")
 		check_test(port, "POST /cgi/file.tester 20 bits", chunked_post_no_upload)
 		check_test(port, "POST /cgi/file.tester 500 bits", chunked_post_no_upload_size_500)
 

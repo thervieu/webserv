@@ -164,7 +164,6 @@ server_info		Server::findRequestConfig(int sd, std::string host)
 	size_t pos = host.rfind(":");
 	if (pos != std::string::npos)
 		host = host.substr(0, pos);
-	std::cout << "host = |" << host << "|\n";
 	for (size_t i = 0; i < _sockets.size(); i++)
 		if (sd == _sockets[i]->getSocketDescriptor())
 			for (size_t j = 0; j < _sockets[i]->getServerConfig()._names.size(); j++)
