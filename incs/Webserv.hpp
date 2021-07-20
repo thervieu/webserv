@@ -22,6 +22,13 @@
 
 # include "Config.hpp"
 
+#if (PRINT_VALUE == 1)
+    #define PRINT_STR(X) (std::cout << X << "\n\n")
+#else
+    #define PRINT_STR(X)
+#endif
+
+
 std::vector<std::string>	createVectorLines(std::string file);
 std::vector<std::string>	splitSpaces(std::string line);
 std::string					readFile(std::string _fileName);

@@ -88,7 +88,10 @@ int			main(int ac, char **av)
 	std::string config_file;
 
 	if (ac == 1)
+	{
 		config_file = "./confs/default_configuration.conf";
+		std::cout << "since no configuration file was given as first argument, we will use default_configuration.conf\n";
+	}
 	else if (ac == 2)
 		config_file = av[1];
 	else

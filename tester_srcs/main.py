@@ -51,12 +51,10 @@ def run(option: str, port: int) -> None:
 
 		print("\nCGI TESTS & CHUNKED REQUESTS:")
 		check_test(port, "POST /cgi/file.tester 20 bits", chunked_post_no_upload)
-		check_test(port, "POST /cgi/file.tester 2k bits", chunked_post_no_upload_size_2k)
-		check_test(port, "POST /cgi/file.tester 500k bits", chunked_post_no_upload_size_500k)
+		check_test(port, "POST /cgi/file.tester 500 bits", chunked_post_no_upload_size_500)
 
 		check_test(port, "POST /post-upload/another_file.tester 20 bits", chunked_post_upload)
-		check_test(port, "POST /post-upload/another_file.tester 2k bits", chunked_post_size_2k)
-		check_test(port, "POST /post-upload/another_file.tester 500k bits", chunked_post_size_500k)
+		check_test(port, "POST /post-upload/another_file.tester 500 bits", chunked_post_size_500)
 
 	if (option == "stress"):
 		print("STRESS TESTS:")

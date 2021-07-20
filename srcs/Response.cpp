@@ -586,8 +586,6 @@ std::vector<char>	Response::getContent()
 	while (fd >= 0 && (rtn_value = read(fd, buffer, 1)) > 0)
 		file.push_back(buffer[0]);
 	close(fd);
-	for (size_t i = 0; i < file.size(); i++)
-		std::cout << file[i];
 	return (file);
 }
 
@@ -800,7 +798,7 @@ std::vector<char>	Response::MAINResponse(void)
 			this->_content = "." + this->_request.getConfig()._root;
 			this->_content = this->_content.substr(0, this->_content.size() - 1) + find_error_page();
 		}
-		if (this->_content.compare("autoindex.html") != 0 && (this->_code != 301 && this->_code != 307))
+		if (this->_content.compare("autoindex.html") != 0 && (this->_code != 301 && this->_code != 307) && _cgi == false)
 		{
 			file_content = this->getContent();
 			file_content = this->changeContent(file_content);
@@ -833,8 +831,8 @@ std::vector<char>	Response::MAINResponse(void)
 		{
 			if (_cgi == true)
 			{
-				for (size_t i = 0; i < file_content.size(); i++)
-					file_content.push_back(file_content[i]);
+				for (size_t i = 0; i < _content.size(); i++)
+					file_content.push_back(_content[i]);
 			}
 			ss << file_content.size();
 			response += "Content-Length: " + ss.str() + "\r\n";
@@ -1014,7 +1012,6 @@ void					Response::VerifyRedirection()
 		if (this->_content.compare(this->_root + str + std::string(this->_location._redirections[i].begin(), this->_location._redirections[i].end())) == 0)
 		{
 			this->_content = this->_location._redirections[i + 1];
-			std::cout << "this->_content: " << this->_content << std::endl;
 			if (this->_location._redirections[i + 2].compare("permanent") == 0)
 				this->_code = 301;
 			else if (this->_location._redirections[i + 2].compare("temporary") == 0)
@@ -1029,6 +1026,7 @@ std::vector<char>		Response::sendResponse()
 {
 	std::vector<char>	f_response;
 	struct stat			filestat;
+	std::string rtn;
 
 	_cgi = false;
 	this->_code = 200;
@@ -1069,9 +1067,9 @@ std::vector<char>		Response::sendResponse()
 	{
 		_code = 413;
 		f_response = MAINResponse();
-		// for (size_t i = 0; i < f_response.size(); i++)
-		// 	std::cout << f_response[i];
-		// std::cout << "\n";
+		for (size_t i = 0; i < f_response.size(); i++)
+			rtn += f_response[i];
+		PRINT_STR(rtn);
 		return (f_response);
 	}
 	//CGI
@@ -1081,9 +1079,10 @@ std::vector<char>		Response::sendResponse()
 		std::string response = CGI(this->_request, this->_location, this->_root).executeCGI(getScriptName(this->_request.getURL()));
 		this->_content = response;
 		f_response = MAINResponse();
-		// for (size_t i = 0; i < f_response.size(); i++)
-		// 	std::cout << f_response[i];
-		// std::cout << "\n\n\n";
+		std::string rtn;
+		for (size_t i = 0; i < f_response.size(); i++)
+			rtn += f_response[i];
+		PRINT_STR(rtn);
 		return (f_response);
 	}
 	if (isAllowedMethod() == false)
@@ -1096,7 +1095,7 @@ std::vector<char>		Response::sendResponse()
 	else if (this->_request.getMethod().compare("OPTIONS") == 0)
 		f_response = OPTIONSResponse();
 	for (size_t i = 0; i < f_response.size(); i++)
-		std::cout << f_response[i];
-	std::cout << "\n\n\n";
+		rtn += f_response[i];
+	PRINT_STR(rtn);
 	return (f_response);
 }

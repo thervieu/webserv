@@ -202,21 +202,21 @@ def chunked_post_no_upload(port: int) -> str:
 	return ""
 
 def gen2():
-	var1 = "a" * 1000
-	var2 = "b" * 1000
+	var1 = "a" * 250
+	var2 = "b" * 250
 	x = var1.encode('utf8')
 	y = var2.encode('utf8')
 	yield x
 	yield y
 
 import time
-def chunked_post_no_upload_size_2k(port: int) -> str:
+def chunked_post_no_upload_size_500(port: int) -> str:
 	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
            'Transfer-Encoding': 'chunked'}
 	r = requests.post("http://localhost:" + str(port) + "/cgi/file.tester", data=gen2(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 2058):
+	if (len(r.text) != 558):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	return ""
@@ -277,27 +277,26 @@ def chunked_post_upload(port: int) -> str:
 	return ""
 
 def gen2():
-	var1 = "a" * 1000
-	var2 = "b" * 1000
+	var1 = "a" * 250
+	var2 = "b" * 250
 	x = var1.encode('utf8')
 	y = var2.encode('utf8')
 	yield x
 	yield y
 
-import time
-def chunked_post_size_2k(port: int) -> str:
+def chunked_post_size_500(port: int) -> str:
 	headers = {'Connection': 'keep-alive', 'Content-Type': 'application/x-www-form-urlencoded',
            'Transfer-Encoding': 'chunked'}
 	r = requests.post("http://localhost:" + str(port) + "/post_upload/another_file.tester", data=gen2(), headers=headers)
 	if (r.status_code != 200 and r.status_code != 201):
 		return "Bad Status Code"
-	if (len(r.text) != 2058):
+	if (len(r.text) != 558):
 		print(len(r.text))
 		return "Bad Length Response Body"
 	filename = "./upload/another_file.tester"
 	with open(filename) as f:
 		content = f.readlines()
-	if (len(content[0]) != 2000):
+	if (len(content[0]) != 500):
 		print(len(content[0]))
 		return "upload_file has wrong text"
 	return ""
@@ -424,12 +423,12 @@ def one_hundred_post_requests(port: int, nb: int) -> None:
 			payload = "a" * i
 			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
 			if (r.status_code != 200 and r.status_code != 201):
-				print("client" + str(i) + ": Bad status code: " + str(r.status_code))
+				print("client " + str(i) + ": Bad status code: " + str(r.status_code))
 			filename = "./upload/index.html"
 			with open(filename) as f:
 				content = f.readlines()
 			if (len(content[0]) != i):
-				print("client" + str(nb) + ": Bad size")
+				print("client " + str(nb) + ": Bad size")
 	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test2(port: int) -> str:
@@ -450,12 +449,12 @@ def one_hundred_post_requestsbis(port: int, nb: int) -> None:
 			payload = "a" * i
 			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
 			if (r.status_code != 200 and r.status_code != 201):
-				print("client" + str(i) + ": Bad status code: " + str(r.status_code))
+				print("client " + str(i) + ": Bad status code: " + str(r.status_code))
 			filename = "./upload/index.html"
 			with open(filename) as f:
 				content = f.readlines()
 			if (len(content[0]) != i):
-				print("client" + str(nb) + ": Bad size")
+				print("client " + str(nb) + ": Bad size")
 	print("client {} has finished all his tasks".format(str(nb)))
 
 def stress_test2bis(port: int) -> str:
