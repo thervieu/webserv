@@ -34,7 +34,7 @@ OBJS = $(addprefix $(OBJS_DIR),  $(OBJ))
 
 OBJS_DIR =	objs/
 
-PRINT_REQ_AND_RESP = 0
+PRINT_REQ_AND_RESP = 1
 
 $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp $(INCS)
 	@mkdir -p $(OBJS_DIR)
