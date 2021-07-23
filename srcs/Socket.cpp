@@ -29,13 +29,13 @@ Socket::Socket(server_info server)
 	}
 	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &this->_opt, sizeof(this->_opt)) < 0)
 	{
-		std::cout << "Error: Unable to set socket options: reuseaddr strerror = " << strerror(errno) << std::endl;
+		std::cout << "Error: Unable to set socket options: reuseaddr: |" << strerror(errno) << "|\n";
 		throw std::exception();
 	}
 
 	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) < 0)
 	{
-		std::cout << "Error: Unable to set socket to non blocking strerror = " << strerror(errno) << std::endl;
+		std::cout << "Error: Unable to set socket to non blocking: |" << strerror(errno) << "|\n";
 		throw std::exception();
 	}
 
@@ -44,12 +44,12 @@ Socket::Socket(server_info server)
 	this->_address.sin_port = htons((int)server._port);
 	if (bind(this->_fd, (struct sockaddr *)&this->_address, sizeof(this->_address)) < 0)
 	{
-		std::cout << "Error: bind failed strerror = " << strerror(errno) << std::endl;
+		std::cout << "Error: port [" << server._port << "] bind failed: |" << strerror(errno) << "|\n";
 		throw std::exception();
 	}
 	if (listen(this->_fd, 1000) < 0)
 	{
-		std::cout << "Error: Unable to listen socket= " << strerror(errno) << std::endl;
+		std::cout << "Error: Unable to listen socket: |" << strerror(errno) << "|\n";
 		throw std::exception();
 	}
 }

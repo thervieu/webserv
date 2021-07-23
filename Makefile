@@ -6,7 +6,7 @@
 #    By: user42 <user42@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/02/19 14:45:55 by user42            #+#    #+#              #
-#    Updated: 2021/07/20 15:12:28 by user42           ###   ########.fr        #
+#    Updated: 2021/07/23 10:08:00 by user42           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ OBJS = $(addprefix $(OBJS_DIR),  $(OBJ))
 
 OBJS_DIR =	objs/
 
-PRINT_REQ_AND_RESP = 1
+PRINT_REQ_AND_RESP = 0
 
 $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp $(INCS)
 	@mkdir -p $(OBJS_DIR)

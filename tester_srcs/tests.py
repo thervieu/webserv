@@ -479,7 +479,7 @@ def one_hundred_post_requests(port: int, nb: int) -> None:
 			payload = "a" * i
 			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
 			if (r.status_code != 200 and r.status_code != 201):
-				print("client " + str(i) + ": Bad status code: " + str(r.status_code))
+				print("client " + str(nb) + ": Bad status code: " + str(r.status_code))
 			filename = "./upload/index.html"
 			with open(filename) as f:
 				content = f.readlines()
@@ -505,7 +505,7 @@ def one_hundred_post_requestsbis(port: int, nb: int) -> None:
 			payload = "a" * i
 			r = requests.post("http://localhost:" + str(port) + "/post_upload/index.html", data=payload)
 			if (r.status_code != 200 and r.status_code != 201):
-				print("client " + str(i) + ": Bad status code: " + str(r.status_code))
+				print("client " + str(nb) + ": Bad status code: " + str(r.status_code))
 			filename = "./upload/index.html"
 			with open(filename) as f:
 				content = f.readlines()

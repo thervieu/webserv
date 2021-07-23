@@ -24,7 +24,6 @@ class Server
 		std::vector<Socket *>		getSockets(void);
 
 		int				getMaxSd(void);
-		server_info		findRequestConfig(int sd, std::string host);
 		std::string		vecToString(std::vector<char> vector);
 		void			select_loop(void);
 		void 			endServer(void);

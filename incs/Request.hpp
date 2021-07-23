@@ -29,7 +29,7 @@ class Request
 
 		Request();
 		Request(Request const &ref);
-		Request(std::string request, std::string client_ip, bool chunked);
+		Request(std::string request, std::string client_ip, server_info config,  bool chunked);
 		~Request();
 
 		Request			&operator=(Request const &rhs);
