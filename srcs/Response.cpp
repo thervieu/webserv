@@ -608,14 +608,22 @@ std::vector<char>	Response::getAutoindex(void)
 
 	//open html template
 	fd = open("./srcs/autoindex.html", O_RDONLY);
-	if (fd < -1)
-		this->_content = "ERROR";
-	while ((rtn_value = read(fd, buffer, 1)) > 0)
-		rep.push_back(buffer[0]);
-	if (this->_content.compare("ERROR") != 0)
+	if (fd == -1)
+	{
 		close(fd);
-	if (rtn_value < 0)
-		this->_content = "ERROR";
+		this->_code = 403;
+		this->_content = this->_root + find_error_page();
+		fd = open(this->_content.c_str(), O_RDONLY);
+		if (fd == -1)
+		{
+			close(fd);
+			this->_content = this->_root + "error.html";
+			fd = open(this->_content.c_str(), O_RDONLY);
+		}
+	}
+	while (fd >= 0 && (rtn_value = read(fd, buffer, 1)) > 0)
+		rep.push_back(buffer[0]);
+	close(fd);
 
 	//open directory
 	if (this->_root.compare("." + this->_request.getConfig()._root.substr(0, this->_request.getConfig()._root.size() - (this->_request.getConfig()._root[this->_request.getConfig()._root.size() - 1] == '/' ? 1 : 0))) != 0)
@@ -656,6 +664,7 @@ std::vector<char>	Response::getAutoindex(void)
 	pos = rep.find("$repeat");
 	pos2 = rep.find("\n", pos);
 	rep.replace(pos, pos2 - pos + 1, tmp);
+	closedir(directory);
 	return (std::vector<char>(rep.begin(), rep.end()));
 }
 
